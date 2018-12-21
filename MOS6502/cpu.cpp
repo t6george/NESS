@@ -13,14 +13,13 @@ int main (int argc, char* argv[]) {
     string filepath (argv[1]);
 
     ifstream ROM (filepath, ios::binary | ios::in);
-    char b;
-    int i = 0;
+    unsigned short byte;
+    unsigned char b;
 
     if (ROM.is_open()) {
-      while (i < 5) {
-        ROM.read(&b, INSTR_SIZE);
-        cout << b;
-        i++;
+      while (ROM >> b) {
+        byte = b;
+        cout << byte << endl;
       }
       ROM.close();
     } else {
