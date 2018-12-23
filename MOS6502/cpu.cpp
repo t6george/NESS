@@ -1,31 +1,19 @@
 #include <iostream>
-#include <cassert>
-#include <string>
-#include <fstream>
 
 #include "../Headers/cpu.hpp"
 
 using namespace std;
 
+CPU::CPU () {}
+CPU::~CPU () {}
 
-int main (int argc, char* argv[]) {
-    assert(argc > 1);
-    string filepath (argv[1]);
+CPU CPU::getInstance () {
+  if (NULL == mos6502) {
+    mos6502 = new CPU ();
+  }
+  return mos6502;
+}
 
-    ifstream ROM (filepath, ios::binary | ios::in);
-    unsigned short byte;
-    unsigned char b;
-
-    if (ROM.is_open()) {
-      while (ROM >> b) {
-        byte = b;
-        cout << byte << endl;
-      }
-      ROM.close();
-    } else {
-      cerr << "Unable to open file in location " << filepath << endl;
-    }
-
-    return 0;
+void CPU::processInstruction (int instr) {
 
 }
