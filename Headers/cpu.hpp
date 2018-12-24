@@ -14,12 +14,14 @@ private:
   unsigned char regX = 0;
   unsigned char regY = 0;
 
+
+
+public:
   CPU ();
   ~CPU ();
 
-public:
-  void getInstance ();
-  void processInstruction (int instr);
+  void initCartridge (string path);
+  void processInstruction (unsigned int instr);
 }
 
 
