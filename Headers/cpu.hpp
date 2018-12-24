@@ -1,6 +1,8 @@
 #ifndef CPU_HPP
 #define CPU_HPP
 
+#include "./rom.hpp"
+
 using namespace std;
 
 #define INSTR_SIZE 8
@@ -8,7 +10,7 @@ using namespace std;
 class CPU {
 private:
 
-  static CPU mos6502 = NULL;
+  ROM * cartridge = NULL;
 
   unsigned char regA = 0;
   unsigned char regX = 0;
@@ -22,7 +24,7 @@ public:
 
   void initCartridge (string path);
   void processInstruction (unsigned int instr);
-}
+};
 
 
 #endif

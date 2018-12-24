@@ -14,11 +14,16 @@ ROM::ROM (unsigned char header [0x10]) {
   flags9 = header[9];
   flags10 = header[10];
 
-  
+  prgRomData = new unsigned char [prgRomSize];
+  chrRomData = new unsigned char [chrRomSize];
+
+
 }
 
 ROM::~ROM () {
-  if (nullptr != gameCode) {
-    delete [] gameCode;
-  }
+  delete[] trainer;
+  delete[] prgRomData;
+  delete[] chrRomData;
+  delete[] instROM;
+  delete[] instPROM;
 }

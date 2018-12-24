@@ -19,14 +19,16 @@ private:
 
   unsigned char * trainer = nullptr;
   unsigned char * prgRomData = nullptr;
-  unsigned char * chrRoData = nullptr;
+  unsigned char * chrRomData = nullptr;
+  unsigned char * instROM = nullptr;
+  unsigned char * instPROM = nullptr;
 
 
 public:
   ROM (unsigned char header [0x10]);
   ~ROM ();
 
-}
+};
 
 
 #endif
