@@ -3,8 +3,7 @@
 
 using namespace std;
 
-#define kb8 8192
-#define kb16 16384
+#define KB_SIZE 1024
 
 class ROM {
 private:
