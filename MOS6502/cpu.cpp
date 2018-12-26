@@ -9,7 +9,7 @@
 
 using namespace std;
 
-CPU::CPU () {}
+CPU::CPU (): pc(HEADER_SIZE) {}
 CPU::~CPU () {}
 
 
@@ -20,13 +20,14 @@ void CPU::initCartridge (string path) {
   int frameI = 0;
 
   unsigned char headerBytes [HEADER_SIZE];
-  ifstream cartridge (path, ios::binary | ios::in);
+  ifstream cart (path, ios::binary | ios::in);
   unsigned short byte;
   unsigned char b;
 
-  if (cartridge.is_open()) {
-    while (cartridge >> b) {
+  if (cart.is_open()) {
+    while (cart >> b) {
       byte = b;
+
       if (byteCount < HEADER_SIZE) {
         headerBytes[byteCount] = byte;
       } else if (HEADER_SIZE  == byteCount) {
@@ -40,14 +41,21 @@ void CPU::initCartridge (string path) {
         }
 
         // rom index
-        frames[2] = frames[1] + this->cartridge.prgRomSize;
-        frames[3] = frames[2] + this->cartridge.chrRomSize;
+        frames[2] = frames[1] + this->cartridge->prgRomSize;
+        frames[3] = frames[2] + this->cartridge->chrRomSize;
 
         if (false) { //inst rom is present
           frames[4] = INSTROM_SIZE + frames[3];
         } else {
-          frames[1] = frames[3];
+          frames[4] = frames[3];
         }
+
+        if (frames[0] == frames[1]) {
+          this->cartridge->prgRomData [ind] = byte;
+        } else {
+          this->cartridge->trainer [ind] = byte;
+        }
+
 
       } else {
 
@@ -66,27 +74,32 @@ void CPU::initCartridge (string path) {
           } else {
             this->cartridge->trainer [ind] = byte;
           }
+
         } else if (1 == frameI) {
           this->cartridge->prgRomData [ind] = byte;
+
         } else if (2 == frameI) {
           if (frames[2] == frames[3]) {
             if (frames[3] == frames[4]) {
               if (frames[4] != frames[5]) {
-                this->cartridge->instrPROM [ind] = byte;
+                this->cartridge->instPROM [ind] = byte;
               }
             } else {
-              this->cartridge->instrROM [ind] = byte;
+              this->cartridge->instROM [ind] = byte;
             }
+
           } else {
             this->cartridge->chrRomData [ind] = byte;
           }
+
         }
 
       }
       byteCount++;
 
     }
-    cartridge.close();
+    cart.close();
+
   } else {
     cerr << "Unable to open rom file in location " << path << endl;
   }
@@ -95,4 +108,11 @@ void CPU::initCartridge (string path) {
 
 void CPU::processInstruction (unsigned int instr) {
 
+}
+
+void CPU::printPrgRom () {
+  // for (int i = 0; i < 3; i++) {
+  //   int a = this->cartridge->prgRomData[i];
+  //   cout << hex << a << endl;
+  // }
 }

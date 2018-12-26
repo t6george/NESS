@@ -5,8 +5,7 @@ using namespace std;
 
 #define KB_SIZE 1024
 
-class ROM {
-private:
+struct ROM {
   unsigned int prgRomSize;
   unsigned int chrRomSize;
   unsigned int prgRamSize;
@@ -22,8 +21,6 @@ private:
   unsigned char * instROM = nullptr;
   unsigned char * instPROM = nullptr;
 
-
-public:
   ROM (unsigned char header [0x10]);
   ~ROM ();
 

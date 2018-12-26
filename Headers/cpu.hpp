@@ -5,8 +5,6 @@
 
 using namespace std;
 
-#define INSTR_SIZE 8
-
 class CPU {
 private:
 
@@ -16,7 +14,8 @@ private:
   unsigned char regX = 0;
   unsigned char regY = 0;
 
-
+  unsigned char sp;
+  unsigned short pc;
 
 public:
   CPU ();
@@ -24,6 +23,7 @@ public:
 
   void initCartridge (string path);
   void processInstruction (unsigned int instr);
+  void printPrgRom ();
 };
 
 
