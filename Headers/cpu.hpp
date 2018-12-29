@@ -2,6 +2,7 @@
 #define CPU_HPP
 
 #include "./rom.hpp"
+// #include <unordered_map>
 
 using namespace std;
 
@@ -16,6 +17,8 @@ private:
 
   unsigned char sp;
   unsigned short pc;
+
+  unsigned char instrLengths [0xFF];
 
 public:
   CPU ();
