@@ -14,7 +14,7 @@ private:
   uint8_t regA;
   uint8_t regX;
   uint8_t regY;
-  
+
   uint8_t regP;
 
   uint8_t regSP;
@@ -29,7 +29,7 @@ public:
   ~CPU ();
 
   void initCartridge (string path);
-  void processInstruction (uint32_t instr);
+  void readRom ();
   void printCpuData ();
 
   bool getCarry ();
@@ -46,6 +46,9 @@ public:
 
   bool getNegative ();
   void setNegative (bool status);
+
+  bool getDecimal ();
+  void setDecimal (bool status);
 
 };
 

@@ -13,7 +13,6 @@ int main (int argc, char* argv[]) {
 
     CPU * cpu = new CPU ();
     cpu->initCartridge (filepath);
-    cpu->printPrgRom ();
 
     return 0;
 

@@ -67,6 +67,17 @@ void CPU::setNegative (bool status) {
   }
 }
 
+bool CPU::getDecimal () {
+  return (regP & 0x8) != 0x0;
+}
+void CPU::setDecimal (bool status) {
+  if (status) {
+    regP |= 0x80;
+  } else {
+    regP &= ~(0x80);
+  }
+}
+
 CPU::~CPU () {}
 
 void CPU::initCartridge (string path) {
@@ -163,8 +174,37 @@ void CPU::initCartridge (string path) {
 
 }
 
-void CPU::processInstruction (unsigned int instr) {
+void CPU::readRom () {
+  while (isRunning) {
+    uint8_t opcode = this->cartridge->prgRomData[regPC];
+    uint16_t addr;
 
+    switch (opcode) {
+      case (0x78): {
+        setIE (true);
+        regPC += 1;
+        break;
+      } case (0x8D): {
+        addr = (this->cartridge->prgRomData[regPC + 2] << 1) + this->cartridge->prgRomData[regPC + 1];
+        regPC += 3;
+        break;
+      } case (0xA9): {
+        regA = this->cartridge->prgRomData[regPC + 1];
+        regPC += 2;
+        break;
+      } case (0xD8): {
+        setDecimal (false);
+        regPC += 1;
+        break;
+      } default: {
+        cerr << "Unidentified Opcode: " << hex << opcode << endl;
+      }
+    }
+
+
+
+
+  }
 }
 
 void CPU::printCpuData () {
