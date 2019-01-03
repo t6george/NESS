@@ -4,12 +4,44 @@
 #include "../Headers/cpu.hpp"
 
 #define HEADER_SIZE 16
-#define INSTROM_SIZE 8192
+#define KB_SIZE 1024
+#define RAM_END 0x1FFF
+#define PPU_END 0x3FFF
+#define APU_IO_END 0x401F
+#define ROM_END 0xFFFF
+
 
 using namespace std;
 
 CPU::CPU (): regA(0x0), regX(0x0), regY(0x0), regP(0x34), regSP(0xFD), regPC(0x10), isRunning(true) {
+  mem = new RAM ();
+  ppu = new PPU ();
+}
 
+uint8_t CPU::readRamByte (uint16_t addr) {
+  uint8_t b;
+  if (addr < RAM_END) {
+    b = mem->sendByte (addr);
+  } else if (addr < PPU_END) {
+    b = ppu->readReg (addr - 1 - RAM_END);
+  } else if (addr <= APU_IO_END) {
+    //ppu->writeReg (addr - 1 - RAM_END,value);
+  } else if (addr <= ROM_END) {
+    //ppu->writeReg (addr - 1 - RAM_END,value);
+  }
+  
+  return b;
+}
+void CPU::writeRamByte (uint16_t addr, uint8_t value) {
+  if (addr <= RAM_END) {
+    mem->recieveByte (addr,value);
+  } else if (addr <= PPU_END) {
+    ppu->writeReg (addr - 1 - RAM_END,value);
+  } else if (addr <= APU_IO_END) {
+    //ppu->writeReg (addr - 1 - RAM_END,value);
+  } else if (addr <= ROM_END) {
+    //ppu->writeReg (addr - 1 - RAM_END,value);
+  }
 }
 
 bool CPU::getCarry () {
@@ -113,7 +145,7 @@ void CPU::initCartridge (string path) {
         frames[3] = frames[2] + this->cartridge->chrRomSize;
 
         if (false) { //inst rom is present
-          frames[4] = INSTROM_SIZE + frames[3];
+          frames[4] = KB_SIZE * 8 + frames[3];
         } else {
           frames[4] = frames[3];
         }
@@ -177,7 +209,7 @@ void CPU::initCartridge (string path) {
 void CPU::readRom () {
   while (isRunning) {
     uint8_t opcode = this->cartridge->prgRomData[regPC];
-    uint16_t addr;
+    uint16_t address;
 
     switch (opcode) {
       case (0x78): {
@@ -185,7 +217,8 @@ void CPU::readRom () {
         regPC += 1;
         break;
       } case (0x8D): {
-        addr = (this->cartridge->prgRomData[regPC + 2] << 1) + this->cartridge->prgRomData[regPC + 1];
+        address = (this->cartridge->prgRomData[regPC + 2] << 1) + this->cartridge->prgRomData[regPC + 1];
+        writeRamByte (address, regA);
         regPC += 3;
         break;
       } case (0xA9): {
@@ -200,9 +233,6 @@ void CPU::readRom () {
         cerr << "Unidentified Opcode: " << hex << opcode << endl;
       }
     }
-
-
-
 
   }
 }
