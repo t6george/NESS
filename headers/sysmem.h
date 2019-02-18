@@ -6,14 +6,13 @@
 #define CART_SPACE_RANGE 0xBFE0
 #define MEM_MAP_COUNT 0x4
 
-
 typedef union {
 	u8 singleByte[1];
 	u8 doubleByte[2];
 } addr;
 
 typedef struct {
-	u64* memory [MEM_MAP_COUNT];
+	u8* memory [MEM_MAP_COUNT];
 	u8 ram [RAM_RANGE];
 	u8 ppuRegs [PPU_REGS_RANGE];
 	u8 apuRegs [APU_REGS_RANGE];
@@ -21,8 +20,8 @@ typedef struct {
 } mainMemory;
 
 
-u8 initMemory (void);
-u64* decodeAddress (addr address);
-u16 readMem (addr address, u8 addrMode);
-u8 writeMem (u8 data, addr address, u8 addrMode);
+mainMemory *initMemory (void);
+u8** decodeAddress (addr address);
+u8 readByte (addr address, u8 addrMode);
+void writeByte (u8 data, addr address, u8 addrMode);
 
