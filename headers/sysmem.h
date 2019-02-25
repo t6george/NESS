@@ -25,8 +25,8 @@ enum addressingMode {
 };
 
 
-mainMemory *initMemory (void);
-void uninitMemory (void);
+mainMemory *powerUpMemory (void);
+void powerDownMemory (mainMemory* mem);
 u8* decodeAddress (u16 address, mainMemory *memory);
 u8 readByte (u16 address, u8 addrMode, mainMemory *memory, u8 os);
 void writeByte (u8 data, u16 address, u8 addrMode, mainMemory *memory, u8 os);

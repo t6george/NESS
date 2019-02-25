@@ -3,7 +3,7 @@
 
 #include "../headers/sysmem.h"
 
-mainMemory *initMemory (void) {
+mainMemory* powerUpMemory (void) {
 	mainMemory *mem;
 
 	mem->ram = (u8*) malloc (RAM_RANGE);
@@ -68,14 +68,47 @@ u8 readByte (u16 address, u8 addrMode, mainMemory *memory, u8 os) {
 			break;
 		}
 	}
+
 	return *memoryContents;
 }
 
 void writeByte (u8 data, u16 address, u8 addrMode, mainMemory *memory, u8 os) {
-
+	switch (addrMode) {
+		case ABSOLUTE: { //account for little endian
+			*decodeAddress ((u16) (((address & 0xFF) << 8) |
+				(address >> 8)), memory) = data;
+			break;
+		}
+		case ZERO_PAGE: {
+			*decodeAddress (address, memory) = data;
+			break;
+		}
+		case ABSOLUTE_INDEXED: {
+			*decodeAddress ((u16) ((((address + os) & 0xFF) << 8) |
+				((address + os) >> 8)), memory) = data;
+			break;
+		}
+		case ZERO_PAGE_INDEXED: {
+			*decodeAddress (address + os, memory) = data;
+			break;
+		}
+		case INDEXED_INDIRECT: {
+			decodeAddress (((u16)(readByte (0xFF & (address + os), ZERO_PAGE, memory, 0x00))) |
+				(((u16)(readByte (0xFF & (address + os + 1), ZERO_PAGE, memory, 0x00))) << 8), memory) = data;
+			break;
+		}
+		case INDIRECT_INDEXED: {
+			decodeAddress ((((u16)(readByte (0xFF & address, ZERO_PAGE, memory, 0x00))) |
+				(((u16)(readByte (0xFF & (address + 1), ZERO_PAGE, memory, 0x00))) << 8)) + os, memory) = data;
+			break;
+		}
+		default: {
+			break;
+		}
+	}
 }
 
-void uninitMemory (void) {
+void powerDownMemory (mainMemory* mem) {
 	free ((void*) mem->ram);
 	free ((void*) mem->ppuRegs);
 	free ((void*) mem->apuRegs);
