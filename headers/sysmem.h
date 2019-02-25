@@ -1,10 +1,10 @@
 #include "6502.h"
 
-#define RAM_RANGE 0x800
-#define PPU_REGS_RANGE 0x8
-#define APU_IO_REGS_RANGE 0x8
-#define APU_REGS_RANGE 0x18
-#define CART_SPACE_RANGE 0xBFE0
+#define RAM_SIZE 0x800
+#define PPU_REGS_SIZE 0x8
+#define APU_IO_REGS_SIZE 0x8
+#define APU_REGS_SIZE 0x18
+#define CART_SPACE_SIZE 0xBFE0
 
 typedef struct {
 	u8 *ram = NULL;

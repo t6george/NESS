@@ -6,11 +6,11 @@
 mainMemory* powerUpMemory (void) {
 	mainMemory *mem;
 
-	mem->ram = (u8*) malloc (RAM_RANGE);
-	mem->ppuRegs (u8*) malloc (PPU_REGS_RANGE);
-	mem->apuRegs (u8*) malloc (APU_REGS_RANGE);
-	mem->apuIORegs (u8*) malloc (APU_IO_REGS_RANGE);
-	mem->cartridgeMem (u8*) malloc (CART_SPACE_RANGE);
+	mem->ram = (u8*) malloc (RAM_SIZE);
+	mem->ppuRegs (u8*) malloc (PPU_REGS_SIZE);
+	mem->apuRegs (u8*) malloc (APU_REGS_SIZE);
+	mem->apuIORegs (u8*) malloc (APU_IO_REGS_SIZE);
+	mem->cartridgeMem (u8*) malloc (CART_SPACE_SIZE);
 
 	memset ((void*) mem, 0x0, sizeof(mem));
 
@@ -36,7 +36,7 @@ u8 readByte (u16 address, u8 addrMode, mainMemory *memory, u8 os) {
 	u8 *memoryContents = NULL;
 
 	switch (addrMode) {
-		case ABSOLUTE: { //account for little endian
+		case ABSOLUTE: {
 			memoryContents = decodeAddress ((u16) (((address & 0xFF) << 8) |
 				(address >> 8)), memory);
 			break;
@@ -51,7 +51,7 @@ u8 readByte (u16 address, u8 addrMode, mainMemory *memory, u8 os) {
 			break;
 		}
 		case ZERO_PAGE_INDEXED: {
-			memoryContents = decodeAddress (address + os, memory);
+			memoryContents = decodeAddress (0xFF & (address + os), memory);
 			break;
 		}
 		case INDEXED_INDIRECT: {
@@ -60,8 +60,8 @@ u8 readByte (u16 address, u8 addrMode, mainMemory *memory, u8 os) {
 			break;
 		}
 		case INDIRECT_INDEXED: {
-			memoryContents = decodeAddress ((((u16)(readByte (0xFF & address, ZERO_PAGE, memory, 0x0))) |
-				(((u16)(readByte (0xFF & (address + 1), ZERO_PAGE, memory, 0x0))) << 8)) + os, memory);
+			memoryContents = decodeAddress ((((u16)(readByte (address, ZERO_PAGE, memory, 0x0))) |
+				(((u16)(readByte (address + 1, ZERO_PAGE, memory, 0x0))) << 8)) + os, memory);
 			break;
 		}
 		default: {
@@ -74,7 +74,7 @@ u8 readByte (u16 address, u8 addrMode, mainMemory *memory, u8 os) {
 
 void writeByte (u8 data, u16 address, u8 addrMode, mainMemory *memory, u8 os) {
 	switch (addrMode) {
-		case ABSOLUTE: { //account for little endian
+		case ABSOLUTE: {
 			*decodeAddress ((u16) (((address & 0xFF) << 8) |
 				(address >> 8)), memory) = data;
 			break;
@@ -89,17 +89,17 @@ void writeByte (u8 data, u16 address, u8 addrMode, mainMemory *memory, u8 os) {
 			break;
 		}
 		case ZERO_PAGE_INDEXED: {
-			*decodeAddress (address + os, memory) = data;
+			*decodeAddress (0xFF & (address + os), memory) = data;
 			break;
 		}
 		case INDEXED_INDIRECT: {
-			decodeAddress (((u16)(readByte (0xFF & (address + os), ZERO_PAGE, memory, 0x00))) |
+			*decodeAddress (((u16)(readByte (0xFF & (address + os), ZERO_PAGE, memory, 0x00))) |
 				(((u16)(readByte (0xFF & (address + os + 1), ZERO_PAGE, memory, 0x00))) << 8), memory) = data;
 			break;
 		}
 		case INDIRECT_INDEXED: {
-			decodeAddress ((((u16)(readByte (0xFF & address, ZERO_PAGE, memory, 0x00))) |
-				(((u16)(readByte (0xFF & (address + 1), ZERO_PAGE, memory, 0x00))) << 8)) + os, memory) = data;
+			*decodeAddress ((((u16)(readByte (address, ZERO_PAGE, memory, 0x00))) |
+				(((u16)(readByte (address + 1, ZERO_PAGE, memory, 0x00))) << 8)) + os, memory) = data;
 			break;
 		}
 		default: {
