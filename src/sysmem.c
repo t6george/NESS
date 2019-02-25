@@ -3,7 +3,7 @@
 
 #include "../headers/sysmem.h"
 
-mainMemory *initMemory (cpu* mos6502) {
+mainMemory *initMemory (void) {
 	mainMemory *mem;
 
 	mem->ram = (u8*) malloc (RAM_RANGE);
@@ -14,15 +14,10 @@ mainMemory *initMemory (cpu* mos6502) {
 
 	memset ((void*) mem, 0x0, sizeof(mem));
 
-	mem->cpuRegA = mos6502->regA;
-	mem->cpuRegX = mos6502->regX;
-	mem->cpuRegY = mos6502->regY;
-	mem->cpuRegPC = mos6502->regPC;
-
 }
 
 u8* decodeAddress (u16 address, mainMemory *memory) {
-	u8* memPtr;
+	u8* memPtr = NULL;
 	if (0xE000 & address == 0x0) {
 		memPtr = memory->ram + (0x07FF & address);
 	} else if (0xE000 & address == 0x2000) {
@@ -37,32 +32,36 @@ u8* decodeAddress (u16 address, mainMemory *memory) {
 	return memPtr;
 }
 
-u8 readByte (u16 address, u8 addrMode, mainMemory *memory) {
+u8 readByte (u16 address, u8 addrMode, mainMemory *memory, u8 os) {
 	u8 *memoryContents = NULL;
 
 	switch (addrMode) {
 		case ABSOLUTE: { //account for little endian
-			memoryContents = decodeAddress ((u16) (((address & 0xFF) << 8) | (address >> 8)), memory);
+			memoryContents = decodeAddress ((u16) (((address & 0xFF) << 8) |
+				(address >> 8)), memory);
 			break;
 		}
 		case ZERO_PAGE: {
 			memoryContents = decodeAddress (address, memory);
 			break;
 		}
-		case INDIRECT: {
-			memory->cpuRegPC = 
-			break;
-		}
 		case ABSOLUTE_INDEXED: {
+			memoryContents = decodeAddress ((u16) ((((address + os) & 0xFF) << 8) |
+				((address + os) >> 8)), memory);
 			break;
 		}
 		case ZERO_PAGE_INDEXED: {
+			memoryContents = decodeAddress (address + os, memory);
 			break;
 		}
 		case INDEXED_INDIRECT: {
+			memoryContents = decodeAddress (((u16)(readByte (0xFF & (address + os), ZERO_PAGE, memory, 0x0))) |
+				(((u16)(readByte (0xFF & (address + os + 1), ZERO_PAGE, memory, 0x0))) << 8), memory);
 			break;
 		}
 		case INDIRECT_INDEXED: {
+			memoryContents = decodeAddress ((((u16)(readByte (0xFF & address, ZERO_PAGE, memory, 0x0))) |
+				(((u16)(readByte (0xFF & (address + 1), ZERO_PAGE, memory, 0x0))) << 8)) + os, memory);
 			break;
 		}
 		default: {
@@ -72,7 +71,7 @@ u8 readByte (u16 address, u8 addrMode, mainMemory *memory) {
 	return *memoryContents;
 }
 
-void writeByte (u8 data, u16 address, u8 addrMode, mainMemory *memory) {
+void writeByte (u8 data, u16 address, u8 addrMode, mainMemory *memory, u8 os) {
 
 }
 

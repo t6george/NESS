@@ -13,16 +13,11 @@ typedef struct {
 	u8 *apuIORegs = NULL;
 	u8 *cartridgeMem = NULL;
 
-	u8 *cpuRegA = NULL;
-	u8 *cpuRegX = NULL;
-	u8 *cpuRegY = NULL;
-	u8 *cpuRegPC = NULL;
 } mainMemory;
 
 enum addressingMode {
 	ABSOLUTE = 0,
 	ZERO_PAGE,
-	INDIRECT,
 	ABSOLUTE_INDEXED,
 	ZERO_PAGE_INDEXED,
 	INDEXED_INDIRECT,
@@ -30,8 +25,8 @@ enum addressingMode {
 };
 
 
-mainMemory *initMemory (cpu* mos6502);
+mainMemory *initMemory (void);
 void uninitMemory (void);
 u8* decodeAddress (u16 address, mainMemory *memory);
-u8 readByte (u16 address, u8 addrMode, mainMemory *memory);
-void writeByte (u8 data, u16 address, u8 addrMode, mainMemory *memory);
+u8 readByte (u16 address, u8 addrMode, mainMemory *memory, u8 os);
+void writeByte (u8 data, u16 address, u8 addrMode, mainMemory *memory, u8 os);
