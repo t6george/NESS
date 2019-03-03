@@ -29,6 +29,20 @@ void resetCpu (cpu6502* cpu) {
   writeByte (0x00, 0x1540, ABSOLUTE, cpu->memory, 0x00);
 }
 
+bool statusFlagGet (cpu6502* cpu, flags flag) {
+  return (bool)((1U << flag) & cpu->regP);
+}
+
+void statusFlagSet (cpu6502* cpu, flags flag) {
+  cpu->regP |= (1U << flag);
+}
+
+u8 stepInstr (cpu6502* cpu) {
+  u8 opcode = cpu->mainMemory (cpu->pc++, u8 addrMode, cpu->mainMemory);
+  for (u8 b = 0; b < x; b++) {
+
+  }
+}
 
 
 

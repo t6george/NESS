@@ -32,7 +32,7 @@ u8* decodeAddress (u16 address, mainMemory *memory) {
 	return memPtr;
 }
 
-u8 readByte (u16 address, u8 addrMode, mainMemory *memory, u8 os) {
+u8 readByte (u16 address, addressingMode addrMode, mainMemory *memory, u8 os) {
 	u8 *memoryContents = NULL;
 
 	switch (addrMode) {

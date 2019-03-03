@@ -15,18 +15,19 @@ typedef struct {
 
 } mainMemory;
 
-enum addressingMode {
-	ABSOLUTE = 0,
+typedef enum {
+	NON_MEMORY = 0,
+	ABSOLUTE,
 	ZERO_PAGE,
 	ABSOLUTE_INDEXED,
 	ZERO_PAGE_INDEXED,
 	INDEXED_INDIRECT,
 	INDIRECT_INDEXED,
-};
+} addressingMode;
 
 
 mainMemory *powerUpMemory (void);
 void powerDownMemory (mainMemory* mem);
 u8* decodeAddress (u16 address, mainMemory *memory);
-u8 readByte (u16 address, u8 addrMode, mainMemory *memory, u8 os);
-void writeByte (u8 data, u16 address, u8 addrMode, mainMemory *memory, u8 os);
+u8 readByte (u16 address, addressingMode addrMode, mainMemory *memory, u8 os);
+void writeByte (u8 data, u16 address, addressingMode addrMode, mainMemory *memory, u8 os);
