@@ -2,23 +2,110 @@
 
 typedef struct {
   u8 size;
-  u8* auxBytes;
   addressingMode addrMode;
   u8 cycles;
-  char* mnemonic;
+  u8* auxBytes;
 } instruction;
 
 
 instruction instructionMap [0x100] {
-  {0, NULL, NON_MEMORY, 7, "BRK"},
-  {2, NULL, INDEXED_INDIRECT, 6, "ORA INDIRECT X"},
-  {1, NULL, ZERO_PAGE, 3, "ORA ZEROPAGE"},
-  {1, NULL, ZERO_PAGE, 5, "ASL ZEROPAGE"},
-
-  {0, NULL, ABSOLUTE, 7, "PHP"},
-  {1, NULL, NON_MEMORY, 7, "BRK"},
-  {1, NULL, NON_MEMORY, 7, "BRK"},
-  {1, NULL, NON_MEMORY, 7, "BRK"},
-  {1, NULL, NON_MEMORY, 7, "BRK"},
-  {1, NULL, NON_MEMORY, 7, "BRK"},
+  //0x0X
+  {0, NON_MEMORY, 7},
+  {1, INDEXED_INDIRECT, 6},
+  {1, ZERO_PAGE, 3},
+  {1, ZERO_PAGE, 5},
+  {0, ABSOLUTE, 3},
+  {1, NON_MEMORY, 2},
+  {0, NON_MEMORY, 2},
+  {2, ABSOLUTE, 4},
+  {2, ABSOLUTE, 6},
+  //0x1X
+  {1, ABSOLUTE, 2},
+  {1, INDIRECT_INDEXED, 5},
+  {1, ZERO_PAGE_INDEXED, 4},
+  {1, ZERO_PAGE_INDEXED, 6},
+  {0, NON_MEMORY, 2},
+  {2, ABSOLUTE_INDEXED, 4},
+  {2, ABSOLUTE_INDEXED, 4},
+  {2, ABSOLUTE_INDEXED, 7},
+  //0x2X
+  {2, ABSOLUTE, 6},
+  {1, INDEXED_INDIRECT, 6},
+  {1, ZERO_PAGE, 3},
+  {1, ZERO_PAGE, 3},
+  {1, ZERO_PAGE, 5},
+  {0, ABSOLUTE, 4},
+  {1, NON_MEMORY, 2},
+  {0, NON_MEMORY, 2},
+  {2, ABSOLUTE, 4},
+  {2, ABSOLUTE, 4},
+  {2, ABSOLUTE, 6},
+  //0x3X
+  {1, ABSOLUTE, 2},
+  {1, INDIRECT_INDEXED, 5},
+  {1, ZERO_PAGE_INDEXED, 4},
+  {1, ZERO_PAGE_INDEXED, 6},
+  {0, NON_MEMORY, 2},
+  {2, ABSOLUTE_INDEXED, 4},
+  {2, ABSOLUTE_INDEXED, 4},
+  {2, ABSOLUTE_INDEXED, 7},
+  //0x4X
+  {0, ABSOLUTE, 6},
+  {1, ZERO_PAGE, 3},
+  {1, ZERO_PAGE, 5},
+  {0, ABSOLUTE, 3},
+  {1, NON_MEMORY, 2},
+  {0, NON_MEMORY, 2},
+  {2, ABSOLUTE, 3},
+  {2, ABSOLUTE, 4},
+  {2, ABSOLUTE, 6},
+  //0x5X
+  {1, ABSOLUTE, 2},
+  {1, INDIRECT_INDEXED, 5},
+  {1, ZERO_PAGE_INDEXED, 4},
+  {1, ZERO_PAGE_INDEXED, 6},
+  {0, NON_MEMORY, 2},
+  {2, ABSOLUTE_INDEXED, 4},
+  {2, ABSOLUTE_INDEXED, 4},
+  {2, ABSOLUTE_INDEXED, 7},
+  //0x6X
+  {0, NON_MEMORY, 6},
+  {1, INDEXED_INDIRECT, 6},
+  {1, ZERO_PAGE, 3},
+  {1, ZERO_PAGE, 5},
+  {0, ABSOLUTE, 4},
+  {1, NON_MEMORY, 2},
+  {0, NON_MEMORY, 2},
+  {2, INDEXED_INDIRECT, 5},
+  {2, ABSOLUTE, 4},
+  {2, ABSOLUTE, 6},
+  //0x7X
+  {1, ABSOLUTE, 2},
+  {1, INDIRECT_INDEXED, 5},
+  {1, ZERO_PAGE_INDEXED, 4},
+  {1, ZERO_PAGE_INDEXED, 6},
+  {0, NON_MEMORY, 2},
+  {2, ABSOLUTE_INDEXED, 4},
+  {2, ABSOLUTE_INDEXED, 4},
+  {2, ABSOLUTE_INDEXED, 7},
+  //0x8X
+  {1, INDIRECT_INDEXED, 6},
+  {1, ZERO_PAGE, 3},
+  {1, ZERO_PAGE, 3},
+  {1, ZERO_PAGE, 3},
+  {0, NON_MEMORY, 2},
+  {0, NON_MEMORY, 2},
+  {2, ABSOLUTE, 4},
+  {2, ABSOLUTE, 4},
+  {2, ABSOLUTE, 4},
+  //0x9X
+  {1, ABSOLUTE, 2},
+  {1, INDIRECT_INDEXED, 6},
+  {1, ZERO_PAGE_INDEXED, 4},
+  {1, ZERO_PAGE_INDEXED, 4},
+  {1, ZERO_PAGE_INDEXED, 4},
+  {0, NON_MEMORY, 2},
+  {2, ABSOLUTE, 5},
+  {0, NON_MEMORY, 2},
+  {2, ABSOLUTE, 5},
 };
