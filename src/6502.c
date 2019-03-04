@@ -33,8 +33,8 @@ bool statusFlagGet (cpu6502* cpu, flags flag) {
   return (bool)((1U << flag) & cpu->regP);
 }
 
-void statusFlagSet (cpu6502* cpu, flags flag) {
-  cpu->regP |= (1U << flag);
+void statusFlagSet (cpu6502* cpu, flags flag, bool status) {
+  cpu->regP = status ? (cpu->regP | (1U << flag)): (cpu->regP & ~(1U << flag));
 }
 
 u8 stepInstr (cpu6502* cpu) {

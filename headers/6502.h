@@ -25,7 +25,7 @@ typedef struct {
 
 cpu6502* powerUpCpu (void);
 void powerDownCpu (cpu6502* cpu);
-void statusFlagSet (cpu6502* cpu, flags flag);
+void statusFlagSet (cpu6502* cpu, flags flag, bool status);
 bool statusFlagGet (cpu6502* cpu, flags flag);
 void resetCpu (cpu6502* cpu);
 u8 stepInstr (cpu6502* cpu);
