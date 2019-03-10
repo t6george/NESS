@@ -13,6 +13,12 @@ typedef enum {
   N,
 } flags;
 
+typedef enum {
+  X = 1,
+  Y,
+  A,
+} regIndex;
+
 typedef struct {
   u8 regA;
   u8 regX;
@@ -21,6 +27,7 @@ typedef struct {
   u8 regS;
   u8 regP;
   mainMemory* memory;
+  u64 indexRegAddrs[2];
 } cpu6502;
 
 cpu6502* powerUpCpu (void);

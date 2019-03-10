@@ -16,6 +16,9 @@ cpu6502* powerUpCpu (void) {
 
   cpu->memory = powerUpMemory (void);
 
+  cpu->regMappings[0] = (u64)(&cpu->regX);
+  cpu->regMappings[1] = (u64)(&cpu->regY);
+  cpu->regMappings[2] = (u64)(&cpu->regA);
   return cpu;
 }
 
