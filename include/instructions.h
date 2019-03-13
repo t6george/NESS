@@ -1,10 +1,5 @@
 #include "sysmem.h"
 
-typedef enum {
-  ACCUMULATOR_REGISTER,
-  MAIN_MEMORY,
-} destinationType;
-
 typedef struct {
   u8 size;
   addressingMode addrMode;

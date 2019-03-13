@@ -27,7 +27,7 @@ typedef struct {
   u8 regS;
   u8 regP;
   mainMemory* memory;
-  u64 indexRegAddrs[2];
+  u64 indexRegAddrs[3];
 } cpu6502;
 
 cpu6502* powerUpCpu (void);

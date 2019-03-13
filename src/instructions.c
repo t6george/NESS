@@ -8,6 +8,15 @@ u8 BRK (instruction *instr, cpu6502 *cpu) {
 }
 
 u8 ORA (instruction *instr, cpu6502 *cpu) {
+  u8 operand;
+  if (instr->addrMode == NON_MEMORY) {
+    operand = instr->auxBytes[0];
+  } else {
+    u16 tgtAddr = instr->size == 2 ? instr->auxBytes[0]: ((u16)instr->auxBytes[0] << 8) | ((u16) instr->auxBytes[1]);
+    u8 offset = (instr->srcReg == 0)? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1])
+    operand = readByte (tgtAddr, instr->addrMode, cpu->memory, offset);
+  }
+  cpu->regA |= operand;
   statusFlagSet (cpu, Z, cpu->regA == 0x0);
   statusFlagSet (cpu, N, (0x80 & cpu->regA) != 0x0);
   return 0;
