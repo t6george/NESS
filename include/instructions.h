@@ -1,16 +1,75 @@
-#include "sysmem.h"
+#pragma once
+#include <sysmem.h>
+#include <6502.h>
 
-typedef struct {
+typedef struct instruction {
   u8 size;
   addressingMode addrMode;
   u8 cycles;
-  u8 (*exec)(instruction* instr, cpu6502 *cpu);
+  u8 (*exec)(struct instruction* instr, cpu6502 *cpu);
   regIndex srcReg;
   u8 auxBytes[2];
 } instruction;
 
+u8 BRK (struct instruction *instr, cpu6502 *cpu);
+u8 ORA (struct instruction *instr, cpu6502 *cpu);
+u8 ASL (struct instruction *instr, cpu6502 *cpu);
+u8 BPL (struct instruction *instr, cpu6502 *cpu);
+u8 CLC (struct instruction *instr, cpu6502 *cpu);
+u8 JSR (struct instruction *instr, cpu6502 *cpu);
+u8 BIT (struct instruction *instr, cpu6502 *cpu);
+u8 ROL (struct instruction *instr, cpu6502 *cpu);
+u8 PLP (struct instruction *instr, cpu6502 *cpu);
+u8 BMI (struct instruction *instr, cpu6502 *cpu);
+u8 SEC (struct instruction *instr, cpu6502 *cpu);
+u8 RTI (struct instruction *instr, cpu6502 *cpu);
+u8 EOR (struct instruction *instr, cpu6502 *cpu);
+u8 LSR (struct instruction *instr, cpu6502 *cpu);
+u8 PHA (struct instruction *instr, cpu6502 *cpu);
+u8 JMP (struct instruction *instr, cpu6502 *cpu);
+u8 BVC (struct instruction *instr, cpu6502 *cpu);
+u8 CLI (struct instruction *instr, cpu6502 *cpu);
+u8 RTS (struct instruction *instr, cpu6502 *cpu);
+u8 ADC (struct instruction *instr, cpu6502 *cpu);
+u8 ROR (struct instruction *instr, cpu6502 *cpu);
+u8 PLA (struct instruction *instr, cpu6502 *cpu);
+u8 BVS (struct instruction *instr, cpu6502 *cpu);
+u8 SEI (struct instruction *instr, cpu6502 *cpu);
+u8 STA (struct instruction *instr, cpu6502 *cpu);
+u8 STY (struct instruction *instr, cpu6502 *cpu);
+u8 STX (struct instruction *instr, cpu6502 *cpu);
+u8 DEY (struct instruction *instr, cpu6502 *cpu);
+u8 TXA (struct instruction *instr, cpu6502 *cpu);
+u8 BCC (struct instruction *instr, cpu6502 *cpu);
+u8 TYA (struct instruction *instr, cpu6502 *cpu);
+u8 TXS (struct instruction *instr, cpu6502 *cpu);
+u8 TAY (struct instruction *instr, cpu6502 *cpu);
+u8 TAX (struct instruction *instr, cpu6502 *cpu);
+u8 LDA (struct instruction *instr, cpu6502 *cpu);
+u8 LDX (struct instruction *instr, cpu6502 *cpu);
+u8 LDY (struct instruction *instr, cpu6502 *cpu);
+u8 BCS (struct instruction *instr, cpu6502 *cpu);
+u8 CLV (struct instruction *instr, cpu6502 *cpu);
+u8 TSX (struct instruction *instr, cpu6502 *cpu);
+u8 CPY (struct instruction *instr, cpu6502 *cpu);
+u8 CMP (struct instruction *instr, cpu6502 *cpu);
+u8 DEC (struct instruction *instr, cpu6502 *cpu);
+u8 CLD (struct instruction *instr, cpu6502 *cpu);
+u8 CPX (struct instruction *instr, cpu6502 *cpu);
+u8 SBC (struct instruction *instr, cpu6502 *cpu);
+u8 INC (struct instruction *instr, cpu6502 *cpu);
+u8 INX (struct instruction *instr, cpu6502 *cpu);
+u8 NOP (struct instruction *instr, cpu6502 *cpu);
+u8 BEQ (struct instruction *instr, cpu6502 *cpu);
+u8 SED (struct instruction *instr, cpu6502 *cpu);
+u8 DEX (struct instruction *instr, cpu6502 *cpu);
+u8 AND (struct instruction *instr, cpu6502 *cpu);
+u8 PHP (struct instruction *instr, cpu6502 *cpu);
+u8 INY (struct instruction *instr, cpu6502 *cpu);
+u8 BNE (struct instruction *instr, cpu6502 *cpu);
 
-const instruction instructionMap [0x100] {
+
+static const instruction instructionMap [0x100] = {
   //0x0X
   {0, ABSOLUTE, 7, .exec = BRK},
   {1, INDEXED_INDIRECT, 6, .exec = ORA, X},

@@ -1,11 +1,11 @@
 #include <stdio.h>
 
-#include "6502.h"
+#include <6502.h>
 
 static mainMemory *memory;
 
 cpu6502* powerUpCpu (void) {
-  printf ("NES Version %d\n", (int) VERSION);
+  printf ("NES Version %f\n", (float) VERSION);
   cpu6502* cpu;
 
   cpu->regP = 0x34;
@@ -14,11 +14,11 @@ cpu6502* powerUpCpu (void) {
   cpu->regY = 0x00;
   cpu->regS = 0xFD;
 
-  cpu->memory = powerUpMemory (void);
+  cpu->memory = powerUpMemory ();
 
-  cpu->regMappings[0] = (u64)(&cpu->regX);
-  cpu->regMappings[1] = (u64)(&cpu->regY);
-  cpu->regMappings[2] = (u64)(&cpu->regA);
+  cpu->indexRegAddrs[0] = (u64)(&cpu->regX);
+  cpu->indexRegAddrs[1] = (u64)(&cpu->regY);
+  cpu->indexRegAddrs[2] = (u64)(&cpu->regA);
   return cpu;
 }
 
@@ -41,8 +41,9 @@ void statusFlagSet (cpu6502* cpu, flags flag, bool status) {
 }
 
 u8 stepInstr (cpu6502* cpu) {
-  u8 opcode = cpu->mainMemory (cpu->pc++, u8 addrMode, cpu->mainMemory);
-  for (u8 b = 0; b < x; b++) {
-
+  // u8 opcode = cpu->memory (cpu->regPC++, u8 addrMode, cpu->mainMemory);
+  for (u8 b = 0; b < 1; b++) {
+    break;
   }
+  return 0;
 }

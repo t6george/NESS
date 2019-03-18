@@ -1,16 +1,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../headers/sysmem.h"
+#include <sysmem.h>
 
 mainMemory* powerUpMemory (void) {
 	mainMemory *mem;
 
 	mem->ram = (u8*) malloc (RAM_SIZE);
-	mem->ppuRegs (u8*) malloc (PPU_REGS_SIZE);
-	mem->apuRegs (u8*) malloc (APU_REGS_SIZE);
-	mem->apuIORegs (u8*) malloc (APU_IO_REGS_SIZE);
-	mem->cartridgeMem (u8*) malloc (CART_SPACE_SIZE);
+	mem->ppuRegs = (u8*) malloc (PPU_REGS_SIZE);
+	mem->apuRegs = (u8*) malloc (APU_REGS_SIZE);
+	mem->apuIORegs = (u8*) malloc (APU_IO_REGS_SIZE);
+	mem->cartridgeMem = (u8*) malloc (CART_SPACE_SIZE);
 
 	memset ((void*) mem, 0x0, sizeof(mem));
 

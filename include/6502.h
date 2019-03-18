@@ -1,8 +1,10 @@
-#include <stdint>
+#pragma once
+#include <stdbool.h>
+#include <sysmem.h>
+#include <utils.h>
 
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint64_t u64;
+#define VERSION 0.1
+
 
 typedef enum {
   C = 0,

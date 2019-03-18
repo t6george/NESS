@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/thomasgeorge/desktop/NES-Emulator/src/6502.c
+stdio.h
+-
+6502.h
+/Users/thomasgeorge/desktop/NES-Emulator/src/6502.h
+

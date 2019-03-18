@@ -1,4 +1,5 @@
-#include "6502.h"
+#pragma once
+#include <utils.h>
 
 #define RAM_SIZE 0x800
 #define PPU_REGS_SIZE 0x8
@@ -7,11 +8,11 @@
 #define CART_SPACE_SIZE 0xBFE0
 
 typedef struct {
-	u8 *ram = NULL;
-	u8 *ppuRegs = NULL;
-	u8 *apuRegs = NULL;
-	u8 *apuIORegs = NULL;
-	u8 *cartridgeMem = NULL;
+	u8 *ram;
+	u8 *ppuRegs;
+	u8 *apuRegs;
+	u8 *apuIORegs;
+	u8 *cartridgeMem;
 
 } mainMemory;
 

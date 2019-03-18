@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/thomasgeorge/desktop/NES-Emulator/src/instructions.c
+instructions.h
+-
+
+include/6502.h
+stdbool.h
+-
+sysmem.h
+-
+utils.h
+-
+
+include/instructions.h
+sysmem.h
+-
+6502.h
+-
+
+include/sysmem.h
+utils.h
+-
+
+include/utils.h
+stdint.h
+-
+
