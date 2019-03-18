@@ -6,9 +6,9 @@
 
 #IncludeRegexTransform: 
 
-/Users/thomasgeorge/desktop/NES-Emulator/src/6502.c
+/Users/thomasgeorge/desktop/NES-Emulator/src/ppu.c
 stdio.h
 -
-6502.h
-/Users/thomasgeorge/desktop/NES-Emulator/src/6502.h
+SDL2/SDL.h
+-
 

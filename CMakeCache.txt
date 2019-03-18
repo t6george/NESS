@@ -204,8 +204,26 @@ NES_BINARY_DIR:STATIC=/Users/thomasgeorge/desktop/NES-Emulator
 //Value Computed by CMake
 NES_SOURCE_DIR:STATIC=/Users/thomasgeorge/desktop/NES-Emulator
 
+//Value Computed by CMake
+SDL2Test_BINARY_DIR:STATIC=/Users/thomasgeorge/desktop/NES-Emulator
+
+//Value Computed by CMake
+SDL2Test_SOURCE_DIR:STATIC=/Users/thomasgeorge/desktop/NES-Emulator
+
 //The directory containing a CMake configuration file for SDL2.
 SDL2_DIR:PATH=/usr/local/lib/cmake/SDL2
+
+//Path to a file.
+SDL2_INCLUDE_DIR:FILEPATH=/Library/Frameworks/SDL2.framework/Headers/SDL.h
+
+//Path to a library.
+SDL2_LIBRARY:FILEPATH=SDL2_LIBRARY-NOTFOUND
+
+//Path to a file.
+SDL_INCLUDE_DIR:PATH=/Library/Frameworks/SDL2.framework/Headers
+
+//Where the SDL Library can be found
+SDL_LIBRARY:STRING=/usr/local/lib/libSDL.dylib;-framework Cocoa
 
 //Value Computed by CMake
 hello_BINARY_DIR:STATIC=/Users/thomasgeorge/desktop/NES-Emulator
@@ -349,4 +367,8 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//Details about finding SDL
+FIND_PACKAGE_MESSAGE_DETAILS_SDL:INTERNAL=[/usr/local/lib/libSDL.dylib;-framework Cocoa][/Library/Frameworks/SDL2.framework/Headers][v2.0.8()]
+//Path to a library.
+SDL_LIBRARY_TEMP:INTERNAL=/usr/local/lib/libSDL.dylib
 

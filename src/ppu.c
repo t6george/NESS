@@ -2,7 +2,6 @@
 #include <SDL2/SDL.h>
 
 int main (int argc, char* argv[]) {
-	memory = initMemory ();
 	//PPU stuff
 	SDL_Window* window = NULL;
 	window = SDL_CreateWindow
