@@ -6,24 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/Users/thomasgeorge/desktop/NES-Emulator/src/6502.c
-stdio.h
--
-6502.h
--
-
-/Users/thomasgeorge/desktop/NES-Emulator/src/apu.c
-
-/Users/thomasgeorge/desktop/NES-Emulator/src/instructions.c
-instructions.h
--
-
-/Users/thomasgeorge/desktop/NES-Emulator/src/ppu.c
-stdio.h
--
-SDL2/SDL.h
--
-
 /Users/thomasgeorge/desktop/NES-Emulator/src/sysmem.c
 stdio.h
 -
@@ -32,25 +14,13 @@ string.h
 sysmem.h
 -
 
-include/6502.h
-stdbool.h
--
-sysmem.h
--
-utils.h
--
-
-include/instructions.h
-sysmem.h
--
-6502.h
--
-
 include/sysmem.h
 utils.h
 -
 
 include/utils.h
 stdint.h
+-
+stdlib.h
 -
 

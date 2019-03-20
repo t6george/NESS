@@ -13,18 +13,18 @@ mainMemory* powerUpMemory (void) {
 	mem->cartridgeMem = (u8*) malloc (CART_SPACE_SIZE);
 
 	memset ((void*) mem, 0x0, sizeof(mem));
-
+	return mem;
 }
 
 u8* decodeAddress (u16 address, mainMemory *memory) {
 	u8* memPtr = NULL;
-	if (0xE000 & address == 0x0) {
+	if ((0xE000 & address) == 0x0) {
 		memPtr = memory->ram + (0x07FF & address);
-	} else if (0xE000 & address == 0x2000) {
+	} else if ((0xE000 & address) == 0x2000) {
 		memPtr = memory->ppuRegs + (0x0007 & address);
-	} else if (0xFFF0 & address == 0x4000 || 0xFFF8 & address == 0x4010) {
+	} else if ((0xFFF0 & address) == 0x4000 || (0xFFF8 & address) == 0x4010) {
 		memPtr = memory->apuRegs + (0x001F & address);
-	} else if (0xFFF8 & address == 0x4018) {
+	} else if ((0xFFF8 & address) == 0x4018) {
 		memPtr = memory->apuIORegs + (0x0007 & address);
 	} else {
 		memPtr = memory->cartridgeMem + (address - 0x4020);
@@ -72,7 +72,7 @@ u8 readByte (u16 address, addressingMode addrMode, mainMemory *memory, u8 os) {
 	return *memoryContents;
 }
 
-void writeByte (u8 data, u16 address, u8 addrMode, mainMemory *memory, u8 os) {
+void writeByte (u8 data, u16 address, addressingMode addrMode, mainMemory *memory, u8 os) {
 	switch (addrMode) {
 		case ABSOLUTE: {
 			*decodeAddress ((u16) (((address & 0xFF) << 8) |
