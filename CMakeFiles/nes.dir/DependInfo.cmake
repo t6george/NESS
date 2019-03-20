@@ -4,18 +4,18 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/Users/thomasgeorge/desktop/NES-Emulator/src/6502.c" "/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles/nes.dir/src/6502.c.o"
-  "/Users/thomasgeorge/desktop/NES-Emulator/src/apu.c" "/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles/nes.dir/src/apu.c.o"
-  "/Users/thomasgeorge/desktop/NES-Emulator/src/instructions.c" "/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles/nes.dir/src/instructions.c.o"
-  "/Users/thomasgeorge/desktop/NES-Emulator/src/ppu.c" "/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles/nes.dir/src/ppu.c.o"
-  "/Users/thomasgeorge/desktop/NES-Emulator/src/sysmem.c" "/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles/nes.dir/src/sysmem.c.o"
+  "/Users/thomasgeorge/desktop/NES-Emulator/src/6502.c" "/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles/NES.dir/src/6502.c.o"
+  "/Users/thomasgeorge/desktop/NES-Emulator/src/apu.c" "/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles/NES.dir/src/apu.c.o"
+  "/Users/thomasgeorge/desktop/NES-Emulator/src/instructions.c" "/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles/NES.dir/src/instructions.c.o"
+  "/Users/thomasgeorge/desktop/NES-Emulator/src/ppu.c" "/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles/NES.dir/src/ppu.c.o"
+  "/Users/thomasgeorge/desktop/NES-Emulator/src/sysmem.c" "/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles/NES.dir/src/sysmem.c.o"
   )
 set(CMAKE_C_COMPILER_ID "AppleClang")
 
 # The include file search paths:
 set(CMAKE_C_TARGET_INCLUDE_PATH
   "include"
-  "/usr/local/Cellar/sdl2/2.0.8/include/SDL2"
+  "/Library/Frameworks/SDL2.framework/Headers"
   )
 
 # Targets to which this target links.

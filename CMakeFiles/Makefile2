@@ -65,39 +65,39 @@ CMAKE_SOURCE_DIR = /Users/thomasgeorge/desktop/NES-Emulator
 CMAKE_BINARY_DIR = /Users/thomasgeorge/desktop/NES-Emulator
 
 #=============================================================================
-# Target rules for target CMakeFiles/nes.dir
+# Target rules for target CMakeFiles/NES.dir
 
 # All Build rule for target.
-CMakeFiles/nes.dir/all:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/depend
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles --progress-num=1,2,3,4,5,6 "Built target nes"
-.PHONY : CMakeFiles/nes.dir/all
+CMakeFiles/NES.dir/all:
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/depend
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles --progress-num=1,2,3,4,5,6 "Built target NES"
+.PHONY : CMakeFiles/NES.dir/all
 
 # Include target in all.
-all: CMakeFiles/nes.dir/all
+all: CMakeFiles/NES.dir/all
 
 .PHONY : all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/nes.dir/rule: cmake_check_build_system
+CMakeFiles/NES.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles 6
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/nes.dir/all
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/NES.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles 0
-.PHONY : CMakeFiles/nes.dir/rule
+.PHONY : CMakeFiles/NES.dir/rule
 
 # Convenience name for target.
-nes: CMakeFiles/nes.dir/rule
+NES: CMakeFiles/NES.dir/rule
 
-.PHONY : nes
-
-# clean rule for target.
-CMakeFiles/nes.dir/clean:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/clean
-.PHONY : CMakeFiles/nes.dir/clean
+.PHONY : NES
 
 # clean rule for target.
-clean: CMakeFiles/nes.dir/clean
+CMakeFiles/NES.dir/clean:
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/clean
+.PHONY : CMakeFiles/NES.dir/clean
+
+# clean rule for target.
+clean: CMakeFiles/NES.dir/clean
 
 .PHONY : clean
 

@@ -49,110 +49,111 @@ CMAKE_SOURCE_DIR = /Users/thomasgeorge/desktop/NES-Emulator
 CMAKE_BINARY_DIR = /Users/thomasgeorge/desktop/NES-Emulator
 
 # Include any dependencies generated for this target.
-include CMakeFiles/nes.dir/depend.make
+include CMakeFiles/NES.dir/depend.make
 
 # Include the progress variables for this target.
-include CMakeFiles/nes.dir/progress.make
+include CMakeFiles/NES.dir/progress.make
 
 # Include the compile flags for this target's objects.
-include CMakeFiles/nes.dir/flags.make
+include CMakeFiles/NES.dir/flags.make
 
-CMakeFiles/nes.dir/src/6502.c.o: CMakeFiles/nes.dir/flags.make
-CMakeFiles/nes.dir/src/6502.c.o: src/6502.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/nes.dir/src/6502.c.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/nes.dir/src/6502.c.o   -c /Users/thomasgeorge/desktop/NES-Emulator/src/6502.c
+CMakeFiles/NES.dir/src/6502.c.o: CMakeFiles/NES.dir/flags.make
+CMakeFiles/NES.dir/src/6502.c.o: src/6502.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/NES.dir/src/6502.c.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/NES.dir/src/6502.c.o   -c /Users/thomasgeorge/desktop/NES-Emulator/src/6502.c
 
-CMakeFiles/nes.dir/src/6502.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/nes.dir/src/6502.c.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/thomasgeorge/desktop/NES-Emulator/src/6502.c > CMakeFiles/nes.dir/src/6502.c.i
+CMakeFiles/NES.dir/src/6502.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/NES.dir/src/6502.c.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/thomasgeorge/desktop/NES-Emulator/src/6502.c > CMakeFiles/NES.dir/src/6502.c.i
 
-CMakeFiles/nes.dir/src/6502.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/nes.dir/src/6502.c.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/thomasgeorge/desktop/NES-Emulator/src/6502.c -o CMakeFiles/nes.dir/src/6502.c.s
+CMakeFiles/NES.dir/src/6502.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/NES.dir/src/6502.c.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/thomasgeorge/desktop/NES-Emulator/src/6502.c -o CMakeFiles/NES.dir/src/6502.c.s
 
-CMakeFiles/nes.dir/src/apu.c.o: CMakeFiles/nes.dir/flags.make
-CMakeFiles/nes.dir/src/apu.c.o: src/apu.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/nes.dir/src/apu.c.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/nes.dir/src/apu.c.o   -c /Users/thomasgeorge/desktop/NES-Emulator/src/apu.c
+CMakeFiles/NES.dir/src/apu.c.o: CMakeFiles/NES.dir/flags.make
+CMakeFiles/NES.dir/src/apu.c.o: src/apu.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/NES.dir/src/apu.c.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/NES.dir/src/apu.c.o   -c /Users/thomasgeorge/desktop/NES-Emulator/src/apu.c
 
-CMakeFiles/nes.dir/src/apu.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/nes.dir/src/apu.c.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/thomasgeorge/desktop/NES-Emulator/src/apu.c > CMakeFiles/nes.dir/src/apu.c.i
+CMakeFiles/NES.dir/src/apu.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/NES.dir/src/apu.c.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/thomasgeorge/desktop/NES-Emulator/src/apu.c > CMakeFiles/NES.dir/src/apu.c.i
 
-CMakeFiles/nes.dir/src/apu.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/nes.dir/src/apu.c.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/thomasgeorge/desktop/NES-Emulator/src/apu.c -o CMakeFiles/nes.dir/src/apu.c.s
+CMakeFiles/NES.dir/src/apu.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/NES.dir/src/apu.c.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/thomasgeorge/desktop/NES-Emulator/src/apu.c -o CMakeFiles/NES.dir/src/apu.c.s
 
-CMakeFiles/nes.dir/src/instructions.c.o: CMakeFiles/nes.dir/flags.make
-CMakeFiles/nes.dir/src/instructions.c.o: src/instructions.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/nes.dir/src/instructions.c.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/nes.dir/src/instructions.c.o   -c /Users/thomasgeorge/desktop/NES-Emulator/src/instructions.c
+CMakeFiles/NES.dir/src/instructions.c.o: CMakeFiles/NES.dir/flags.make
+CMakeFiles/NES.dir/src/instructions.c.o: src/instructions.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/NES.dir/src/instructions.c.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/NES.dir/src/instructions.c.o   -c /Users/thomasgeorge/desktop/NES-Emulator/src/instructions.c
 
-CMakeFiles/nes.dir/src/instructions.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/nes.dir/src/instructions.c.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/thomasgeorge/desktop/NES-Emulator/src/instructions.c > CMakeFiles/nes.dir/src/instructions.c.i
+CMakeFiles/NES.dir/src/instructions.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/NES.dir/src/instructions.c.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/thomasgeorge/desktop/NES-Emulator/src/instructions.c > CMakeFiles/NES.dir/src/instructions.c.i
 
-CMakeFiles/nes.dir/src/instructions.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/nes.dir/src/instructions.c.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/thomasgeorge/desktop/NES-Emulator/src/instructions.c -o CMakeFiles/nes.dir/src/instructions.c.s
+CMakeFiles/NES.dir/src/instructions.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/NES.dir/src/instructions.c.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/thomasgeorge/desktop/NES-Emulator/src/instructions.c -o CMakeFiles/NES.dir/src/instructions.c.s
 
-CMakeFiles/nes.dir/src/ppu.c.o: CMakeFiles/nes.dir/flags.make
-CMakeFiles/nes.dir/src/ppu.c.o: src/ppu.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/nes.dir/src/ppu.c.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/nes.dir/src/ppu.c.o   -c /Users/thomasgeorge/desktop/NES-Emulator/src/ppu.c
+CMakeFiles/NES.dir/src/ppu.c.o: CMakeFiles/NES.dir/flags.make
+CMakeFiles/NES.dir/src/ppu.c.o: src/ppu.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/NES.dir/src/ppu.c.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/NES.dir/src/ppu.c.o   -c /Users/thomasgeorge/desktop/NES-Emulator/src/ppu.c
 
-CMakeFiles/nes.dir/src/ppu.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/nes.dir/src/ppu.c.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/thomasgeorge/desktop/NES-Emulator/src/ppu.c > CMakeFiles/nes.dir/src/ppu.c.i
+CMakeFiles/NES.dir/src/ppu.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/NES.dir/src/ppu.c.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/thomasgeorge/desktop/NES-Emulator/src/ppu.c > CMakeFiles/NES.dir/src/ppu.c.i
 
-CMakeFiles/nes.dir/src/ppu.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/nes.dir/src/ppu.c.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/thomasgeorge/desktop/NES-Emulator/src/ppu.c -o CMakeFiles/nes.dir/src/ppu.c.s
+CMakeFiles/NES.dir/src/ppu.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/NES.dir/src/ppu.c.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/thomasgeorge/desktop/NES-Emulator/src/ppu.c -o CMakeFiles/NES.dir/src/ppu.c.s
 
-CMakeFiles/nes.dir/src/sysmem.c.o: CMakeFiles/nes.dir/flags.make
-CMakeFiles/nes.dir/src/sysmem.c.o: src/sysmem.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/nes.dir/src/sysmem.c.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/nes.dir/src/sysmem.c.o   -c /Users/thomasgeorge/desktop/NES-Emulator/src/sysmem.c
+CMakeFiles/NES.dir/src/sysmem.c.o: CMakeFiles/NES.dir/flags.make
+CMakeFiles/NES.dir/src/sysmem.c.o: src/sysmem.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/NES.dir/src/sysmem.c.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/NES.dir/src/sysmem.c.o   -c /Users/thomasgeorge/desktop/NES-Emulator/src/sysmem.c
 
-CMakeFiles/nes.dir/src/sysmem.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/nes.dir/src/sysmem.c.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/thomasgeorge/desktop/NES-Emulator/src/sysmem.c > CMakeFiles/nes.dir/src/sysmem.c.i
+CMakeFiles/NES.dir/src/sysmem.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/NES.dir/src/sysmem.c.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/thomasgeorge/desktop/NES-Emulator/src/sysmem.c > CMakeFiles/NES.dir/src/sysmem.c.i
 
-CMakeFiles/nes.dir/src/sysmem.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/nes.dir/src/sysmem.c.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/thomasgeorge/desktop/NES-Emulator/src/sysmem.c -o CMakeFiles/nes.dir/src/sysmem.c.s
+CMakeFiles/NES.dir/src/sysmem.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/NES.dir/src/sysmem.c.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/thomasgeorge/desktop/NES-Emulator/src/sysmem.c -o CMakeFiles/NES.dir/src/sysmem.c.s
 
-# Object files for target nes
-nes_OBJECTS = \
-"CMakeFiles/nes.dir/src/6502.c.o" \
-"CMakeFiles/nes.dir/src/apu.c.o" \
-"CMakeFiles/nes.dir/src/instructions.c.o" \
-"CMakeFiles/nes.dir/src/ppu.c.o" \
-"CMakeFiles/nes.dir/src/sysmem.c.o"
+# Object files for target NES
+NES_OBJECTS = \
+"CMakeFiles/NES.dir/src/6502.c.o" \
+"CMakeFiles/NES.dir/src/apu.c.o" \
+"CMakeFiles/NES.dir/src/instructions.c.o" \
+"CMakeFiles/NES.dir/src/ppu.c.o" \
+"CMakeFiles/NES.dir/src/sysmem.c.o"
 
-# External object files for target nes
-nes_EXTERNAL_OBJECTS =
+# External object files for target NES
+NES_EXTERNAL_OBJECTS =
 
-nes: CMakeFiles/nes.dir/src/6502.c.o
-nes: CMakeFiles/nes.dir/src/apu.c.o
-nes: CMakeFiles/nes.dir/src/instructions.c.o
-nes: CMakeFiles/nes.dir/src/ppu.c.o
-nes: CMakeFiles/nes.dir/src/sysmem.c.o
-nes: CMakeFiles/nes.dir/build.make
-nes: CMakeFiles/nes.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking C executable nes"
-	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/nes.dir/link.txt --verbose=$(VERBOSE)
+NES: CMakeFiles/NES.dir/src/6502.c.o
+NES: CMakeFiles/NES.dir/src/apu.c.o
+NES: CMakeFiles/NES.dir/src/instructions.c.o
+NES: CMakeFiles/NES.dir/src/ppu.c.o
+NES: CMakeFiles/NES.dir/src/sysmem.c.o
+NES: CMakeFiles/NES.dir/build.make
+NES: /usr/local/lib/libSDL2_image.dylib
+NES: CMakeFiles/NES.dir/link.txt
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking C executable NES"
+	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/NES.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
-CMakeFiles/nes.dir/build: nes
+CMakeFiles/NES.dir/build: NES
 
-.PHONY : CMakeFiles/nes.dir/build
+.PHONY : CMakeFiles/NES.dir/build
 
-CMakeFiles/nes.dir/clean:
-	$(CMAKE_COMMAND) -P CMakeFiles/nes.dir/cmake_clean.cmake
-.PHONY : CMakeFiles/nes.dir/clean
+CMakeFiles/NES.dir/clean:
+	$(CMAKE_COMMAND) -P CMakeFiles/NES.dir/cmake_clean.cmake
+.PHONY : CMakeFiles/NES.dir/clean
 
-CMakeFiles/nes.dir/depend:
-	cd /Users/thomasgeorge/desktop/NES-Emulator && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/thomasgeorge/desktop/NES-Emulator /Users/thomasgeorge/desktop/NES-Emulator /Users/thomasgeorge/desktop/NES-Emulator /Users/thomasgeorge/desktop/NES-Emulator /Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles/nes.dir/DependInfo.cmake --color=$(COLOR)
-.PHONY : CMakeFiles/nes.dir/depend
+CMakeFiles/NES.dir/depend:
+	cd /Users/thomasgeorge/desktop/NES-Emulator && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/thomasgeorge/desktop/NES-Emulator /Users/thomasgeorge/desktop/NES-Emulator /Users/thomasgeorge/desktop/NES-Emulator /Users/thomasgeorge/desktop/NES-Emulator /Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles/NES.dir/DependInfo.cmake --color=$(COLOR)
+.PHONY : CMakeFiles/NES.dir/depend
 

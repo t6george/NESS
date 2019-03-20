@@ -79,6 +79,7 @@ SDL2Test_EXTERNAL_OBJECTS =
 
 SDL2Test: CMakeFiles/SDL2Test.dir/src/ppu.c.o
 SDL2Test: CMakeFiles/SDL2Test.dir/build.make
+SDL2Test: /usr/local/lib/libSDL2_image.dylib
 SDL2Test: CMakeFiles/SDL2Test.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/thomasgeorge/desktop/NES-Emulator/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable SDL2Test"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/SDL2Test.dir/link.txt --verbose=$(VERBOSE)

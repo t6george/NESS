@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named nes
+# Target rules for targets named NES
 
 # Build rule for target.
-nes: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 nes
-.PHONY : nes
+NES: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NES
+.PHONY : NES
 
 # fast build rule for target.
-nes/fast:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/build
-.PHONY : nes/fast
+NES/fast:
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/build
+.PHONY : NES/fast
 
 src/6502.o: src/6502.c.o
 
@@ -129,7 +129,7 @@ src/6502.o: src/6502.c.o
 
 # target to build an object file
 src/6502.c.o:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/src/6502.c.o
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/src/6502.c.o
 .PHONY : src/6502.c.o
 
 src/6502.i: src/6502.c.i
@@ -138,7 +138,7 @@ src/6502.i: src/6502.c.i
 
 # target to preprocess a source file
 src/6502.c.i:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/src/6502.c.i
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/src/6502.c.i
 .PHONY : src/6502.c.i
 
 src/6502.s: src/6502.c.s
@@ -147,7 +147,7 @@ src/6502.s: src/6502.c.s
 
 # target to generate assembly for a file
 src/6502.c.s:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/src/6502.c.s
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/src/6502.c.s
 .PHONY : src/6502.c.s
 
 src/apu.o: src/apu.c.o
@@ -156,7 +156,7 @@ src/apu.o: src/apu.c.o
 
 # target to build an object file
 src/apu.c.o:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/src/apu.c.o
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/src/apu.c.o
 .PHONY : src/apu.c.o
 
 src/apu.i: src/apu.c.i
@@ -165,7 +165,7 @@ src/apu.i: src/apu.c.i
 
 # target to preprocess a source file
 src/apu.c.i:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/src/apu.c.i
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/src/apu.c.i
 .PHONY : src/apu.c.i
 
 src/apu.s: src/apu.c.s
@@ -174,7 +174,7 @@ src/apu.s: src/apu.c.s
 
 # target to generate assembly for a file
 src/apu.c.s:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/src/apu.c.s
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/src/apu.c.s
 .PHONY : src/apu.c.s
 
 src/instructions.o: src/instructions.c.o
@@ -183,7 +183,7 @@ src/instructions.o: src/instructions.c.o
 
 # target to build an object file
 src/instructions.c.o:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/src/instructions.c.o
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/src/instructions.c.o
 .PHONY : src/instructions.c.o
 
 src/instructions.i: src/instructions.c.i
@@ -192,7 +192,7 @@ src/instructions.i: src/instructions.c.i
 
 # target to preprocess a source file
 src/instructions.c.i:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/src/instructions.c.i
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/src/instructions.c.i
 .PHONY : src/instructions.c.i
 
 src/instructions.s: src/instructions.c.s
@@ -201,7 +201,7 @@ src/instructions.s: src/instructions.c.s
 
 # target to generate assembly for a file
 src/instructions.c.s:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/src/instructions.c.s
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/src/instructions.c.s
 .PHONY : src/instructions.c.s
 
 src/ppu.o: src/ppu.c.o
@@ -210,7 +210,7 @@ src/ppu.o: src/ppu.c.o
 
 # target to build an object file
 src/ppu.c.o:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/src/ppu.c.o
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/src/ppu.c.o
 .PHONY : src/ppu.c.o
 
 src/ppu.i: src/ppu.c.i
@@ -219,7 +219,7 @@ src/ppu.i: src/ppu.c.i
 
 # target to preprocess a source file
 src/ppu.c.i:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/src/ppu.c.i
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/src/ppu.c.i
 .PHONY : src/ppu.c.i
 
 src/ppu.s: src/ppu.c.s
@@ -228,7 +228,7 @@ src/ppu.s: src/ppu.c.s
 
 # target to generate assembly for a file
 src/ppu.c.s:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/src/ppu.c.s
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/src/ppu.c.s
 .PHONY : src/ppu.c.s
 
 src/sysmem.o: src/sysmem.c.o
@@ -237,7 +237,7 @@ src/sysmem.o: src/sysmem.c.o
 
 # target to build an object file
 src/sysmem.c.o:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/src/sysmem.c.o
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/src/sysmem.c.o
 .PHONY : src/sysmem.c.o
 
 src/sysmem.i: src/sysmem.c.i
@@ -246,7 +246,7 @@ src/sysmem.i: src/sysmem.c.i
 
 # target to preprocess a source file
 src/sysmem.c.i:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/src/sysmem.c.i
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/src/sysmem.c.i
 .PHONY : src/sysmem.c.i
 
 src/sysmem.s: src/sysmem.c.s
@@ -255,7 +255,7 @@ src/sysmem.s: src/sysmem.c.s
 
 # target to generate assembly for a file
 src/sysmem.c.s:
-	$(MAKE) -f CMakeFiles/nes.dir/build.make CMakeFiles/nes.dir/src/sysmem.c.s
+	$(MAKE) -f CMakeFiles/NES.dir/build.make CMakeFiles/NES.dir/src/sysmem.c.s
 .PHONY : src/sysmem.c.s
 
 # Help Target
@@ -266,7 +266,7 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... nes"
+	@echo "... NES"
 	@echo "... src/6502.o"
 	@echo "... src/6502.i"
 	@echo "... src/6502.s"

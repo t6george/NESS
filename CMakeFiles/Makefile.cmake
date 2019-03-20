@@ -11,6 +11,8 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.13.4/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.13.4/CMakeSystem.cmake"
   "CMakeLists.txt"
+  "cmake/FindSDL2.cmake"
+  "cmake/FindSDL2_image.cmake"
   "include/6502.h.in"
   "/usr/local/Cellar/cmake/3.13.4/share/cmake/Modules/CMakeCInformation.cmake"
   "/usr/local/Cellar/cmake/3.13.4/share/cmake/Modules/CMakeCXXInformation.cmake"
@@ -25,6 +27,8 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/local/Cellar/cmake/3.13.4/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake"
   "/usr/local/Cellar/cmake/3.13.4/share/cmake/Modules/Compiler/Clang.cmake"
   "/usr/local/Cellar/cmake/3.13.4/share/cmake/Modules/Compiler/GNU.cmake"
+  "/usr/local/Cellar/cmake/3.13.4/share/cmake/Modules/FindPackageHandleStandardArgs.cmake"
+  "/usr/local/Cellar/cmake/3.13.4/share/cmake/Modules/FindPackageMessage.cmake"
   "/usr/local/Cellar/cmake/3.13.4/share/cmake/Modules/Platform/Apple-AppleClang-C.cmake"
   "/usr/local/Cellar/cmake/3.13.4/share/cmake/Modules/Platform/Apple-AppleClang-CXX.cmake"
   "/usr/local/Cellar/cmake/3.13.4/share/cmake/Modules/Platform/Apple-Clang-C.cmake"
@@ -33,7 +37,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/local/Cellar/cmake/3.13.4/share/cmake/Modules/Platform/Darwin-Initialize.cmake"
   "/usr/local/Cellar/cmake/3.13.4/share/cmake/Modules/Platform/Darwin.cmake"
   "/usr/local/Cellar/cmake/3.13.4/share/cmake/Modules/Platform/UnixPaths.cmake"
-  "/usr/local/lib/cmake/SDL2/sdl2-config.cmake"
   )
 
 # The corresponding makefile is:
@@ -50,5 +53,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/nes.dir/DependInfo.cmake"
+  "CMakeFiles/NES.dir/DependInfo.cmake"
   )

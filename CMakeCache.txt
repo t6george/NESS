@@ -210,26 +210,20 @@ SDL2Test_BINARY_DIR:STATIC=/Users/thomasgeorge/desktop/NES-Emulator
 //Value Computed by CMake
 SDL2Test_SOURCE_DIR:STATIC=/Users/thomasgeorge/desktop/NES-Emulator
 
-//The directory containing a CMake configuration file for SDL2.
-SDL2_DIR:PATH=/usr/local/lib/cmake/SDL2
+//SDL2 directory
+SDL2_DIR:PATH=
 
 //Path to a file.
-SDL2_INCLUDE_DIR:FILEPATH=/Library/Frameworks/SDL2.framework/Headers/SDL.h
+SDL2_IMAGE_INCLUDE_DIR:PATH=/usr/local/include/SDL2
 
 //Path to a library.
-SDL2_LIBRARY:FILEPATH=SDL2_LIBRARY-NOTFOUND
+SDL2_IMAGE_LIBRARY:FILEPATH=/usr/local/lib/libSDL2_image.dylib
 
 //Path to a file.
-SDL_INCLUDE_DIR:PATH=/Library/Frameworks/SDL2.framework/Headers
+SDL2_INCLUDE_DIR:PATH=/Library/Frameworks/SDL2.framework/Headers
 
 //Where the SDL Library can be found
-SDL_LIBRARY:STRING=/usr/local/lib/libSDL.dylib;-framework Cocoa
-
-//Value Computed by CMake
-hello_BINARY_DIR:STATIC=/Users/thomasgeorge/desktop/NES-Emulator
-
-//Value Computed by CMake
-hello_SOURCE_DIR:STATIC=/Users/thomasgeorge/desktop/NES-Emulator
+SDL2_LIBRARY:STRING=/Library/Frameworks/SDL2.framework;-framework Cocoa
 
 
 ########################
@@ -368,7 +362,13 @@ CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding SDL
-FIND_PACKAGE_MESSAGE_DETAILS_SDL:INTERNAL=[/usr/local/lib/libSDL.dylib;-framework Cocoa][/Library/Frameworks/SDL2.framework/Headers][v2.0.8()]
+FIND_PACKAGE_MESSAGE_DETAILS_SDL:INTERNAL=[/Library/Frameworks/SDL2.framework;-framework Cocoa][/Library/Frameworks/SDL2.framework/Headers][v()]
+//Details about finding SDL2_image
+FIND_PACKAGE_MESSAGE_DETAILS_SDL2_image:INTERNAL=[/usr/local/lib/libSDL2_image.dylib][/usr/local/include/SDL2][v()]
+//ADVANCED property for variable: SDL2_IMAGE_INCLUDE_DIR
+SDL2_IMAGE_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: SDL2_IMAGE_LIBRARY
+SDL2_IMAGE_LIBRARY-ADVANCED:INTERNAL=1
 //Path to a library.
-SDL_LIBRARY_TEMP:INTERNAL=/usr/local/lib/libSDL.dylib
+SDL2_LIBRARY_TEMP:INTERNAL=/Library/Frameworks/SDL2.framework
 
