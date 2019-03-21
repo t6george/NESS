@@ -1,20 +1,22 @@
 #include <instructions.h>
 
-// u16 address, addressingMode addrMode, mainMemory *memory, u8 os
+u8 readOperand (struct instruction *instr, cpu6502 *cpu) {
+  u16 tgtAddr = instr->size == 2 ? instr->auxBytes[0]: ((u16)instr->auxBytes[1] << 8) | ((u16) instr->auxBytes[0]);
+  u8 offset = (instr->srcReg == 0)? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);
+  return readByte (tgtAddr, instr->addrMode, cpu->memory, offset);
+}
+void writeBack (struct instruction *instr, cpu6502 *cpu, u8 byte) {
+  u16 tgtAddr = instr->size == 2 ? instr->auxBytes[0]: ((u16)instr->auxBytes[1] << 8) | ((u16) instr->auxBytes[0]);
+  u8 offset = (instr->srcReg == 0)? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);
+  writeByte (byte, tgtAddr, instr->addrMode, cpu->memory, offset);
+}
 
 u8 BRK (struct instruction *instr, cpu6502 *cpu) {
   return 0;
 }
 
 u8 ORA (struct instruction *instr, cpu6502 *cpu) {
-  u8 operand;
-  if (instr->addrMode == NON_MEMORY) {
-    operand = instr->auxBytes[0];
-  } else {
-    u16 tgtAddr = instr->size == 2 ? instr->auxBytes[0]: ((u16)instr->auxBytes[1] << 8) | ((u16) instr->auxBytes[0]);
-    u8 offset = (instr->srcReg == 0)? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);
-    operand = readByte (tgtAddr, instr->addrMode, cpu->memory, offset);
-  }
+  u8 operand = (instr->addrMode == NON_MEMORY) ? instr->auxBytes[0]: readOperand (instr, cpu);
   cpu->regA |= operand;
   statusFlagSet (cpu, Z, cpu->regA == 0x0);
   statusFlagSet (cpu, N, (0x80 & cpu->regA) != 0x0);
@@ -22,6 +24,16 @@ u8 ORA (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 ASL (struct instruction *instr, cpu6502 *cpu) {
+  u8 operand = (instr->addrMode == NON_MEMORY) ? cpu->regA: readOperand (instr, cpu);
+  statusFlagSet (cpu, C, (bool)(0x80 & operand));
+  operand <<= 1;
+  if (instr->addrMode == NON_MEMORY) {
+    cpu->regA = operand;
+  } else {
+    writeBack (instr, cpu, operand);
+  }
+  statusFlagSet (cpu, N, (bool)(0x80 & operand));
+  statusFlagSet (cpu, Z, operand == 0x00);
   return 0;
 }
 
@@ -62,10 +74,24 @@ u8 RTI (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 EOR (struct instruction *instr, cpu6502 *cpu) {
+  u8 operand = (instr->addrMode == NON_MEMORY) ? instr->auxBytes[0]: readOperand (instr, cpu);
+  cpu->regA ^= operand;
+  statusFlagSet (cpu, Z, cpu->regA == 0x0);
+  statusFlagSet (cpu, N, (0x80 & cpu->regA) != 0x0);
   return 0;
 }
 
 u8 LSR (struct instruction *instr, cpu6502 *cpu) {
+  u8 operand = (instr->addrMode == NON_MEMORY) ? cpu->regA: readOperand (instr, cpu);
+  statusFlagSet (cpu, C, (bool)(0x80 & operand));
+  operand >>= 1;
+  if (instr->addrMode == NON_MEMORY) {
+    cpu->regA = operand;
+  } else {
+    writeBack (instr, cpu, operand);
+  }
+  statusFlagSet (cpu, N, (bool)(0x80 & operand));
+  statusFlagSet (cpu, Z, operand == 0x00);
   return 0;
 }
 
@@ -206,7 +232,7 @@ u8 INX (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 NOP (struct instruction *instr, cpu6502 *cpu) {
-  return 0;
+  return 2;
 }
 
 u8 BEQ (struct instruction *instr, cpu6502 *cpu) {
@@ -222,6 +248,10 @@ u8 DEX (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 AND (struct instruction *instr, cpu6502 *cpu) {
+  u8 operand = (instr->addrMode == NON_MEMORY) ? instr->auxBytes[0]: readOperand (instr, cpu);
+  cpu->regA &= operand;
+  statusFlagSet (cpu, Z, cpu->regA == 0x0);
+  statusFlagSet (cpu, N, (0x80 & cpu->regA) != 0x0);
   return 0;
 }
 
