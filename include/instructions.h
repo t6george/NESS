@@ -13,6 +13,7 @@ typedef struct instruction {
 
 u8 readOperand (struct instruction *instr, cpu6502 *cpu);
 void writeBack (struct instruction *instr, cpu6502 *cpu, u8 byte);
+void setNZFlags (cpu6502 *cpu, u8 op);
 u8 BRK (struct instruction *instr, cpu6502 *cpu);
 u8 ORA (struct instruction *instr, cpu6502 *cpu);
 u8 ASL (struct instruction *instr, cpu6502 *cpu);

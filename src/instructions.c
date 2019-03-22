@@ -11,6 +11,11 @@ void writeBack (struct instruction *instr, cpu6502 *cpu, u8 byte) {
   writeByte (byte, tgtAddr, instr->addrMode, cpu->memory, offset);
 }
 
+void setNZFlags (cpu6502 *cpu, u8 op) {
+  statusFlagSet (cpu, Z, op == 0x0);
+  statusFlagSet (cpu, N, (0x80 & op) != 0x0);
+}
+
 u8 BRK (struct instruction *instr, cpu6502 *cpu) {
   return instr->cycles;
 }
@@ -18,8 +23,7 @@ u8 BRK (struct instruction *instr, cpu6502 *cpu) {
 u8 ORA (struct instruction *instr, cpu6502 *cpu) {
   u8 operand = (instr->addrMode == NON_MEMORY) ? instr->auxBytes[0]: readOperand (instr, cpu);
   cpu->regA |= operand;
-  statusFlagSet (cpu, Z, cpu->regA == 0x0);
-  statusFlagSet (cpu, N, (0x80 & cpu->regA) != 0x0);
+  setNZFlags (cpu, cpu->regA);
   return instr->cycles;
 }
 
@@ -32,8 +36,7 @@ u8 ASL (struct instruction *instr, cpu6502 *cpu) {
   } else {
     writeBack (instr, cpu, operand);
   }
-  statusFlagSet (cpu, N, (bool)(0x80 & operand));
-  statusFlagSet (cpu, Z, operand == 0x00);
+  setNZFlags (cpu, operand);
   return instr->cycles;
 }
 
@@ -55,6 +58,16 @@ u8 BIT (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 ROL (struct instruction *instr, cpu6502 *cpu) {
+  u8 operand = (instr->addrMode == NON_MEMORY) ? cpu->regA: readOperand (instr, cpu);
+  u8 oldCarry = (u8) statusFlagGet (cpu, C);
+  statusFlagSet (cpu, C, (bool)(0x80 & operand));
+  operand = (operand << 1) | oldCarry;
+  if (instr->addrMode == NON_MEMORY) {
+    cpu->regA = operand;
+  } else {
+    writeBack (instr, cpu, operand);
+  }
+  setNZFlags (cpu, operand);
   return instr->cycles;
 }
 
@@ -78,8 +91,7 @@ u8 RTI (struct instruction *instr, cpu6502 *cpu) {
 u8 EOR (struct instruction *instr, cpu6502 *cpu) {
   u8 operand = (instr->addrMode == NON_MEMORY) ? instr->auxBytes[0]: readOperand (instr, cpu);
   cpu->regA ^= operand;
-  statusFlagSet (cpu, Z, cpu->regA == 0x0);
-  statusFlagSet (cpu, N, (0x80 & cpu->regA) != 0x0);
+  setNZFlags (cpu, cpu->regA);
   return instr->cycles;
 }
 
@@ -92,8 +104,7 @@ u8 LSR (struct instruction *instr, cpu6502 *cpu) {
   } else {
     writeBack (instr, cpu, operand);
   }
-  statusFlagSet (cpu, N, (bool)(0x80 & operand));
-  statusFlagSet (cpu, Z, operand == 0x00);
+  setNZFlags (cpu, operand);
   return instr->cycles;
 }
 
@@ -123,6 +134,16 @@ u8 ADC (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 ROR (struct instruction *instr, cpu6502 *cpu) {
+  u8 operand = (instr->addrMode == NON_MEMORY) ? cpu->regA: readOperand (instr, cpu);
+  u8 oldCarry = ((u8) statusFlagGet (cpu, C)) << 0x7;
+  statusFlagSet (cpu, C, (bool)(0x01 & operand));
+  operand = (operand >> 1) | oldCarry;
+  if (instr->addrMode == NON_MEMORY) {
+    cpu->regA = operand;
+  } else {
+    writeBack (instr, cpu, operand);
+  }
+  setNZFlags (cpu, operand);
   return instr->cycles;
 }
 
@@ -140,22 +161,29 @@ u8 SEI (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 STA (struct instruction *instr, cpu6502 *cpu) {
+  writeBack (instr, cpu, cpu->regA);
   return instr->cycles;
 }
 
 u8 STY (struct instruction *instr, cpu6502 *cpu) {
+  writeBack (instr, cpu, cpu->regY);
   return instr->cycles;
 }
 
 u8 STX (struct instruction *instr, cpu6502 *cpu) {
+  writeBack (instr, cpu, cpu->regX);
   return instr->cycles;
 }
 
 u8 DEY (struct instruction *instr, cpu6502 *cpu) {
+  --cpu->regY;
+  setNZFlags (cpu, cpu->regY);
   return instr->cycles;
 }
 
 u8 TXA (struct instruction *instr, cpu6502 *cpu) {
+  cpu->regA = cpu->regX;
+  setNZFlags (cpu, cpu->regA);
   return instr->cycles;
 }
 
@@ -164,6 +192,8 @@ u8 BCC (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 TYA (struct instruction *instr, cpu6502 *cpu) {
+  cpu->regA = cpu->regY;
+  setNZFlags (cpu, cpu->regA);
   return instr->cycles;
 }
 
@@ -172,31 +202,32 @@ u8 TXS (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 TAY (struct instruction *instr, cpu6502 *cpu) {
+  cpu->regY = cpu->regA;
+  setNZFlags (cpu, cpu->regY);
   return instr->cycles;
 }
 
 u8 TAX (struct instruction *instr, cpu6502 *cpu) {
+  cpu->regX = cpu->regA;
+  setNZFlags (cpu, cpu->regX);
   return instr->cycles;
 }
 
 u8 LDA (struct instruction *instr, cpu6502 *cpu) {
   cpu->regA = readOperand (instr, cpu);
-  statusFlagSet (cpu, Z, cpu->regA == 0x0);
-  statusFlagSet (cpu, N, (0x80 & cpu->regA) != 0x0);
+  setNZFlags (cpu, cpu->regA);
   return instr->cycles;
 }
 
 u8 LDX (struct instruction *instr, cpu6502 *cpu) {
   cpu->regX = readOperand (instr, cpu);
-  statusFlagSet (cpu, Z, cpu->regA == 0x0);
-  statusFlagSet (cpu, N, (0x80 & cpu->regA) != 0x0);
+  setNZFlags (cpu, cpu->regA);
   return instr->cycles;
 }
 
 u8 LDY (struct instruction *instr, cpu6502 *cpu) {
   cpu->regY = readOperand (instr, cpu);
-  statusFlagSet (cpu, Z, cpu->regA == 0x0);
-  statusFlagSet (cpu, N, (0x80 & cpu->regA) != 0x0);
+  setNZFlags (cpu, cpu->regA);
   return instr->cycles;
 }
 
@@ -243,6 +274,8 @@ u8 INC (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 INX (struct instruction *instr, cpu6502 *cpu) {
+  ++cpu->regX;
+  setNZFlags (cpu, cpu->regX);
   return instr->cycles;
 }
 
@@ -260,14 +293,15 @@ u8 SED (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 DEX (struct instruction *instr, cpu6502 *cpu) {
+  --cpu->regX;
+  setNZFlags (cpu, cpu->regX);
   return instr->cycles;
 }
 
 u8 AND (struct instruction *instr, cpu6502 *cpu) {
   u8 operand = (instr->addrMode == NON_MEMORY) ? instr->auxBytes[0]: readOperand (instr, cpu);
   cpu->regA &= operand;
-  statusFlagSet (cpu, Z, cpu->regA == 0x0);
-  statusFlagSet (cpu, N, (0x80 & cpu->regA) != 0x0);
+  setNZFlags (cpu, cpu->regA);
   return instr->cycles;
 }
 
@@ -276,6 +310,8 @@ u8 PHP (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 INY (struct instruction *instr, cpu6502 *cpu) {
+  ++cpu->regY;
+  setNZFlags (cpu, cpu->regY);
   return instr->cycles;
 }
 
