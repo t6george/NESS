@@ -1,25 +1,26 @@
 #include <instructions.h>
 
-#define IS_PAGE_CROSSED(a1, a2) (0xFF & a1) != (0xFF & a2)
+#define IS_PAGE_CROSSED(a1, a2) (0xFF00 & a1) != (0xFF00 & a2)
 
-#define READ_IN(instr, cpu, dst) ({
-  u16 tgtAddr = instr->size == 2 ? instr->auxBytes[0]:
-    ((u16)instr->auxBytes[1] << 8) | ((u16) instr->auxBytes[0]);\
-  u8 offset = (instr->srcReg == 0)? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);\
-  dst = readByte (tgtAddr, instr->addrMode, cpu->memory, offset);
-})
+#define READ_IN(instr, cpu, dst) dst = readByte (instr->size == 2 ? instr->auxBytes[0]:\
+    ((u16)instr->auxBytes[1] << 8) | ((u16) instr->auxBytes[0]),\
+    instr->addrMode, cpu->memory, (instr->srcReg == 0)? 0:\
+    *((u8*)cpu->indexRegAddrs[instr->srcReg-1]));
 
-#define WRITE_BACK(instr, cpu, byte) ({
-  u16 tgtAddr = instr->size == 2 ? instr->auxBytes[0]:
-    ((u16)instr->auxBytes[1] << 8) | ((u16) instr->auxBytes[0]);\
-  u8 offset = (instr->srcReg == 0)? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);\
-  writeByte (byte, tgtAddr, instr->addrMode, cpu->memory, offset);
-})
 
-#define SET_NZ (cpu, op) ({
-  statusFlagSet (cpu, Z, op == 0x0);\
-  statusFlagSet (cpu, N, (0x80 & op) != 0x0);
-})
+#define WRITE_BACK(instr, cpu, byte) writeByte (byte, instr->size == 2 ? instr->auxBytes[0]:\
+    ((u16)instr->auxBytes[1] << 8) | ((u16) instr->auxBytes[0]),\
+    instr->addrMode, cpu->memory, (instr->srcReg == 0)? 0:\
+    *((u8*)cpu->indexRegAddrs[instr->srcReg-1]));
+
+
+// #define SET_NZ (cpu, op) do {statusFlagSet (cpu, Z, op == 0x0);\
+//                             statusFlagSet (cpu, N, (0x80 & op) != 0x0); } while (0);
+#include <stdio.h>
+#define SET_NZ(cpu, op) do {\
+            statusFlagSet (cpu, Z, op == 0x0);\
+            statusFlagSet (cpu, N, (0x80 & op) != 0x0);\
+          } while(0);
 
 u8 BRK (struct instruction *instr, cpu6502 *cpu) {
   return instr->cycles;
@@ -56,7 +57,7 @@ u8 BPL (struct instruction *instr, cpu6502 *cpu) {
   bool toBranch = !statusFlagGet (cpu, N);
   i8 offset = 0;
   if (toBranch) {
-    offset = (i8) intr->auxBytes[0]
+    offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
   return instr->cycles + (u8)toBranch +
     (u8)(IS_PAGE_CROSSED((cpu->regPC - offset), cpu->regPC));
@@ -105,7 +106,7 @@ u8 BMI (struct instruction *instr, cpu6502 *cpu) {
   bool toBranch = statusFlagGet (cpu, N);
   i8 offset = 0;
   if (toBranch) {
-    offset = (i8) intr->auxBytes[0]
+    offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
   return instr->cycles + (u8)toBranch +
     (u8)(IS_PAGE_CROSSED((cpu->regPC - offset), cpu->regPC));
@@ -159,7 +160,7 @@ u8 BVC (struct instruction *instr, cpu6502 *cpu) {
   bool toBranch = !statusFlagGet (cpu, V);
   i8 offset = 0;
   if (toBranch) {
-    offset = (i8) intr->auxBytes[0]
+    offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
   return instr->cycles + (u8)toBranch +
     (u8)(IS_PAGE_CROSSED((cpu->regPC - offset), cpu->regPC));
@@ -205,7 +206,7 @@ u8 BVS (struct instruction *instr, cpu6502 *cpu) {
   bool toBranch = statusFlagGet (cpu, V);
   i8 offset = 0;
   if (toBranch) {
-    offset = (i8) intr->auxBytes[0]
+    offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
   return instr->cycles + (u8)toBranch +
     (u8)(IS_PAGE_CROSSED((cpu->regPC - offset), cpu->regPC));
@@ -247,7 +248,7 @@ u8 BCC (struct instruction *instr, cpu6502 *cpu) {
   bool toBranch = !statusFlagGet (cpu, C);
   i8 offset = 0;
   if (toBranch) {
-    offset = (i8) intr->auxBytes[0]
+    offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
   return instr->cycles + (u8)toBranch +
     (u8)(IS_PAGE_CROSSED((cpu->regPC - offset), cpu->regPC));
@@ -297,7 +298,7 @@ u8 BCS (struct instruction *instr, cpu6502 *cpu) {
   bool toBranch = statusFlagGet (cpu, C);
   i8 offset = 0;
   if (toBranch) {
-    offset = (i8) intr->auxBytes[0]
+    offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
   return instr->cycles + (u8)toBranch +
     (u8)(IS_PAGE_CROSSED((cpu->regPC - offset), cpu->regPC));
@@ -355,7 +356,7 @@ u8 BEQ (struct instruction *instr, cpu6502 *cpu) {
   bool toBranch = statusFlagGet (cpu, Z);
   i8 offset = 0;
   if (toBranch) {
-    offset = (i8) intr->auxBytes[0]
+    offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
   return instr->cycles + (u8)toBranch +
     (u8)(IS_PAGE_CROSSED((cpu->regPC - offset), cpu->regPC));
@@ -397,7 +398,7 @@ u8 BNE (struct instruction *instr, cpu6502 *cpu) {
   bool toBranch = !statusFlagGet (cpu, Z);
   i8 offset = 0;
   if (toBranch) {
-    offset = (i8) intr->auxBytes[0]
+    offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
   return instr->cycles + (u8)toBranch +
     (u8)(IS_PAGE_CROSSED((cpu->regPC - offset), cpu->regPC));
