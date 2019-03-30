@@ -9,8 +9,6 @@
 /Users/thomasgeorge/desktop/NES-Emulator/src/instructions.c
 instructions.h
 -
-stdio.h
--
 
 include/6502.h
 stdbool.h

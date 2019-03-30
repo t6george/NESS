@@ -1,6 +1,6 @@
 #include <instructions.h>
 
-#define IS_PAGE_CROSSED(a1, a2) (0xFF00 & a1) != (0xFF00 & a2)
+#define IS_PAGE_CROSSED(a1, a2) (0xFF00 & (a1)) != (0xFF00 & (a2))
 
 #define READ_IN(instr, cpu, dst) dst = readByte (instr->size == 2 ? instr->auxBytes[0]:\
     ((u16)instr->auxBytes[1] << 8) | ((u16) instr->auxBytes[0]),\
@@ -14,9 +14,6 @@
     *((u8*)cpu->indexRegAddrs[instr->srcReg-1]));
 
 
-// #define SET_NZ (cpu, op) do {statusFlagSet (cpu, Z, op == 0x0);\
-//                             statusFlagSet (cpu, N, (0x80 & op) != 0x0); } while (0);
-#include <stdio.h>
 #define SET_NZ(cpu, op) do {\
             statusFlagSet (cpu, Z, op == 0x0);\
             statusFlagSet (cpu, N, (0x80 & op) != 0x0);\
@@ -60,7 +57,7 @@ u8 BPL (struct instruction *instr, cpu6502 *cpu) {
     offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
   return instr->cycles + (u8)toBranch +
-    (u8)(IS_PAGE_CROSSED((cpu->regPC - offset), cpu->regPC));
+    (u8)(IS_PAGE_CROSSED((cpu->regPC - offset + instr->size), cpu->regPC));
 }
 
 u8 CLC (struct instruction *instr, cpu6502 *cpu) {
@@ -109,7 +106,7 @@ u8 BMI (struct instruction *instr, cpu6502 *cpu) {
     offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
   return instr->cycles + (u8)toBranch +
-    (u8)(IS_PAGE_CROSSED((cpu->regPC - offset), cpu->regPC));
+    (u8)(IS_PAGE_CROSSED((cpu->regPC - offset + instr->size), cpu->regPC));
 }
 
 u8 SEC (struct instruction *instr, cpu6502 *cpu) {
@@ -163,7 +160,7 @@ u8 BVC (struct instruction *instr, cpu6502 *cpu) {
     offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
   return instr->cycles + (u8)toBranch +
-    (u8)(IS_PAGE_CROSSED((cpu->regPC - offset), cpu->regPC));
+    (u8)(IS_PAGE_CROSSED((cpu->regPC - offset + instr->size), cpu->regPC));
 }
 
 u8 CLI (struct instruction *instr, cpu6502 *cpu) {
@@ -209,7 +206,7 @@ u8 BVS (struct instruction *instr, cpu6502 *cpu) {
     offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
   return instr->cycles + (u8)toBranch +
-    (u8)(IS_PAGE_CROSSED((cpu->regPC - offset), cpu->regPC));
+    (u8)(IS_PAGE_CROSSED((cpu->regPC - offset + instr->size), cpu->regPC));
 }
 
 u8 SEI (struct instruction *instr, cpu6502 *cpu) {
@@ -251,7 +248,7 @@ u8 BCC (struct instruction *instr, cpu6502 *cpu) {
     offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
   return instr->cycles + (u8)toBranch +
-    (u8)(IS_PAGE_CROSSED((cpu->regPC - offset), cpu->regPC));
+    (u8)(IS_PAGE_CROSSED((cpu->regPC - offset + instr->size), cpu->regPC));
 }
 
 u8 TYA (struct instruction *instr, cpu6502 *cpu) {
@@ -301,7 +298,7 @@ u8 BCS (struct instruction *instr, cpu6502 *cpu) {
     offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
   return instr->cycles + (u8)toBranch +
-    (u8)(IS_PAGE_CROSSED((cpu->regPC - offset), cpu->regPC));
+    (u8)(IS_PAGE_CROSSED((cpu->regPC - offset + instr->size), cpu->regPC));
 }
 
 u8 CLV (struct instruction *instr, cpu6502 *cpu) {
@@ -314,14 +311,29 @@ u8 TSX (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 CPY (struct instruction *instr, cpu6502 *cpu) {
+  u8 operand;
+  READ_IN(instr, cpu, operand)
+  statusFlagSet (cpu, C, cpu->regY >= operand);
+  SET_NZ (cpu->regY - operand);
   return instr->cycles;
 }
 
 u8 CMP (struct instruction *instr, cpu6502 *cpu) {
-  return instr->cycles;
+  u8 operand;
+  READ_IN(instr, cpu, operand)
+  statusFlagSet (cpu, C, cpu->regA >= operand);
+  SET_NZ (cpu->regA - operand);
+
+  return instr->cycles + (u8)(IS_PAGE_CROSSED(addr - this->reg.x, addr)) *
+    (u8)(addrMode == ABSOLUTE_INDEXED || addrMode == INDIRECT_INDEXED);
 }
 
 u8 DEC (struct instruction *instr, cpu6502 *cpu) {
+  u8 operand;
+  READ_IN (instr, cpu, operand)
+  --operand;
+  WRITE_BACK (instr, cpu, operand)
+  SET_NZ (operand)
   return instr->cycles;
 }
 
@@ -331,6 +343,10 @@ u8 CLD (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 CPX (struct instruction *instr, cpu6502 *cpu) {
+  u8 operand;
+  READ_IN(instr, cpu, operand)
+  statusFlagSet (cpu, C, cpu->regX >= operand);
+  SET_NZ (cpu->regX - operand);
   return instr->cycles;
 }
 
@@ -339,6 +355,11 @@ u8 SBC (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 INC (struct instruction *instr, cpu6502 *cpu) {
+  u8 operand;
+  READ_IN (instr, cpu, operand)
+  --operand;
+  WRITE_BACK (instr, cpu, operand)
+  SET_NZ (operand)
   return instr->cycles;
 }
 
@@ -359,7 +380,7 @@ u8 BEQ (struct instruction *instr, cpu6502 *cpu) {
     offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
   return instr->cycles + (u8)toBranch +
-    (u8)(IS_PAGE_CROSSED((cpu->regPC - offset), cpu->regPC));
+    (u8)(IS_PAGE_CROSSED((cpu->regPC - offset + instr->size), cpu->regPC));
 }
 
 u8 SED (struct instruction *instr, cpu6502 *cpu) {
@@ -401,5 +422,5 @@ u8 BNE (struct instruction *instr, cpu6502 *cpu) {
     offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
   return instr->cycles + (u8)toBranch +
-    (u8)(IS_PAGE_CROSSED((cpu->regPC - offset), cpu->regPC));
+    (u8)(IS_PAGE_CROSSED((cpu->regPC - offset + instr->size), cpu->regPC));
 }
