@@ -165,7 +165,7 @@ static const instruction instructionMap [0x100] = {
   {1, NON_MEMORY, 2, .exec = ADC},
   {0, NON_MEMORY, 2, .exec = ROR, A},
   {},
-  {2, INDEXED_INDIRECT, 5, .exec = JMP},
+  {2, INDIRECT_INDEXED, 5, .exec = JMP},
   {2, ABSOLUTE, 4, .exec = ADC},
   {2, ABSOLUTE, 6, .exec = ROR},
   {},

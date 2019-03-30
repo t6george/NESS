@@ -3,7 +3,6 @@
 #define PAGE_PENALTY(a1, a2) (u8) (0xFF00 & (a1)) != (0xFF00 & (a2)) *\
             (u8) (instr->addrMode == ABSOLUTE_INDEXED || instr->addrMode == INDIRECT_INDEXED)
 
-
 #define READ_IN(dst) do {\
             address = (instr->size == 2) ? instr->auxBytes[0]:\
             ((u16)instr->auxBytes[1] << 8) | ((u16) instr->auxBytes[0]);\
@@ -30,11 +29,11 @@ u8 BRK (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 ORA (struct instruction *instr, cpu6502 *cpu) {
-  u8 operand, pagePenalty = 0;
+  u8 operand, pagePenalty = 0; u16 address;
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->auxBytes[0];
   } else {
-    READ_IN(instr, cpu, operand)
+    READ_IN(operand)
     pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
       *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
   cpu->regA |= operand;
@@ -43,24 +42,23 @@ u8 ORA (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 ASL (struct instruction *instr, cpu6502 *cpu) {
-  u8 operand;
+  u8 operand; u16 address;
   if (instr->addrMode == NON_MEMORY)
     operand = cpu->regA;
   else
-    READ_IN(instr, cpu, operand)
+    READ_IN(operand)
   statusFlagSet (cpu, C, (0x80 & operand) != 0x0);
   operand <<= 1;
   if (instr->addrMode == NON_MEMORY)
     cpu->regA = operand;
   else
-    WRITE_BACK (instr, cpu, operand)
+    WRITE_BACK(operand)
   SET_NZ(operand)
   return instr->cycles;
 }
 
 u8 BPL (struct instruction *instr, cpu6502 *cpu) {
-  bool toBranch = !statusFlagGet (cpu, N);
-  i8 offset = 0;
+  bool toBranch = !statusFlagGet (cpu, N); i8 offset = 0;
   if (toBranch) {
     offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
@@ -78,8 +76,8 @@ u8 JSR (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 BIT (struct instruction *instr, cpu6502 *cpu) {
-  u8 operand;
-  READ_IN(instr, cpu, operand)
+  u8 operand; u16 address;
+  READ_IN(operand)
   statusFlagSet (cpu, Z, (cpu->regA & operand) == 0);
   statusFlagSet (cpu, V, (0x80 & operand) != 0x0);
   statusFlagSet (cpu, N, (0x40 & operand) != 0x0);
@@ -88,17 +86,17 @@ u8 BIT (struct instruction *instr, cpu6502 *cpu) {
 
 u8 ROL (struct instruction *instr, cpu6502 *cpu) {
   u8 oldCarry = (u8) statusFlagGet (cpu, C);
-  u8 operand;
+  u8 operand; u16 address;
   if (instr->addrMode == NON_MEMORY)
     operand = cpu->regA;
   else
-    READ_IN(instr, cpu, operand)
+    READ_IN(operand)
   statusFlagSet (cpu, C, (0x80 & operand) != 0x0);
   operand = (operand << 1) | oldCarry;
   if (instr->addrMode == NON_MEMORY)
     cpu->regA = operand;
   else
-    WRITE_BACK (instr, cpu, operand)
+    WRITE_BACK(operand)
   SET_NZ(operand)
   return instr->cycles;
 }
@@ -108,8 +106,7 @@ u8 PLP (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 BMI (struct instruction *instr, cpu6502 *cpu) {
-  bool toBranch = statusFlagGet (cpu, N);
-  i8 offset = 0;
+  bool toBranch = statusFlagGet (cpu, N); i8 offset = 0;
   if (toBranch) {
     offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
@@ -127,11 +124,11 @@ u8 RTI (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 EOR (struct instruction *instr, cpu6502 *cpu) {
-  u8 operand, pagePenalty = 0;
+  u8 operand, pagePenalty = 0; u16 address;
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->auxBytes[0];
   } else {
-    READ_IN(instr, cpu, operand)
+    READ_IN(operand)
     pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
       *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
   cpu->regA ^= operand;
@@ -140,17 +137,17 @@ u8 EOR (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 LSR (struct instruction *instr, cpu6502 *cpu) {
-  u8 operand;
+  u8 operand; u16 address;
   if (instr->addrMode == NON_MEMORY)
     operand = cpu->regA;
   else
-    READ_IN(instr, cpu, operand)
+    READ_IN(operand)
   statusFlagSet (cpu, C, (0x80 & operand) != 0x0);
   operand >>= 1;
   if (instr->addrMode == NON_MEMORY)
     cpu->regA = operand;
   else
-    WRITE_BACK (instr, cpu, operand)
+    WRITE_BACK(operand)
   SET_NZ(operand)
   return instr->cycles;
 }
@@ -160,12 +157,14 @@ u8 PHA (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 JMP (struct instruction *instr, cpu6502 *cpu) {
+  u8 operand; u16 address;
+  READ_IN(operand)
+  cpu->regPC = operand;
   return instr->cycles;
 }
 
 u8 BVC (struct instruction *instr, cpu6502 *cpu) {
-  bool toBranch = !statusFlagGet (cpu, V);
-  i8 offset = 0;
+  bool toBranch = !statusFlagGet (cpu, V); i8 offset = 0;
   if (toBranch) {
     offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
@@ -183,31 +182,39 @@ u8 RTS (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 ADC (struct instruction *instr, cpu6502 *cpu) {
-  u8 operand, pagePenalty = 0;
+  u8 operand, pagePenalty = 0; u16 address;
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->auxBytes[0];
   } else {
-    READ_IN(instr, cpu, operand)
+    READ_IN(operand)
     pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
       *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
+
+  u16 sum = cpu->regA + operand + (u8) statusFlagGet (cpu, C);
+  statusFlagSet (cpu, C, 0xFF < sum);
+  statusFlagSet (cpu, V, ((operand ^ sum) & (cpu->regA ^ sum) & 0x80) != 0);
+  cpu->regA = (u8) sum;
+  SET_NZ (cpu->regA)
   return instr->cycles + pagePenalty;
 }
 
 u8 ROR (struct instruction *instr, cpu6502 *cpu) {
-  u8 operand;
   u8 oldCarry = ((u8) statusFlagGet (cpu, C)) << 0x7;
-  if (instr->addrMode == NON_MEMORY) {
+  u8 operand; u16 address;
+
+  if (instr->addrMode == NON_MEMORY)
     operand = cpu->regA;
-  } else {
-    READ_IN(instr, cpu, operand)
-  }
+  else
+    READ_IN(operand)
+
   statusFlagSet (cpu, C, (0x01 & operand) == 0x01);
   operand = (operand >> 1) | oldCarry;
-  if (instr->addrMode == NON_MEMORY) {
+
+  if (instr->addrMode == NON_MEMORY)
     cpu->regA = operand;
-  } else {
-    WRITE_BACK (instr, cpu, operand)
-  }
+  else
+    WRITE_BACK(operand)
+
   SET_NZ(operand)
   return instr->cycles;
 }
@@ -217,8 +224,7 @@ u8 PLA (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 BVS (struct instruction *instr, cpu6502 *cpu) {
-  bool toBranch = statusFlagGet (cpu, V);
-  i8 offset = 0;
+  bool toBranch = statusFlagGet (cpu, V); i8 offset = 0;
   if (toBranch) {
     offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
@@ -232,17 +238,20 @@ u8 SEI (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 STA (struct instruction *instr, cpu6502 *cpu) {
-  WRITE_BACK (instr, cpu, cpu->regA)
+  u16 address;
+  WRITE_BACK(cpu->regA)
   return instr->cycles;
 }
 
 u8 STY (struct instruction *instr, cpu6502 *cpu) {
-  WRITE_BACK (instr, cpu, cpu->regY)
+  u16 address;
+  WRITE_BACK(cpu->regY)
   return instr->cycles;
 }
 
 u8 STX (struct instruction *instr, cpu6502 *cpu) {
-  WRITE_BACK (instr, cpu, cpu->regX)
+  u16 address;
+  WRITE_BACK(cpu->regX)
   return instr->cycles;
 }
 
@@ -259,8 +268,7 @@ u8 TXA (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 BCC (struct instruction *instr, cpu6502 *cpu) {
-  bool toBranch = !statusFlagGet (cpu, C);
-  i8 offset = 0;
+  bool toBranch = !statusFlagGet (cpu, C); i8 offset = 0;
   if (toBranch) {
     offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
@@ -291,11 +299,11 @@ u8 TAX (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 LDA (struct instruction *instr, cpu6502 *cpu) {
-  u8 pagePenalty = 0;
+  u8 pagePenalty = 0; u16 address;
   if (instr->addrMode == NON_MEMORY) {
     cpu->regA = instr->auxBytes[0];
   } else {
-    READ_IN(instr, cpu, (cpu->regA))
+    READ_IN((cpu->regA))
     pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
       *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
   SET_NZ(cpu->regA)
@@ -303,11 +311,11 @@ u8 LDA (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 LDX (struct instruction *instr, cpu6502 *cpu) {
-  u8 pagePenalty = 0;
+  u8 pagePenalty = 0; u16 address;
   if (instr->addrMode == NON_MEMORY) {
     cpu->regX = instr->auxBytes[0];
   } else {
-    READ_IN(instr, cpu, (cpu->regX))
+    READ_IN((cpu->regX))
     pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
       *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
   SET_NZ(cpu->regX)
@@ -315,11 +323,11 @@ u8 LDX (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 LDY (struct instruction *instr, cpu6502 *cpu) {
-  u8 pagePenalty = 0;
+  u8 pagePenalty = 0; u16 address;
   if (instr->addrMode == NON_MEMORY) {
     cpu->regY = instr->auxBytes[0];
   } else {
-    READ_IN(instr, cpu, (cpu->regY))
+    READ_IN((cpu->regY))
     pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
       *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
   SET_NZ(cpu->regY)
@@ -327,8 +335,7 @@ u8 LDY (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 BCS (struct instruction *instr, cpu6502 *cpu) {
-  bool toBranch = statusFlagGet (cpu, C);
-  i8 offset = 0;
+  bool toBranch = statusFlagGet (cpu, C); i8 offset = 0;
   if (toBranch) {
     offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
@@ -346,19 +353,19 @@ u8 TSX (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 CPY (struct instruction *instr, cpu6502 *cpu) {
-  u8 operand;
-  READ_IN(instr, cpu, operand)
+  u8 operand; u16 address;
+  READ_IN(operand)
   statusFlagSet (cpu, C, cpu->regY >= operand);
   SET_NZ((cpu->regY - operand))
   return instr->cycles;
 }
 
 u8 CMP (struct instruction *instr, cpu6502 *cpu) {
-  u8 operand, pagePenalty = 0;
+  u8 operand, pagePenalty = 0; u16 address;
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->auxBytes[0];
   } else {
-    READ_IN(instr, cpu, operand)
+    READ_IN(operand)
     pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
       *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
   statusFlagSet (cpu, C, cpu->regA >= operand);
@@ -367,10 +374,10 @@ u8 CMP (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 DEC (struct instruction *instr, cpu6502 *cpu) {
-  u8 operand;
-  READ_IN(instr, cpu, operand)
+  u8 operand; u16 address;
+  READ_IN(operand)
   --operand;
-  WRITE_BACK (instr, cpu, operand)
+  WRITE_BACK(operand)
   SET_NZ(operand)
   return instr->cycles;
 }
@@ -381,29 +388,36 @@ u8 CLD (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 CPX (struct instruction *instr, cpu6502 *cpu) {
-  u8 operand;
-  READ_IN(instr, cpu, operand)
+  u8 operand; u16 address;
+  READ_IN(operand)
   statusFlagSet (cpu, C, cpu->regX >= operand);
   SET_NZ((cpu->regX - operand))
   return instr->cycles;
 }
 
 u8 SBC (struct instruction *instr, cpu6502 *cpu) {
-  u8 operand, pagePenalty = 0;
+  u8 operand, pagePenalty = 0; u16 address;
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->auxBytes[0];
   } else {
-    READ_IN(instr, cpu, operand)
+    READ_IN(operand)
     pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
       *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
+
+  operand = ~operand;
+  u16 diff = cpu->regA + operand + (u8) statusFlagGet (cpu, C);
+  statusFlagSet (cpu, C, 0xFF < sum);
+  statusFlagSet (cpu, V, ((operand ^ sum) & (cpu->regA ^ sum) & 0x80) != 0);
+  cpu->regA = (u8) sum;
+  SET_NZ (cpu->regA)
   return instr->cycles + pagePenalty;
 }
 
 u8 INC (struct instruction *instr, cpu6502 *cpu) {
-  u8 operand;
-  READ_IN(instr, cpu, operand)
+  u8 operand; u16 address;
+  READ_IN(operand)
   ++operand;
-  WRITE_BACK (instr, cpu, operand)
+  WRITE_BACK(operand)
   SET_NZ(operand)
   return instr->cycles;
 }
@@ -419,8 +433,7 @@ u8 NOP (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 BEQ (struct instruction *instr, cpu6502 *cpu) {
-  bool toBranch = statusFlagGet (cpu, Z);
-  i8 offset = 0;
+  bool toBranch = statusFlagGet (cpu, Z); i8 offset = 0;
   if (toBranch) {
     offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
@@ -440,11 +453,11 @@ u8 DEX (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 AND (struct instruction *instr, cpu6502 *cpu) {
-  u8 operand, pagePenalty = 0;
+  u8 operand, pagePenalty = 0; u16 address;
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->auxBytes[0];
   } else {
-    READ_IN(instr, cpu, operand)
+    READ_IN(operand)
     pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
       *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
   cpu->regA &= operand;
@@ -463,8 +476,7 @@ u8 INY (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 BNE (struct instruction *instr, cpu6502 *cpu) {
-  bool toBranch = !statusFlagGet (cpu, Z);
-  i8 offset = 0;
+  bool toBranch = !statusFlagGet (cpu, Z); i8 offset = 0;
   if (toBranch) {
     offset = (i8) instr->auxBytes[0];
     cpu->regPC += offset; }
