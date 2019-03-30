@@ -1,26 +1,26 @@
 #include <instructions.h>
 
-#define PAGE_PENALTY (a1, a2) (u8) (0xFF00 & (a1)) != (0xFF00 & (a2)) *\
-  (u8) (instr->addrMode == ABSOLUTE_INDEXED || instr->addrMode == INDIRECT_INDEXED)
-
-#define READ_IN(instr, cpu, dst) do {\
-            u16 address = instr->size == 2 ? instr->auxBytes[0]:\
-              ((u16)instr->auxBytes[1] << 8) | ((u16) instr->auxBytes[0]);\
-            dst = readByte (address,instr->addrMode,\
-              cpu->memory, instr->srcReg == 0 ? 0:\
-              *((u8*)cpu->indexRegAddrs[instr->srcReg-1]));
-          } while (0);
+#define PAGE_PENALTY(a1, a2) (u8) (0xFF00 & (a1)) != (0xFF00 & (a2)) *\
+            (u8) (instr->addrMode == ABSOLUTE_INDEXED || instr->addrMode == INDIRECT_INDEXED)
 
 
-#define WRITE_BACK(instr, cpu, byte) do {\
-            u16 address = instr->size == 2 ? instr->auxBytes[0]:\
-              ((u16)instr->auxBytes[1] << 8) | ((u16) instr->auxBytes[0]);\
-            writeByte (byte, instr->size == 2 ? address,\
-              instr->addrMode, cpu->memory, instr->srcReg == 0 ? 0:\
-              *((u8*)cpu->indexRegAddrs[instr->srcReg-1]));
+#define READ_IN(dst) do {\
+            address = (instr->size == 2) ? instr->auxBytes[0]:\
+            ((u16)instr->auxBytes[1] << 8) | ((u16) instr->auxBytes[0]);\
+            dst = readByte (address, instr->addrMode,\
+            cpu->memory, instr->srcReg == 0 ? 0:\
+            *((u8*)cpu->indexRegAddrs[instr->srcReg-1]));\
           } while(0);
 
-#define SET_NZ(cpu, op) do {\
+#define WRITE_BACK(byte) do {\
+            address = (instr->size == 2) ? instr->auxBytes[0]:\
+            ((u16)instr->auxBytes[1] << 8) | ((u16) instr->auxBytes[0]);\
+            writeByte (byte, address,instr->addrMode,\
+            cpu->memory, instr->srcReg == 0 ? 0:\
+            *((u8*)cpu->indexRegAddrs[instr->srcReg-1]));\
+          } while(0);
+
+#define SET_NZ(op) do {\
             statusFlagSet (cpu, Z, op == 0x0);\
             statusFlagSet (cpu, N, (0x80 & op) != 0x0);\
           } while(0);
@@ -34,11 +34,11 @@ u8 ORA (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->auxBytes[0];
   } else {
-    READ_IN (instr, cpu, operand)
-    pagePenalty = PAGE_PENALTY(address - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1]), address) }
+    READ_IN(instr, cpu, operand)
+    pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
+      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
   cpu->regA |= operand;
-  SET_NZ (cpu, cpu->regA)
+  SET_NZ(cpu->regA)
   return instr->cycles + pagePenalty;
 }
 
@@ -47,14 +47,14 @@ u8 ASL (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY)
     operand = cpu->regA;
   else
-    READ_IN (instr, cpu, operand)
+    READ_IN(instr, cpu, operand)
   statusFlagSet (cpu, C, (0x80 & operand) != 0x0);
   operand <<= 1;
   if (instr->addrMode == NON_MEMORY)
     cpu->regA = operand;
   else
     WRITE_BACK (instr, cpu, operand)
-  SET_NZ (cpu, operand)
+  SET_NZ(operand)
   return instr->cycles;
 }
 
@@ -79,7 +79,7 @@ u8 JSR (struct instruction *instr, cpu6502 *cpu) {
 
 u8 BIT (struct instruction *instr, cpu6502 *cpu) {
   u8 operand;
-  READ_IN (instr, cpu, operand)
+  READ_IN(instr, cpu, operand)
   statusFlagSet (cpu, Z, (cpu->regA & operand) == 0);
   statusFlagSet (cpu, V, (0x80 & operand) != 0x0);
   statusFlagSet (cpu, N, (0x40 & operand) != 0x0);
@@ -92,14 +92,14 @@ u8 ROL (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY)
     operand = cpu->regA;
   else
-    READ_IN (instr, cpu, operand)
+    READ_IN(instr, cpu, operand)
   statusFlagSet (cpu, C, (0x80 & operand) != 0x0);
   operand = (operand << 1) | oldCarry;
   if (instr->addrMode == NON_MEMORY)
     cpu->regA = operand;
   else
     WRITE_BACK (instr, cpu, operand)
-  SET_NZ (cpu, operand)
+  SET_NZ(operand)
   return instr->cycles;
 }
 
@@ -131,11 +131,11 @@ u8 EOR (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->auxBytes[0];
   } else {
-    READ_IN (instr, cpu, operand)
-    pagePenalty = PAGE_PENALTY(address - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1]), address) }
+    READ_IN(instr, cpu, operand)
+    pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
+      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
   cpu->regA ^= operand;
-  SET_NZ (cpu, cpu->regA)
+  SET_NZ(cpu->regA)
   return instr->cycles + pagePenalty;
 }
 
@@ -144,14 +144,14 @@ u8 LSR (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY)
     operand = cpu->regA;
   else
-    READ_IN (instr, cpu, operand)
+    READ_IN(instr, cpu, operand)
   statusFlagSet (cpu, C, (0x80 & operand) != 0x0);
   operand >>= 1;
   if (instr->addrMode == NON_MEMORY)
     cpu->regA = operand;
   else
     WRITE_BACK (instr, cpu, operand)
-  SET_NZ (cpu, operand)
+  SET_NZ(operand)
   return instr->cycles;
 }
 
@@ -187,9 +187,9 @@ u8 ADC (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->auxBytes[0];
   } else {
-    READ_IN (instr, cpu, operand)
-    pagePenalty = PAGE_PENALTY(address - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1]), address) }
+    READ_IN(instr, cpu, operand)
+    pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
+      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
   return instr->cycles + pagePenalty;
 }
 
@@ -199,7 +199,7 @@ u8 ROR (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     operand = cpu->regA;
   } else {
-    READ_IN (instr, cpu, operand)
+    READ_IN(instr, cpu, operand)
   }
   statusFlagSet (cpu, C, (0x01 & operand) == 0x01);
   operand = (operand >> 1) | oldCarry;
@@ -208,7 +208,7 @@ u8 ROR (struct instruction *instr, cpu6502 *cpu) {
   } else {
     WRITE_BACK (instr, cpu, operand)
   }
-  SET_NZ (cpu, operand)
+  SET_NZ(operand)
   return instr->cycles;
 }
 
@@ -248,13 +248,13 @@ u8 STX (struct instruction *instr, cpu6502 *cpu) {
 
 u8 DEY (struct instruction *instr, cpu6502 *cpu) {
   --cpu->regY;
-  SET_NZ (cpu, cpu->regY)
+  SET_NZ(cpu->regY)
   return instr->cycles;
 }
 
 u8 TXA (struct instruction *instr, cpu6502 *cpu) {
   cpu->regA = cpu->regX;
-  SET_NZ (cpu, cpu->regA)
+  SET_NZ(cpu->regA)
   return instr->cycles;
 }
 
@@ -270,7 +270,7 @@ u8 BCC (struct instruction *instr, cpu6502 *cpu) {
 
 u8 TYA (struct instruction *instr, cpu6502 *cpu) {
   cpu->regA = cpu->regY;
-  SET_NZ (cpu, cpu->regA)
+  SET_NZ(cpu->regA)
   return instr->cycles;
 }
 
@@ -280,13 +280,13 @@ u8 TXS (struct instruction *instr, cpu6502 *cpu) {
 
 u8 TAY (struct instruction *instr, cpu6502 *cpu) {
   cpu->regY = cpu->regA;
-  SET_NZ (cpu, cpu->regY)
+  SET_NZ(cpu->regY)
   return instr->cycles;
 }
 
 u8 TAX (struct instruction *instr, cpu6502 *cpu) {
   cpu->regX = cpu->regA;
-  SET_NZ (cpu, cpu->regX)
+  SET_NZ(cpu->regX)
   return instr->cycles;
 }
 
@@ -295,10 +295,10 @@ u8 LDA (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     cpu->regA = instr->auxBytes[0];
   } else {
-    READ_IN (instr, cpu, (cpu->regA))
-    pagePenalty = PAGE_PENALTY(address - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1]), address) }
-  SET_NZ (cpu, cpu->regA)
+    READ_IN(instr, cpu, (cpu->regA))
+    pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
+      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
+  SET_NZ(cpu->regA)
   return instr->cycles + pagePenalty;
 }
 
@@ -307,10 +307,10 @@ u8 LDX (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     cpu->regX = instr->auxBytes[0];
   } else {
-    READ_IN (instr, cpu, (cpu->regX))
-    pagePenalty = PAGE_PENALTY(address - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1]), address) }
-  SET_NZ (cpu, cpu->regX)
+    READ_IN(instr, cpu, (cpu->regX))
+    pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
+      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
+  SET_NZ(cpu->regX)
   return instr->cycles + pagePenalty;
 }
 
@@ -319,10 +319,10 @@ u8 LDY (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     cpu->regY = instr->auxBytes[0];
   } else {
-    READ_IN (instr, cpu, (cpu->regY))
-    pagePenalty = PAGE_PENALTY(address - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1]), address) }
-  SET_NZ (cpu, cpu->regY)
+    READ_IN(instr, cpu, (cpu->regY))
+    pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
+      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
+  SET_NZ(cpu->regY)
   return instr->cycles + pagePenalty;
 }
 
@@ -349,7 +349,7 @@ u8 CPY (struct instruction *instr, cpu6502 *cpu) {
   u8 operand;
   READ_IN(instr, cpu, operand)
   statusFlagSet (cpu, C, cpu->regY >= operand);
-  SET_NZ (cpu->regY - operand);
+  SET_NZ((cpu->regY - operand))
   return instr->cycles;
 }
 
@@ -358,20 +358,20 @@ u8 CMP (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->auxBytes[0];
   } else {
-    READ_IN (instr, cpu, operand)
-    pagePenalty = PAGE_PENALTY(address - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1]), address) }
+    READ_IN(instr, cpu, operand)
+    pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
+      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
   statusFlagSet (cpu, C, cpu->regA >= operand);
-  SET_NZ (cpu->regA - operand);
+  SET_NZ((cpu->regA - operand))
   return instr->cycles + pagePenalty;
 }
 
 u8 DEC (struct instruction *instr, cpu6502 *cpu) {
   u8 operand;
-  READ_IN (instr, cpu, operand)
+  READ_IN(instr, cpu, operand)
   --operand;
   WRITE_BACK (instr, cpu, operand)
-  SET_NZ (operand)
+  SET_NZ(operand)
   return instr->cycles;
 }
 
@@ -384,7 +384,7 @@ u8 CPX (struct instruction *instr, cpu6502 *cpu) {
   u8 operand;
   READ_IN(instr, cpu, operand)
   statusFlagSet (cpu, C, cpu->regX >= operand);
-  SET_NZ (cpu->regX - operand);
+  SET_NZ((cpu->regX - operand))
   return instr->cycles;
 }
 
@@ -393,24 +393,24 @@ u8 SBC (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->auxBytes[0];
   } else {
-    READ_IN (instr, cpu, operand)
-    pagePenalty = PAGE_PENALTY(address - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1]), address) }
+    READ_IN(instr, cpu, operand)
+    pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
+      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
   return instr->cycles + pagePenalty;
 }
 
 u8 INC (struct instruction *instr, cpu6502 *cpu) {
   u8 operand;
-  READ_IN (instr, cpu, operand)
+  READ_IN(instr, cpu, operand)
   ++operand;
   WRITE_BACK (instr, cpu, operand)
-  SET_NZ (operand)
+  SET_NZ(operand)
   return instr->cycles;
 }
 
 u8 INX (struct instruction *instr, cpu6502 *cpu) {
   ++cpu->regX;
-  SET_NZ (cpu, cpu->regX)
+  SET_NZ(cpu->regX)
   return instr->cycles;
 }
 
@@ -435,7 +435,7 @@ u8 SED (struct instruction *instr, cpu6502 *cpu) {
 
 u8 DEX (struct instruction *instr, cpu6502 *cpu) {
   --cpu->regX;
-  SET_NZ (cpu, cpu->regX)
+  SET_NZ(cpu->regX)
   return instr->cycles;
 }
 
@@ -444,11 +444,11 @@ u8 AND (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->auxBytes[0];
   } else {
-    READ_IN (instr, cpu, operand)
-    pagePenalty = PAGE_PENALTY(address - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1]), address) }
+    READ_IN(instr, cpu, operand)
+    pagePenalty = PAGE_PENALTY((address - instr->srcReg == 0 ? 0:
+      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), address); }
   cpu->regA &= operand;
-  SET_NZ (cpu, cpu->regA)
+  SET_NZ(cpu->regA)
   return instr->cycles + pagePenalty;
 }
 
@@ -458,7 +458,7 @@ u8 PHP (struct instruction *instr, cpu6502 *cpu) {
 
 u8 INY (struct instruction *instr, cpu6502 *cpu) {
   ++cpu->regY;
-  SET_NZ (cpu, cpu->regY)
+  SET_NZ(cpu->regY)
   return instr->cycles;
 }
 
