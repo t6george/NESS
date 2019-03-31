@@ -17,49 +17,20 @@ mainMemory* powerUpMemory (void) {
 }
 
 /*Lets refer to the host computer system's memory as "physical"*/
-u8* getPhysAddress (u16 address, mainMemory *memory) {
+u8* getPhysAddress (mainMemory *memory, u16 virtAddress) {
 	u8* physPntr = NULL;
-	if ((0xE000 & address) == 0x0) {
-		physPntr = memory->ram + (0x07FF & address);
-	} else if ((0xE000 & address) == 0x2000) {
-		physPntr = memory->ppuRegs + (0x0007 & address);
-	} else if ((0xFFF0 & address) == 0x4000 || (0xFFF8 & address) == 0x4010) {
+	if ((0xE000 & virtAddress) == 0x0) {
+		physPntr = memory->ram + (0x07FF & virtAddress);
+	} else if ((0xE000 & virtAddress) == 0x2000) {
+		physPntr = memory->ppuRegs + (0x0007 & virtAddress);
+	} else if ((0xFFF0 & virtAddress) == 0x4000 || (0xFFF8 & virtAddress) == 0x4010) {
 		physPntr = memory->apuRegs + (0x001F & address);
-	} else if ((0xFFF8 & address) == 0x4018) {
-		physPntr = memory->apuIORegs + (0x0007 & address);
+	} else if ((0xFFF8 & virtAddress) == 0x4018) {
+		physPntr = memory->apuIORegs + (0x0007 & virtAddress);
 	} else {
-		physPntr = memory->cartridgeMem + (address - 0x4020);
+		physPntr = memory->cartridgeMem + (virtAddress - 0x4020);
 	}
 	return physPntr;
-}
-
-/*Lets refer to the guest's (NES) memory as "virtual"*/
-u16 getVirtualAddress (cpu6502 *cpu, addressingMode addrMode, regIndex srcReg, u16 encodedAddr) {
-	u16 virtAddress = encodedAddr;
-	u8 os = srcReg == 0 ? 0: *((u8*)cpu->indexRegAddrs[srcReg-1]);
-	switch (addrMode) {
-		case ABSOLUTE_INDEXED: {
-			virtAddress += os;
-			break;
-		}
-		case ZERO_PAGE_INDEXED: {
-			virtAddress = 0xFF & (address + os);
-			break;
-		}
-		case INDEXED_INDIRECT: {
-			virtAddress = ((u16)*getPhysAddress(0xFF & (virtAddress + os))) |
-				(((u16)*getPhysAddress(0xFF & (virtAddress + os + 1))) << 8);
-			break;
-		}
-		case INDIRECT_INDEXED: {
-			virtAddress = (((u16)*getPhysAddress(virtAddress)) |
-				(((u16)*getPhysAddress(virtAddress + 1)) << 8)) + os;
-			break;
-		}
-		default: {
-			break;
-		}
-		return virtAddress;
 }
 
 void powerDownMemory (mainMemory* mem) {

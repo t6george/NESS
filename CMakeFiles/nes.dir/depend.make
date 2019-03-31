@@ -3,6 +3,7 @@
 
 CMakeFiles/NES.dir/src/6502.c.o: src/6502.c
 CMakeFiles/NES.dir/src/6502.c.o: include/6502.h
+CMakeFiles/NES.dir/src/6502.c.o: include/instructions.h
 CMakeFiles/NES.dir/src/6502.c.o: include/sysmem.h
 CMakeFiles/NES.dir/src/6502.c.o: include/utils.h
 

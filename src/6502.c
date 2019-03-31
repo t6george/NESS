@@ -1,5 +1,4 @@
 #include <stdio.h>
-
 #include <6502.h>
 
 static mainMemory *memory;
@@ -29,7 +28,37 @@ void powerDownCpu (cpu6502* cpu) {
 void resetCpu (cpu6502* cpu) {
   cpu->regS -= 0x03;
   cpu->regP |= 0x04;
-  writeByte (0x00, 0x1540, ABSOLUTE, cpu->memory, 0x00);
+  *getPhysAddress(cpu->memory, 0x1540) = 0x00;
+}
+
+/*Lets refer to the guest's (NES) memory as "virtual"*/
+void getVirtualAddress (cpu6502 *cpu, instruction *instr) {
+	u8 os = instr->srcReg == 0 ? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);
+	u16 virtAddress = instr->size == 3 ? instr->opData.addr: (instr->opData.addr >> 8);
+
+	switch (instr->addrMode) {
+		case ABSOLUTE_INDEXED: {
+			virtAddress += os;
+			break;
+		}
+		case ZERO_PAGE_INDEXED: {
+			virtAddress = 0xFF & (virtAddress + os);
+			break;
+		}
+		case INDEXED_INDIRECT: {
+			virtAddress = ((u16)*getPhysAddress(cpu->memory, 0xFF & (virtAddress + os))) |
+				(((u16)*getPhysAddress(0xFF & (virtAddress + os + 1))) << 8);
+			break;
+		}
+		case INDIRECT_INDEXED: {
+			virtAddress = (((u16)*getPhysAddress(cpu->memory, virtAddress)) |
+				(((u16)*getPhysAddress(cpu->memory, virtAddress + 1)) << 8)) + os;
+			break;
+		}
+		default: {
+			break;
+		}
+		instr->opData.addr = virtAddress;
 }
 
 bool statusFlagGet (cpu6502* cpu, flags flag) {
@@ -42,10 +71,6 @@ void statusFlagSet (cpu6502* cpu, flags flag, bool status) {
 
 u8 stepInstr (cpu6502* cpu) {
   // u8 opcode = cpu->memory (cpu->regPC++, u8 addrMode, cpu->mainMemory);
-  if (instr->size == 2)
-    address = (u16) instr->auxBytes[0];
-  else
-    address = ((u16)instr->auxBytes[1] << 8) | ((u16) instr->auxBytes[0]);
   for (u8 b = 0; b < 1; b++) {
     break;
   }

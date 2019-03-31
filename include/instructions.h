@@ -8,7 +8,10 @@ typedef struct instruction {
   u8 cycles;
   u8 (*exec)(struct instruction* instr, cpu6502 *cpu);
   regIndex srcReg;
-  u16 opAddr;
+  union {
+    u8 val;
+    u16 addr;
+  } opData;
 } instruction;
 
 u8 stackPull8(cpu6502* cpu);
