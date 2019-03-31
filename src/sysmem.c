@@ -16,96 +16,50 @@ mainMemory* powerUpMemory (void) {
 	return mem;
 }
 
-u8* decodeAddress (u16 address, mainMemory *memory) {
-	u8* memPtr = NULL;
+/*Lets refer to the host computer system's memory as "physical"*/
+u8* getPhysAddress (u16 address, mainMemory *memory) {
+	u8* physPntr = NULL;
 	if ((0xE000 & address) == 0x0) {
-		memPtr = memory->ram + (0x07FF & address);
+		physPntr = memory->ram + (0x07FF & address);
 	} else if ((0xE000 & address) == 0x2000) {
-		memPtr = memory->ppuRegs + (0x0007 & address);
+		physPntr = memory->ppuRegs + (0x0007 & address);
 	} else if ((0xFFF0 & address) == 0x4000 || (0xFFF8 & address) == 0x4010) {
-		memPtr = memory->apuRegs + (0x001F & address);
+		physPntr = memory->apuRegs + (0x001F & address);
 	} else if ((0xFFF8 & address) == 0x4018) {
-		memPtr = memory->apuIORegs + (0x0007 & address);
+		physPntr = memory->apuIORegs + (0x0007 & address);
 	} else {
-		memPtr = memory->cartridgeMem + (address - 0x4020);
+		physPntr = memory->cartridgeMem + (address - 0x4020);
 	}
-	return memPtr;
+	return physPntr;
 }
 
-u8 readByte (u16 address, addressingMode addrMode, mainMemory *memory, u8 os) {
-	u8 *memoryContents = NULL;
-
+/*Lets refer to the guest's (NES) memory as "virtual"*/
+u16 getVirtualAddress (cpu6502 *cpu, addressingMode addrMode, regIndex srcReg, u16 encodedAddr) {
+	u16 virtAddress = encodedAddr;
+	u8 os = srcReg == 0 ? 0: *((u8*)cpu->indexRegAddrs[srcReg-1]);
 	switch (addrMode) {
-		case ABSOLUTE: {
-			memoryContents = decodeAddress ((u16) (((address & 0xFF) << 8) |
-				(address >> 8)), memory);
-			break;
-		}
-		case ZERO_PAGE: {
-			memoryContents = decodeAddress (address, memory);
-			break;
-		}
 		case ABSOLUTE_INDEXED: {
-			memoryContents = decodeAddress ((u16) ((((address + os) & 0xFF) << 8) |
-				((address + os) >> 8)), memory);
+			virtAddress += os;
 			break;
 		}
 		case ZERO_PAGE_INDEXED: {
-			memoryContents = decodeAddress (0xFF & (address + os), memory);
+			virtAddress = 0xFF & (address + os);
 			break;
 		}
 		case INDEXED_INDIRECT: {
-			memoryContents = decodeAddress (((u16)(readByte (0xFF & (address + os), ZERO_PAGE, memory, 0x0))) |
-				(((u16)(readByte (0xFF & (address + os + 1), ZERO_PAGE, memory, 0x0))) << 8), memory);
+			virtAddress = ((u16)*getPhysAddress(0xFF & (virtAddress + os))) |
+				(((u16)*getPhysAddress(0xFF & (virtAddress + os + 1))) << 8);
 			break;
 		}
 		case INDIRECT_INDEXED: {
-			memoryContents = decodeAddress ((((u16)(readByte (address, ZERO_PAGE, memory, 0x0))) |
-				(((u16)(readByte (address + 1, ZERO_PAGE, memory, 0x0))) << 8)) + os, memory);
+			virtAddress = (((u16)*getPhysAddress(virtAddress)) |
+				(((u16)*getPhysAddress(virtAddress + 1)) << 8)) + os;
 			break;
 		}
 		default: {
 			break;
 		}
-	}
-
-	return *memoryContents;
-}
-
-void writeByte (u8 data, u16 address, addressingMode addrMode, mainMemory *memory, u8 os) {
-	switch (addrMode) {
-		case ABSOLUTE: {
-			*decodeAddress ((u16) (((address & 0xFF) << 8) |
-				(address >> 8)), memory) = data;
-			break;
-		}
-		case ZERO_PAGE: {
-			*decodeAddress (address, memory) = data;
-			break;
-		}
-		case ABSOLUTE_INDEXED: {
-			*decodeAddress ((u16) ((((address + os) & 0xFF) << 8) |
-				((address + os) >> 8)), memory) = data;
-			break;
-		}
-		case ZERO_PAGE_INDEXED: {
-			*decodeAddress (0xFF & (address + os), memory) = data;
-			break;
-		}
-		case INDEXED_INDIRECT: {
-			*decodeAddress (((u16)(readByte (0xFF & (address + os), ZERO_PAGE, memory, 0x00))) |
-				(((u16)(readByte (0xFF & (address + os + 1), ZERO_PAGE, memory, 0x00))) << 8), memory) = data;
-			break;
-		}
-		case INDIRECT_INDEXED: {
-			*decodeAddress ((((u16)(readByte (address, ZERO_PAGE, memory, 0x00))) |
-				(((u16)(readByte (address + 1, ZERO_PAGE, memory, 0x00))) << 8)) + os, memory) = data;
-			break;
-		}
-		default: {
-			break;
-		}
-	}
+		return virtAddress;
 }
 
 void powerDownMemory (mainMemory* mem) {

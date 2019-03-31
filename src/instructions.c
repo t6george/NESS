@@ -34,14 +34,9 @@ void sysWrite (cpu6502 *cpu, instruction *instr, u16 address, u8 byte) {
 u8 stackPull8(cpu6502* cpu) {
   return readByte (++cpu->regS + 0x100, ABSOLUTE, cpu->memory, 0x00);
 }
-u16 stackPull16(cpu6502* cpu) {
-  return 0;
-}
+
 void stackPush8(cpu6502* cpu, u8 byte) {
   writeByte (byte, 0x100 + cpu->regS--, ABSOLUTE, cpu->memory, 0x00);
-}
-void stackPush16(cpu6502* cpu, u16 twoBytes) {
-
 }
 
 u8 BRK (struct instruction *instr, cpu6502 *cpu) {
@@ -121,6 +116,8 @@ u8 ROL (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 PLP (struct instruction *instr, cpu6502 *cpu) {
+  cpu->regP = stackPull8(cpu);
+  SET_NZ(cpu->regP)
   return instr->cycles;
 }
 
@@ -172,6 +169,7 @@ u8 LSR (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 PHA (struct instruction *instr, cpu6502 *cpu) {
+  stackPush8(cpu, cpu->regA);
   return instr->cycles;
 }
 
@@ -238,6 +236,8 @@ u8 ROR (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 PLA (struct instruction *instr, cpu6502 *cpu) {
+  cpu->regA = stackPull8(cpu);
+  SET_NZ(cpu->regA)
   return instr->cycles;
 }
 
@@ -298,6 +298,7 @@ u8 TYA (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 TXS (struct instruction *instr, cpu6502 *cpu) {
+  cpu->regS = cpu->regX;
   return instr->cycles;
 }
 
@@ -364,6 +365,7 @@ u8 CLV (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 TSX (struct instruction *instr, cpu6502 *cpu) {
+  cpu->regX = cpu->regS;
   return instr->cycles;
 }
 
@@ -479,6 +481,7 @@ u8 AND (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 PHP (struct instruction *instr, cpu6502 *cpu) {
+  stackPush8(cpu, cpu->regP);
   return instr->cycles;
 }
 

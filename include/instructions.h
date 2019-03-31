@@ -8,13 +8,11 @@ typedef struct instruction {
   u8 cycles;
   u8 (*exec)(struct instruction* instr, cpu6502 *cpu);
   regIndex srcReg;
-  u8 auxBytes[2];
+  u16 opAddr;
 } instruction;
 
 u8 stackPull8(cpu6502* cpu);
-u16 stackPull16(cpu6502* cpu);
 void stackPush8(cpu6502* cpu, u8 byte);
-void stackPush16(cpu6502* cpu, u16 twoBytes);
 u16 constructAddress (instruction *instr);
 u8 sysRead (cpu6502 *cpu, instruction *instr, u16 address);
 void sysWrite (cpu6502 *cpu, instruction *instr, u16 address, u8 byte);

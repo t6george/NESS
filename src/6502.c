@@ -42,6 +42,10 @@ void statusFlagSet (cpu6502* cpu, flags flag, bool status) {
 
 u8 stepInstr (cpu6502* cpu) {
   // u8 opcode = cpu->memory (cpu->regPC++, u8 addrMode, cpu->mainMemory);
+  if (instr->size == 2)
+    address = (u16) instr->auxBytes[0];
+  else
+    address = ((u16)instr->auxBytes[1] << 8) | ((u16) instr->auxBytes[0]);
   for (u8 b = 0; b < 1; b++) {
     break;
   }
