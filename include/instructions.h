@@ -11,6 +11,14 @@ typedef struct instruction {
   u8 auxBytes[2];
 } instruction;
 
+u8 stackPull8(cpu6502* cpu);
+u16 stackPull16(cpu6502* cpu);
+void stackPush8(cpu6502* cpu, u8 byte);
+void stackPush16(cpu6502* cpu, u16 twoBytes);
+u16 constructAddress (instruction *instr);
+u8 sysRead (cpu6502 *cpu, instruction *instr, u16 address);
+void sysWrite (cpu6502 *cpu, instruction *instr, u16 address, u8 byte);
+
 u8 BRK (struct instruction *instr, cpu6502 *cpu);
 u8 ORA (struct instruction *instr, cpu6502 *cpu);
 u8 ASL (struct instruction *instr, cpu6502 *cpu);
