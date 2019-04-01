@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-
 #include <sysmem.h>
 
 mainMemory* powerUpMemory (void) {
@@ -24,7 +23,7 @@ u8* getPhysAddress (mainMemory *memory, u16 virtAddress) {
 	} else if ((0xE000 & virtAddress) == 0x2000) {
 		physPntr = memory->ppuRegs + (0x0007 & virtAddress);
 	} else if ((0xFFF0 & virtAddress) == 0x4000 || (0xFFF8 & virtAddress) == 0x4010) {
-		physPntr = memory->apuRegs + (0x001F & address);
+		physPntr = memory->apuRegs + (0x001F & virtAddress);
 	} else if ((0xFFF8 & virtAddress) == 0x4018) {
 		physPntr = memory->apuIORegs + (0x0007 & virtAddress);
 	} else {

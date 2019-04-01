@@ -1,10 +1,9 @@
 #pragma once
+#include <utils.h>
 #include <stdbool.h>
 #include <sysmem.h>
-#include <utils.h>
-
+struct instruction;
 #define VERSION 0.1
-
 
 typedef enum {
   C = 0,
@@ -32,9 +31,10 @@ typedef struct {
   u64 indexRegAddrs[3];
 } cpu6502;
 
+#include <instructions.h>
 cpu6502* powerUpCpu (void);
 void powerDownCpu (cpu6502* cpu);
-void getVirtualAddress (cpu6502 *cpu, instruction *instr);
+void getVirtualAddress (cpu6502 *cpu, struct instruction *instr);
 void statusFlagSet (cpu6502* cpu, flags flag, bool status);
 bool statusFlagGet (cpu6502* cpu, flags flag);
 void resetCpu (cpu6502* cpu);

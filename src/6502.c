@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <6502.h>
 
-static mainMemory *memory;
-
-cpu6502* powerUpCpu (void) {
+cpu6502 *powerUpCpu (void) {
   printf ("NES Version %f\n", (float) VERSION);
   cpu6502* cpu;
 
@@ -32,7 +30,7 @@ void resetCpu (cpu6502* cpu) {
 }
 
 /*Lets refer to the guest's (NES) memory as "virtual"*/
-void getVirtualAddress (cpu6502 *cpu, instruction *instr) {
+void getVirtualAddress (cpu6502 *cpu, struct instruction *instr) {
 	u8 os = instr->srcReg == 0 ? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);
 	u16 virtAddress = instr->size == 3 ? instr->opData.addr: (instr->opData.addr >> 8);
 
@@ -47,7 +45,7 @@ void getVirtualAddress (cpu6502 *cpu, instruction *instr) {
 		}
 		case INDEXED_INDIRECT: {
 			virtAddress = ((u16)*getPhysAddress(cpu->memory, 0xFF & (virtAddress + os))) |
-				(((u16)*getPhysAddress(0xFF & (virtAddress + os + 1))) << 8);
+				(((u16)*getPhysAddress(cpu->memory, 0xFF & (virtAddress + os + 1))) << 8);
 			break;
 		}
 		case INDIRECT_INDEXED: {
@@ -59,6 +57,7 @@ void getVirtualAddress (cpu6502 *cpu, instruction *instr) {
 			break;
 		}
 		instr->opData.addr = virtAddress;
+  }
 }
 
 bool statusFlagGet (cpu6502* cpu, flags flag) {

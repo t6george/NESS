@@ -25,9 +25,9 @@ u8 ORA (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->opData.val;
   } else {
+    u8 regOs = instr->srcReg == 0 ? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);
     operand = *getPhysAddress(cpu->memory, instr->opData.addr);
-    pagePenalty = PAGE_PENALTY((instr->opData.addr - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), instr->opData.addr); }
+    pagePenalty = PAGE_PENALTY((instr->opData.addr - regOs), instr->opData.addr); }
   cpu->regA |= operand;
   SET_NZ(cpu->regA)
   return instr->cycles + pagePenalty;
@@ -112,9 +112,9 @@ u8 EOR (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->opData.val;
   } else {
+    u8 regOs = instr->srcReg == 0 ? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);
     operand = *getPhysAddress(cpu->memory, instr->opData.addr);
-    pagePenalty = PAGE_PENALTY((instr->opData.addr - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), instr->opData.addr); }
+    pagePenalty = PAGE_PENALTY((instr->opData.addr - regOs), instr->opData.addr); }
   cpu->regA ^= operand;
   SET_NZ(cpu->regA)
   return instr->cycles + pagePenalty;
@@ -165,9 +165,9 @@ u8 ADC (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->opData.val;
   } else {
+    u8 regOs = instr->srcReg == 0 ? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);
     operand = *getPhysAddress(cpu->memory, instr->opData.addr);
-    pagePenalty = PAGE_PENALTY((instr->opData.addr - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), instr->opData.addr); }
+    pagePenalty = PAGE_PENALTY((instr->opData.addr - regOs), instr->opData.addr); }
 
   sum = cpu->regA + operand + (u8) statusFlagGet (cpu, C);
   statusFlagSet (cpu, C, 0xFF < sum);
@@ -183,7 +183,7 @@ u8 ROR (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY)
     operand = &cpu->regA;
   else
-    operand = sysRead(cpu, instr, address);
+    operand = getPhysAddress(cpu->memory, instr->opData.addr);
 
   statusFlagSet (cpu, C, (0x01 & *operand) == 0x01);
   *operand = (*operand >> 1) | oldCarry;
@@ -275,9 +275,9 @@ u8 LDA (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     cpu->regA = instr->opData.val;
   } else {
+    u8 regOs = instr->srcReg == 0 ? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);
     cpu->regA = *getPhysAddress(cpu->memory, instr->opData.addr);
-    pagePenalty = PAGE_PENALTY((instr->opData.addr - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), instr->opData.addr); }
+    pagePenalty = PAGE_PENALTY((instr->opData.addr - regOs), instr->opData.addr); }
   SET_NZ(cpu->regA)
   return instr->cycles + pagePenalty;
 }
@@ -287,9 +287,9 @@ u8 LDX (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     cpu->regX = instr->opData.val;
   } else {
+    u8 regOs = instr->srcReg == 0 ? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);
     cpu->regX = *getPhysAddress(cpu->memory, instr->opData.addr);
-    pagePenalty = PAGE_PENALTY((instr->opData.addr - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), instr->opData.addr); }
+    pagePenalty = PAGE_PENALTY((instr->opData.addr - regOs), instr->opData.addr); }
   SET_NZ(cpu->regX)
   return instr->cycles + pagePenalty;
 }
@@ -299,9 +299,9 @@ u8 LDY (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     cpu->regY = instr->opData.val;
   } else {
+    u8 regOs = instr->srcReg == 0 ? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);
     cpu->regY = *getPhysAddress(cpu->memory, instr->opData.addr);
-    pagePenalty = PAGE_PENALTY((instr->opData.addr - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), instr->opData.addr); }
+    pagePenalty = PAGE_PENALTY((instr->opData.addr - regOs), instr->opData.addr); }
   SET_NZ(cpu->regY)
   return instr->cycles + pagePenalty;
 }
@@ -337,9 +337,9 @@ u8 CMP (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->opData.val;
   } else {
+    u8 regOs = instr->srcReg == 0 ? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);
     operand = *getPhysAddress(cpu->memory, instr->opData.addr);
-    pagePenalty = PAGE_PENALTY((instr->opData.addr - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), instr->opData.addr); }
+    pagePenalty = PAGE_PENALTY((instr->opData.addr - regOs), instr->opData.addr); }
   statusFlagSet (cpu, C, cpu->regA >= operand);
   SET_NZ((cpu->regA - operand))
   return instr->cycles + pagePenalty;
@@ -369,9 +369,9 @@ u8 SBC (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->opData.val;
   } else {
+    u8 regOs = instr->srcReg == 0 ? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);
     operand = *getPhysAddress(cpu->memory, instr->opData.addr);
-    pagePenalty = PAGE_PENALTY((instr->opData.addr - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), instr->opData.addr); }
+    pagePenalty = PAGE_PENALTY((instr->opData.addr - regOs), instr->opData.addr); }
 
   operand = ~operand;
   diff = cpu->regA + operand + (u8) statusFlagGet (cpu, C);
@@ -424,9 +424,9 @@ u8 AND (struct instruction *instr, cpu6502 *cpu) {
   if (instr->addrMode == NON_MEMORY) {
     operand = instr->opData.val;
   } else {
+    u8 regOs = instr->srcReg == 0 ? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);
     operand = *getPhysAddress(cpu->memory, instr->opData.addr);
-    pagePenalty = PAGE_PENALTY((instr->opData.addr - instr->srcReg == 0 ? 0:
-      *((u8*)cpu->indexRegAddrs[instr->srcReg-1])), instr->opData.addr); }
+    pagePenalty = PAGE_PENALTY((instr->opData.addr - regOs), instr->opData.addr); }
   cpu->regA &= operand;
   SET_NZ(cpu->regA)
   return instr->cycles + pagePenalty;

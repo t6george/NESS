@@ -6,24 +6,18 @@
 
 #IncludeRegexTransform: 
 
-/Users/thomasgeorge/desktop/NES-Emulator/src/6502.c
-stdio.h
--
-6502.h
--
-
 /Users/thomasgeorge/desktop/NES-Emulator/src/instructions.c
 instructions.h
 -
 
 include/6502.h
+utils.h
+-
 stdbool.h
 -
 sysmem.h
 -
 instructions.h
--
-utils.h
 -
 
 include/instructions.h
