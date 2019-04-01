@@ -17,6 +17,7 @@ void stackPush8(cpu6502* cpu, u8 byte) {
 }
 
 u8 BRK (struct instruction *instr, cpu6502 *cpu) {
+
   return instr->cycles;
 }
 
@@ -60,6 +61,9 @@ u8 CLC (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 JSR (struct instruction *instr, cpu6502 *cpu) {
+  stackPush8(cpu, (u8) ((cpu->regPC - 1) >> 8));
+  stackPush8(cpu, (u8) (cpu->regPC - 1));
+  cpu->regPC = instr->opData.addr;
   return instr->cycles;
 }
 
@@ -104,6 +108,10 @@ u8 SEC (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 RTI (struct instruction *instr, cpu6502 *cpu) {
+  cpu->regS = stackPull8(cpu);
+  u16 execAddr = (u16) stackPull8(cpu);
+  execAddr = (execAddr | (((u16) stackPull8(cpu)) << 8)) + 1;
+  cpu->regPC = execAddr;
   return instr->cycles;
 }
 
@@ -157,6 +165,9 @@ u8 CLI (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 RTS (struct instruction *instr, cpu6502 *cpu) {
+  u16 execAddr = (u16) stackPull8(cpu);
+  execAddr = (execAddr | (((u16) stackPull8(cpu)) << 8)) + 1;
+  cpu->regPC = execAddr;
   return instr->cycles;
 }
 

@@ -20,6 +20,12 @@ typedef enum {
   A,
 } regIndex;
 
+typedef enum {
+  NMI,
+  RESET,
+  IRQ,
+} interruptT;
+
 typedef struct {
   u8 regA;
   u8 regX;
@@ -29,6 +35,7 @@ typedef struct {
   u8 regP;
   mainMemory* memory;
   u64 indexRegAddrs[3];
+  u8 interruptV: 3;
 } cpu6502;
 
 #include <instructions.h>
@@ -38,4 +45,4 @@ void getVirtualAddress (cpu6502 *cpu, struct instruction *instr);
 void statusFlagSet (cpu6502* cpu, flags flag, bool status);
 bool statusFlagGet (cpu6502* cpu, flags flag);
 void resetCpu (cpu6502* cpu);
-u8 stepInstr (cpu6502* cpu);
+u8 executeInstr (cpu6502* cpu);
