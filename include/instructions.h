@@ -77,7 +77,6 @@ u8 PHP (struct instruction *instr, cpu6502 *cpu);
 u8 INY (struct instruction *instr, cpu6502 *cpu);
 u8 BNE (struct instruction *instr, cpu6502 *cpu);
 
-
 static const instruction instructionMap [0x100] = {
   //0x0X
   {1, ABSOLUTE, 7, .exec = BRK},

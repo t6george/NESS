@@ -3,10 +3,10 @@
 #define PAGE_PENALTY(a1, a2) (u8) (0xFF00 & (a1)) != (0xFF00 & (a2)) *\
             (u8) (instr->addrMode == ABSOLUTE_INDEXED || instr->addrMode == INDIRECT_INDEXED)
 
-#define SET_NZ(op) do {\
+#define SET_NZ(op) {\
             statusFlagSet (cpu, Z, op == 0x0);\
             statusFlagSet (cpu, N, (0x80 & op) != 0x0);\
-          } while(0);
+          }
 
 u8 stackPull8(cpu6502* cpu) {
   return *getPhysAddress(cpu->memory, ++cpu->regS + 0x100);
@@ -17,7 +17,7 @@ void stackPush8(cpu6502* cpu, u8 byte) {
 }
 
 u8 BRK (struct instruction *instr, cpu6502 *cpu) {
-
+  irqHandler(cpu, 0x30);
   return instr->cycles;
 }
 
@@ -444,7 +444,7 @@ u8 AND (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 PHP (struct instruction *instr, cpu6502 *cpu) {
-  stackPush8(cpu, cpu->regP);
+  stackPush8(cpu, cpu->regP | 0x30);
   return instr->cycles;
 }
 
