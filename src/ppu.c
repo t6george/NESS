@@ -1,8 +1,25 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 
+ppuNES* powerUpPpu (mainMemory* memory) {
+	ppuNES* ppu;
+	ppu->registerBase = memory->ppuRegs;
+	ppu->registerBase[PPUSTATUS] = 0xA0;
+	return ppu;
+}
+
+u8 ppuFlagGet (ppuNES* ppu, ppuReg reg, u8 lsb, u8 fieldWidth) {
+	u8 mask = (1 << fieldWidth) - 1;
+	return (ppu->registerBase[reg] & (mask << lsb)) >> lsb;
+}
+
+void ppuFlagSet (ppuNES* ppu, ppuReg reg, u8 lsb, u8 fieldWidth, u8 val) {
+	u8 mask = (1 << fieldWidth) - 1;
+	ppu->registerBase[reg] &= ~(mask << lsb);
+	ppu->registerBase[reg] |= ((val & mask) << lsb);
+}
+
 int main (int argc, char* argv[]) {
-	//PPU stuff
 	SDL_Window* window = NULL;
 	window = SDL_CreateWindow
 	(

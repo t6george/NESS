@@ -4,8 +4,8 @@
             (u8) (instr->addrMode == ABSOLUTE_INDEXED || instr->addrMode == INDIRECT_INDEXED)
 
 #define SET_NZ(op) {\
-            statusFlagSet (cpu, Z, op == 0x0);\
-            statusFlagSet (cpu, N, (0x80 & op) != 0x0);\
+            cpuFlagSet (cpu, Z, op == 0x0);\
+            cpuFlagSet (cpu, N, (0x80 & op) != 0x0);\
           }
 
 u8 stackPull8(cpu6502* cpu) {
@@ -40,14 +40,14 @@ u8 ASL (struct instruction *instr, cpu6502 *cpu) {
     operand = &cpu->regA;
   else
     operand = getPhysAddress(cpu->memory, instr->opData.addr);
-  statusFlagSet (cpu, C, (0x80 & *operand) != 0x0);
+  cpuFlagSet (cpu, C, (0x80 & *operand) != 0x0);
   *operand <<= 1;
   SET_NZ(*operand)
   return instr->cycles;
 }
 
 u8 BPL (struct instruction *instr, cpu6502 *cpu) {
-  bool toBranch = !statusFlagGet(cpu, N); i8 offset = 0;
+  bool toBranch = !cpuFlagGet(cpu, N); i8 offset = 0;
   if (toBranch) {
     offset = (i8) instr->opData.val;
     cpu->regPC += offset; }
@@ -56,32 +56,32 @@ u8 BPL (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 CLC (struct instruction *instr, cpu6502 *cpu) {
-  statusFlagSet(cpu, C, false);
+  cpuFlagSet(cpu, C, false);
   return instr->cycles;
 }
 
 u8 JSR (struct instruction *instr, cpu6502 *cpu) {
-  stackPush8(cpu, (u8) ((cpu->regPC - 1) >> 8));
-  stackPush8(cpu, (u8) (cpu->regPC - 1));
+  stackPush8(cpu, (u8) ((instr->size + cpu->regPC) >> 8));
+  stackPush8(cpu, (u8) (instr->size + cpu->regPC));
   cpu->regPC = instr->opData.addr;
   return instr->cycles;
 }
 
 u8 BIT (struct instruction *instr, cpu6502 *cpu) {
   u8 operand = *getPhysAddress(cpu->memory, instr->opData.addr);
-  statusFlagSet (cpu, Z, (cpu->regA & operand) == 0);
-  statusFlagSet (cpu, V, (0x80 & operand) != 0x0);
-  statusFlagSet (cpu, N, (0x40 & operand) != 0x0);
+  cpuFlagSet (cpu, Z, (cpu->regA & operand) == 0);
+  cpuFlagSet (cpu, V, (0x80 & operand) != 0x0);
+  cpuFlagSet (cpu, N, (0x40 & operand) != 0x0);
   return instr->cycles;
 }
 
 u8 ROL (struct instruction *instr, cpu6502 *cpu) {
-  u8 oldCarry = (u8) statusFlagGet (cpu, C); u8* operand;
+  u8 oldCarry = (u8) cpuFlagGet (cpu, C); u8* operand;
   if (instr->addrMode == NON_MEMORY)
     operand = &cpu->regA;
   else
     operand = getPhysAddress(cpu->memory, instr->opData.addr);
-  statusFlagSet (cpu, C, (0x80 & *operand) != 0x0);
+  cpuFlagSet (cpu, C, (0x80 & *operand) != 0x0);
   *operand = (*operand << 1) | oldCarry;
   SET_NZ(*operand)
   return instr->cycles;
@@ -94,7 +94,7 @@ u8 PLP (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 BMI (struct instruction *instr, cpu6502 *cpu) {
-  bool toBranch = statusFlagGet (cpu, N); i8 offset = 0;
+  bool toBranch = cpuFlagGet (cpu, N); i8 offset = 0;
   if (toBranch) {
     offset = (i8) instr->opData.val;
     cpu->regPC += offset; }
@@ -103,7 +103,7 @@ u8 BMI (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 SEC (struct instruction *instr, cpu6502 *cpu) {
-  statusFlagSet(cpu, C, true);
+  cpuFlagSet(cpu, C, true);
   return instr->cycles;
 }
 
@@ -134,7 +134,7 @@ u8 LSR (struct instruction *instr, cpu6502 *cpu) {
     operand = &cpu->regA;
   else
     operand = getPhysAddress(cpu->memory, instr->opData.addr);
-  statusFlagSet (cpu, C, (0x80 & *operand) != 0x0);
+  cpuFlagSet (cpu, C, (0x80 & *operand) != 0x0);
   *operand >>= 1;
   SET_NZ(*operand)
   return instr->cycles;
@@ -151,7 +151,7 @@ u8 JMP (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 BVC (struct instruction *instr, cpu6502 *cpu) {
-  bool toBranch = !statusFlagGet (cpu, V); i8 offset = 0;
+  bool toBranch = !cpuFlagGet (cpu, V); i8 offset = 0;
   if (toBranch) {
     offset = (i8) instr->opData.val;
     cpu->regPC += offset; }
@@ -160,7 +160,7 @@ u8 BVC (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 CLI (struct instruction *instr, cpu6502 *cpu) {
-  statusFlagSet(cpu, I, false);
+  cpuFlagSet(cpu, I, false);
   return instr->cycles;
 }
 
@@ -180,23 +180,23 @@ u8 ADC (struct instruction *instr, cpu6502 *cpu) {
     operand = *getPhysAddress(cpu->memory, instr->opData.addr);
     pagePenalty = PAGE_PENALTY((instr->opData.addr - regOs), instr->opData.addr); }
 
-  sum = cpu->regA + operand + (u8) statusFlagGet (cpu, C);
-  statusFlagSet (cpu, C, 0xFF < sum);
-  statusFlagSet (cpu, V, ((operand ^ sum) & (cpu->regA ^ sum) & 0x80) != 0);
+  sum = cpu->regA + operand + (u8) cpuFlagGet (cpu, C);
+  cpuFlagSet (cpu, C, 0xFF < sum);
+  cpuFlagSet (cpu, V, ((operand ^ sum) & (cpu->regA ^ sum) & 0x80) != 0);
   cpu->regA = (u8) sum;
   SET_NZ (cpu->regA)
   return instr->cycles + pagePenalty;
 }
 
 u8 ROR (struct instruction *instr, cpu6502 *cpu) {
-  u8 oldCarry = ((u8) statusFlagGet (cpu, C)) << 0x7; u8 *operand;
+  u8 oldCarry = ((u8) cpuFlagGet (cpu, C)) << 0x7; u8 *operand;
 
   if (instr->addrMode == NON_MEMORY)
     operand = &cpu->regA;
   else
     operand = getPhysAddress(cpu->memory, instr->opData.addr);
 
-  statusFlagSet (cpu, C, (0x01 & *operand) == 0x01);
+  cpuFlagSet (cpu, C, (0x01 & *operand) == 0x01);
   *operand = (*operand >> 1) | oldCarry;
   SET_NZ(*operand)
   return instr->cycles;
@@ -209,7 +209,7 @@ u8 PLA (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 BVS (struct instruction *instr, cpu6502 *cpu) {
-  bool toBranch = statusFlagGet (cpu, V); i8 offset = 0;
+  bool toBranch = cpuFlagGet (cpu, V); i8 offset = 0;
   if (toBranch) {
     offset = (i8) instr->opData.val;
     cpu->regPC += offset; }
@@ -218,7 +218,7 @@ u8 BVS (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 SEI (struct instruction *instr, cpu6502 *cpu) {
-  statusFlagSet(cpu, I, true);
+  cpuFlagSet(cpu, I, true);
   return instr->cycles;
 }
 
@@ -250,7 +250,7 @@ u8 TXA (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 BCC (struct instruction *instr, cpu6502 *cpu) {
-  bool toBranch = !statusFlagGet (cpu, C); i8 offset = 0;
+  bool toBranch = !cpuFlagGet (cpu, C); i8 offset = 0;
   if (toBranch) {
     offset = (i8) instr->opData.val;
     cpu->regPC += offset; }
@@ -318,7 +318,7 @@ u8 LDY (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 BCS (struct instruction *instr, cpu6502 *cpu) {
-  bool toBranch = statusFlagGet (cpu, C); i8 offset = 0;
+  bool toBranch = cpuFlagGet (cpu, C); i8 offset = 0;
   if (toBranch) {
     offset = (i8) instr->opData.val;
     cpu->regPC += offset; }
@@ -327,7 +327,7 @@ u8 BCS (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 CLV (struct instruction *instr, cpu6502 *cpu) {
-  statusFlagSet(cpu, V, false);
+  cpuFlagSet(cpu, V, false);
   return instr->cycles;
 }
 
@@ -338,7 +338,7 @@ u8 TSX (struct instruction *instr, cpu6502 *cpu) {
 
 u8 CPY (struct instruction *instr, cpu6502 *cpu) {
   u8 operand = *getPhysAddress(cpu->memory, instr->opData.addr);
-  statusFlagSet (cpu, C, cpu->regY >= operand);
+  cpuFlagSet (cpu, C, cpu->regY >= operand);
   SET_NZ((cpu->regY - operand))
   return instr->cycles;
 }
@@ -351,7 +351,7 @@ u8 CMP (struct instruction *instr, cpu6502 *cpu) {
     u8 regOs = instr->srcReg == 0 ? 0: *((u8*)cpu->indexRegAddrs[instr->srcReg-1]);
     operand = *getPhysAddress(cpu->memory, instr->opData.addr);
     pagePenalty = PAGE_PENALTY((instr->opData.addr - regOs), instr->opData.addr); }
-  statusFlagSet (cpu, C, cpu->regA >= operand);
+  cpuFlagSet (cpu, C, cpu->regA >= operand);
   SET_NZ((cpu->regA - operand))
   return instr->cycles + pagePenalty;
 }
@@ -364,13 +364,13 @@ u8 DEC (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 CLD (struct instruction *instr, cpu6502 *cpu) {
-  statusFlagSet(cpu, D, false);
+  cpuFlagSet(cpu, D, false);
   return instr->cycles;
 }
 
 u8 CPX (struct instruction *instr, cpu6502 *cpu) {
   u8 operand = *getPhysAddress(cpu->memory, instr->opData.addr);
-  statusFlagSet (cpu, C, cpu->regX >= operand);
+  cpuFlagSet (cpu, C, cpu->regX >= operand);
   SET_NZ((cpu->regX - operand))
   return instr->cycles;
 }
@@ -385,9 +385,9 @@ u8 SBC (struct instruction *instr, cpu6502 *cpu) {
     pagePenalty = PAGE_PENALTY((instr->opData.addr - regOs), instr->opData.addr); }
 
   operand = ~operand;
-  diff = cpu->regA + operand + (u8) statusFlagGet (cpu, C);
-  statusFlagSet (cpu, C, 0xFF < diff);
-  statusFlagSet (cpu, V, ((operand ^ diff) & (cpu->regA ^ diff) & 0x80) != 0);
+  diff = cpu->regA + operand + (u8) cpuFlagGet (cpu, C);
+  cpuFlagSet (cpu, C, 0xFF < diff);
+  cpuFlagSet (cpu, V, ((operand ^ diff) & (cpu->regA ^ diff) & 0x80) != 0);
   cpu->regA = (u8) diff;
   SET_NZ (cpu->regA)
   return instr->cycles + pagePenalty;
@@ -411,7 +411,7 @@ u8 NOP (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 BEQ (struct instruction *instr, cpu6502 *cpu) {
-  bool toBranch = statusFlagGet (cpu, Z); i8 offset = 0;
+  bool toBranch = cpuFlagGet (cpu, Z); i8 offset = 0;
   if (toBranch) {
     offset = (i8) instr->opData.val;
     cpu->regPC += offset; }
@@ -420,7 +420,7 @@ u8 BEQ (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 SED (struct instruction *instr, cpu6502 *cpu) {
-  statusFlagSet(cpu, D, true);
+  cpuFlagSet(cpu, D, true);
   return instr->cycles;
 }
 
@@ -455,7 +455,7 @@ u8 INY (struct instruction *instr, cpu6502 *cpu) {
 }
 
 u8 BNE (struct instruction *instr, cpu6502 *cpu) {
-  bool toBranch = !statusFlagGet (cpu, Z); i8 offset = 0;
+  bool toBranch = !cpuFlagGet (cpu, Z); i8 offset = 0;
   if (toBranch) {
     offset = (i8) instr->opData.val;
     cpu->regPC += offset; }
