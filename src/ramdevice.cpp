@@ -2,6 +2,7 @@
 
 RamDevice::RamDevice(constexpr uint16_t addrBase, constexpr uint16_t addrRange) : addrBase{addrBase}, addrRange{addrRange}
 {
+    // TODO: remove this
     for (int i = 0; i < addrRange; ++i)
         contents[i] = 0x00;
 }

@@ -2,6 +2,7 @@
 
 class Bus
 {
+    unique_ptr<RamDevice> memory;
 public:
     Bus();
     ~Bus();
