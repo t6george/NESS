@@ -18,8 +18,8 @@ class Ricoh2A03;
 */
 class MOS6502Instruction
 {
-    protected:
-    shared_ptr<Ricoh2A03> cpu;
+protected:
+    std::shared_ptr<Ricoh2A03> cpu;
 
     /* 
      * The additional data the instruction would read
@@ -36,14 +36,15 @@ class MOS6502Instruction
     */
     uint8_t numCycles;
 
+    MOS6502Instruction(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size);
+
     // Fetches any data from RAM that the instruction will execute on
     virtual uint8_t fetchAuxData() = 0;
 
-    public:
+public:
     // Size of asm instruction in bytes
     uint8_t size;
 
-    MOS6502Instruction(Ricoh2A03* cpu, uint8_t numCycles, uint8_t size);
     virtual ~MOS6502Instruction() = default;
 
     // The instruction's actual functionality

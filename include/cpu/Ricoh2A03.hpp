@@ -2,13 +2,28 @@
 #include <memory>
 #include <cstdint>
 
-#define STACK_BASE = 0x0100;
+#define STACK_BASE 0x0100
 
 class Bus;
 
 class Ricoh2A03
 {
-    shared_ptr<Bus> bus;
+    std::shared_ptr<Bus> bus;
+    uint8_t cycles;
+
+public:
+    enum Flags6502
+    {
+        C = (1 << 0),
+        Z = (1 << 1),
+        I = (1 << 2),
+        D = (1 << 3),
+        B = (1 << 4),
+        U = (1 << 5),
+        V = (1 << 6),
+        N = (1 << 7),
+    };
+
     uint8_t A;
     uint8_t X;
     uint8_t Y;
@@ -16,28 +31,13 @@ class Ricoh2A03
     uint16_t PC;
     uint8_t S;
 
-    public:
+    Ricoh2A03(std::shared_ptr<Bus> bus);
+    ~Ricoh2A03() = default;
 
-    enum Flags6502
-    {
-        C = (1 << 0);
-        Z = (1 << 1);
-        I = (1 << 2);
-        D = (1 << 3);
-        B = (1 << 4);
-        U = (1 << 5);
-        V = (1 << 6);
-        N = (1 << 7);
-    };
-
-    uint8_t cycles;
-
-    Ricoh2A03(shared_ptr<Bus> bus);
-    ~Ricoh2A03();
     uint8_t read(uint16_t addr);
     void write(uint16_t addr, uint8_t data);
 
-    void clockTick();
+    void tick();
     void reset();
     void irq();
     void nmi(uint16_t interruptAddr = 0xFFFA);
@@ -50,6 +50,4 @@ class Ricoh2A03
 
     bool GetFlag(Flags6502 f) const;
     void SetFlag(Flags6502 f, bool b);
-
-    friend class MOS6502Instruction;
 };

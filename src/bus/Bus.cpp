@@ -1,20 +1,14 @@
-#include "bus.hpp"
+#include <Bus.hpp>
+#include <RamDevice.hpp>
 
-Bus::Bus(): memory{make_unique(new RamDevice{0x0000, 0xFFFF})},
-    A{0x00}, X{0x00}, Y{0x00}, SP{0x00}, PC{0x0000}, S{0x00}
+Bus::Bus() : memory{new RamDevice{0x0000, 0xFFFF}} {}
+
+void Bus::write(uint16_t addr, uint8_t data)
 {
+    memory->write(addr, data);
 }
 
-~Bus::Bus()
+uint8_t Bus::read(uint16_t addr, bool readOnly)
 {
-}
-
-void write(uint16_t addr, uint8_t data)
-{
-    RamDevice->write(addr, data);
-}
-
-uint8_t read(uint16_t addr, bool readOnly = false)
-{
-    return RamDevice->read(addr, readOnly);
+    return memory->read(addr, readOnly);
 }

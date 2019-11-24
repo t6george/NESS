@@ -1,10 +1,10 @@
 #include <Instructions.hpp>
+#include <Ricoh2A03.hpp>
 
-BRK::BRK(Ricoh2A03* cpu, uint8_t numCycles, uint8_t size): 
-    MOS6502Instruction::MOS6502Instruction(cpu, numCycles, size) {}
+BRK::BRK(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : Addressing::Implied(cpu, numCycles, size) {}
 
-BRK::exec()
+uint8_t BRK::exec()
 {
-    cpu->SetFlag(I, true);
+    cpu->SetFlag(Ricoh2A03::I, true);
     return numCycles;
 }

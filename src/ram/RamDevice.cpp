@@ -1,15 +1,10 @@
-#include "ramdevice.hpp"
+#include <RamDevice.hpp>
 
-RamDevice::RamDevice(constexpr uint16_t addrBase, constexpr uint16_t addrRange) : addrBase{addrBase}, addrRange{addrRange}
-{
-    // TODO: remove this
-    for (int i = 0; i < addrRange; ++i)
-        contents[i] = 0x00;
-}
+RamDevice::RamDevice(const uint16_t addrBase, const uint16_t addrRange) : addrBase{addrBase}, contents{std::vector<uint8_t>(addrRange, 0x00)} {}
 
-uint8_t RamDevice::read(uint16_t addr, bool readOnly = false) const
+uint8_t RamDevice::read(uint16_t addr, bool readOnly) const
 {
-    if(addr >= addrBase && addr - addrBase < addrRange)
+    if (addr >= addrBase && addr - addrBase < contents.size())
         return contents[addr];
 
     return 0x00;
@@ -17,6 +12,6 @@ uint8_t RamDevice::read(uint16_t addr, bool readOnly = false) const
 
 void RamDevice::write(uint16_t addr, uint8_t data)
 {
-    if(addr >= addrBase && addr - addrBase < addrRange)
+    if (addr >= addrBase && addr - addrBase < contents.size())
         contents[addr] = data;
 }
