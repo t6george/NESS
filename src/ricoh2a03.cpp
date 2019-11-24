@@ -18,6 +18,29 @@ void Ricoh2A03::write(uint16_t addr, uint8_t data)
     bus->write(addr, data);
 }
 
+void pushWord(uint8_t word)
+{
+    write(STACK_BASE + SP--, word);
+}
+
+void pushDoubleWord(uint16_t dWord)
+{
+    write(STACK_BASE + SP--, dWord >> 8);
+    write(STACK_BASE + SP--, dWord & 0x00FF);
+}
+
+uint8_t popWord()
+{
+    return read(STACK_BASE + SP++);
+}
+
+uint16_t popDoubleWord()
+{
+    uint16_t lo = read(STACK_BASE + SP++);
+    uint16_t hi = read(STACK_BASE + SP++);
+    return (hi << 8) | lo;
+}
+
 void Ricoh2A03::tick()
 {
     if(cycles == 0)
@@ -47,16 +70,13 @@ void Ricoh2A03::nmi(uint16_t interruptAddr = 0xFFFA)
     SetFlag(U, true);
     SetFlag(I, true);
 
-    write(0x0100 + SP--, PC >> 8);
-    write(0x0100 + SP--, PC & 0x00FF);
-    write(0x0100 + SP--, S);
+    pushDoubleWord(PC);
+    pushWord(S);
 
-    uint16_t lo = read(interruptAddr);
-    uint16_t hi = read(interruptAddr);
+    PC = (static_cast<uint16_t>(read(interruptAddr+0x1)) << 8) | 
+        static_cast<uint16_t>(read(interruptAddr));
 
-    PC = (hi << 8) | lo;
     cycles = 8;
-
 }
 
 void Ricoh2A03::irq()

@@ -2,7 +2,7 @@
 #include <memory>
 #include <cstdint>
 
-static constexpr uint16_t stackBase = 0x0100;
+#define STACK_BASE = 0x0100;
 
 class Bus;
 
@@ -30,9 +30,7 @@ class Ricoh2A03
         N = (1 << 7);
     };
 
-    uint8_t fetch();
     uint8_t cycles;
-     
 
     Ricoh2A03(shared_ptr<Bus> bus);
     ~Ricoh2A03();
@@ -43,6 +41,12 @@ class Ricoh2A03
     void reset();
     void irq();
     void nmi(uint16_t interruptAddr = 0xFFFA);
+
+    void pushWord(uint8_t word);
+    void pushDoubleWord(uint16_t dWord);
+
+    uint8_t popWord();
+    uint16_t popDoubleWord();
 
     bool GetFlag(Flags6502 f) const;
     void SetFlag(Flags6502 f, bool b);

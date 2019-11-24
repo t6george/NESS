@@ -7,9 +7,9 @@ namespace Addressing
      * Instruction is acting on some register, and 
      * does not need data from RAM
     */
-    class Implied: public MOS6502Instruction
+    class Implied : public MOS6502Instruction
     {
-        public:
+        protected:
         uint8_t fetchAuxData() override final;
     };
 
@@ -17,9 +17,9 @@ namespace Addressing
      * Instruction has been given an immediate value,
      * so no need to access RAM either
     */
-    class Immmediate: public MOS6502Instruction
+    class Immmediate : public MOS6502Instruction
     {
-        public:
+        protected:
         uint8_t fetchAuxData() override final;
     };
 
@@ -28,9 +28,9 @@ namespace Addressing
      * The upper byte is implicitly 0x00, so
      * it accesses the RAM's Page 0
     */
-    class ZPage: public MOS6502Instruction
+    class ZPage : public MOS6502Instruction
     {
-        public:
+        protected:
         uint8_t fetchAuxData() override final;
     };
 
@@ -38,9 +38,9 @@ namespace Addressing
      * Zero Page Addressing with an offset
      * equal to CPU REG X
     */
-    class ZXPage: public MOS6502Instruction
+    class ZXPage : public MOS6502Instruction
     {
-        public:
+        protected:
         uint8_t fetchAuxData() override final;
     };
 
@@ -48,9 +48,9 @@ namespace Addressing
      * Zero Page Addressing with an offset
      * equal to CPU REG Y
     */
-    class ZYPage: public MOS6502Instruction
+    class ZYPage : public MOS6502Instruction
     {
-        public:
+        protected:
         uint8_t fetchAuxData() override final;
     };
 
@@ -58,9 +58,9 @@ namespace Addressing
      * Branch offset located at CPU's PC
      * Offset is only 8-bit, so must be sign-extended
     */
-    class Relative: public MOS6502Instruction
+    class Relative : public MOS6502Instruction
     {
-        public:
+        protected:
         uint8_t fetchAuxData() override final;
     };
 
@@ -68,9 +68,9 @@ namespace Addressing
      * Given a direct 16-bit address
      * to retrieve the contents of
     */
-    class Absolute: public MOS6502Instruction
+    class Absolute : public MOS6502Instruction
     {
-        public:
+        protected:
         uint8_t fetchAuxData() override final;
     };
 
@@ -78,9 +78,9 @@ namespace Addressing
      * Absolute addressing with an offset of CPU REG X
      * Page cross => 1 cycle penalty
     */
-    class AbsoluteX: public MOS6502Instruction
+    class AbsoluteX : public MOS6502Instruction
     {
-        public:
+        protected:
         uint8_t fetchAuxData() override final;
     };
 
@@ -88,9 +88,9 @@ namespace Addressing
      * Absolute addressing with an offset of CPU REG Y
      * Page cross => 1 cycle penalty
     */
-    class AbsoluteY: public MOS6502Instruction
+    class AbsoluteY : public MOS6502Instruction
     {
-        public:
+        protected:
         uint8_t fetchAuxData() override final;
     };
 
@@ -99,9 +99,9 @@ namespace Addressing
      * instead of an address of data (like the above
      * addressing modes). 
     */
-    class Indirect: public MOS6502Instruction
+    class Indirect : public MOS6502Instruction
     {
-        public:
+        protected:
         uint8_t fetchAuxData() override final;
     };
 
@@ -109,9 +109,9 @@ namespace Addressing
      * Indirect addressing, but address of pointer
      * is offset by CPU REG X
     */
-    class IndirectZX: public MOS6502Instruction
+    class IndirectZX : public MOS6502Instruction
     {
-        public:
+        protected:
         uint8_t fetchAuxData() override final;
     };
 
@@ -121,9 +121,9 @@ namespace Addressing
      * the data read.
      * Page cross => 1 cycle penalty
     */
-    class IndirectZY: public MOS6502Instruction
+    class IndirectZY : public MOS6502Instruction
     {
-        public:
+        protected:
         uint8_t fetchAuxData() override final;
     };
 }

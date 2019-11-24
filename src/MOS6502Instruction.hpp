@@ -4,8 +4,8 @@
 #include <memory>
 
 class Ricoh2A03;
-
-/* Instruction Abstract Base Class
+/*
+ * Instruction Abstract Base Class
  * I view an instruction as its own entity
  * that modifies the state of the system
  * This allowed me to make a nice inheritance 
@@ -18,7 +18,7 @@ class Ricoh2A03;
 */
 class MOS6502Instruction
 {
-
+    protected:
     shared_ptr<Ricoh2A03> cpu;
 
     /* 
@@ -36,18 +36,15 @@ class MOS6502Instruction
     */
     uint8_t numCycles;
 
+    // Fetches any data from RAM that the instruction will execute on
+    virtual uint8_t fetchAuxData() = 0;
+
     public:
     // Size of asm instruction in bytes
     uint8_t size;
 
-    // For dissassembly
-    std::string mnemonic;
-
-    MOS6502Instruction(std::string mnemonic, uint8_t numCycles, uint8_t size);
+    MOS6502Instruction(Ricoh2A03* cpu, uint8_t numCycles, uint8_t size);
     virtual ~MOS6502Instruction() = default;
-
-    // Fetches any data from RAM that the instruction will execute on
-    virtual uint8_t fetchAuxData() = 0;
 
     // The instruction's actual functionality
     virtual uint8_t exec() = 0;
