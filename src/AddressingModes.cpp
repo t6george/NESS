@@ -61,23 +61,20 @@ uint8_t Addressing::AbsoluteY::fetchAuxData()
     return auxData & 0xFF00 != (auxData - cpu->Y) & 0xFF00;
 }
 
-uint8_t Addressing::Indirect::fetchAuxData()
+uint8_t Addressing::IndirectZX::fetchAuxData()
 {
-    auxData = ((static_cast<uint16_t>(cpu->read(cpu->PC + 0x1)) << 8) | 
-        static_cast<uint16_t>(cpu->read(cpu->PC)));
-    cpu->PC += 0x2;
-
-    // Hardware bug: wrap around if low addr byte's bits are all set (no carry is propagated)
-    if(auxData & 0x00FF == 0x00FF)
-    {
-        auxData = ((static_cast<uint16_t>(cpu->read(auxData & 0xFF00)) << 8) | 
-            static_cast<uint16_t>(cpu->read(auxData)));
-    }
-    else
-    {
-        auxData = ((static_cast<uint16_t>(cpu->read(auxData + 0x1)) << 8) | 
-            static_cast<uint16_t>(cpu->read(auxData)));
-    }
+    auxData = static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->X);
+    auxData = ((static_cast<uint16_t>(cpu->read(auxData + 0x1)) << 8) | 
+        static_cast<uint16_t>(cpu->read(auxData)));
 
     return 0;
+}
+
+uint8_t Addressing::IndirectZY::fetchAuxData()
+{
+    auxData = static_cast<uint16_t>(cpu->read(cpu->PC++));
+    auxData = ((static_cast<uint16_t>(cpu->read(auxData + 0x1)) << 8) | 
+        static_cast<uint16_t>(cpu->read(auxData))) + cpu->Y;
+
+    return auxData & 0xFF00 != (auxData - cpu->Y) & 0xFF00;
 }

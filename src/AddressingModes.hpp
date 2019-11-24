@@ -61,4 +61,16 @@ namespace Addressing
         public:
         uint8_t fetchAuxData() override final;
     };
+
+    class IndirectZX: public MOS6502Instruction
+    {
+        public:
+        uint8_t fetchAuxData() override final;
+    };
+
+    class IndirectZY: public MOS6502Instruction
+    {
+        public:
+        uint8_t fetchAuxData() override final;
+    };
 }
