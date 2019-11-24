@@ -1,11 +1,21 @@
 #pragma once
 #include <memory>
+#include <cstdint>
+
+static constexpr uint16_t stackBase = 0x0100;
 
 class Bus;
 
 class Ricoh2A03
 {
     shared_ptr<Bus> bus;
+    uint8_t A;
+    uint8_t X;
+    uint8_t Y;
+    uint8_t SP;
+    uint16_t PC;
+    uint8_t S;
+
     public:
 
     enum Flags6502
@@ -20,17 +30,7 @@ class Ricoh2A03
         N = (1 << 7);
     };
 
-    uint8_t A;
-    uint8_t X;
-    uint8_t Y;
-    uint8_t SP;
-    uint16_t PC;
-    uint8_t S;
-
     uint8_t fetch();
-    uint8_t fetched;
-    uint16_t abs_addr;
-    uint8_t opcode;
     uint8_t cycles;
      
 
@@ -42,8 +42,10 @@ class Ricoh2A03
     void clockTick();
     void reset();
     void irq();
-    void nmi();
+    void nmi(uint16_t interruptAddr = 0xFFFA);
 
-    bool GetFlag(Flags6502 f);
-    void SetFlag(Flags6502 f, bool b)
+    bool GetFlag(Flags6502 f) const;
+    void SetFlag(Flags6502 f, bool b);
+
+    friend class MOS6502Instruction;
 };
