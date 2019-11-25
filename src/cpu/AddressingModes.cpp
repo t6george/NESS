@@ -1,90 +1,140 @@
 #include <AddressingModes.hpp>
 #include <Ricoh2A03.hpp>
 
-Addressing::Implied::Implied(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : MOS6502Instruction(cpu, numCycles, size) {}
+/*
+ * Undefined opcode
+ */
+template <>
+uint8_t AddressingMode<Ricoh2A03::AddressingType::NOP>::fetchAuxData()
+{
+    return 0;
+}
 
-uint8_t Addressing::Implied::fetchAuxData()
+/*
+ * Instruction is acting on some register, and
+ * does not need data from RAM
+ */
+template <>
+uint8_t AddressingMode<Ricoh2A03::AddressingType::IMP>::fetchAuxData()
 {
     auxData = cpu->A;
+
     return 0;
 }
 
-Addressing::Immediate::Immediate(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : MOS6502Instruction(cpu, numCycles, size) {}
-
-uint8_t Addressing::Immediate::fetchAuxData()
+/*
+ * Instruction has been given an immediate value,
+ * so no need to access RAM either
+ */
+template <>
+uint8_t AddressingMode<Ricoh2A03::AddressingType::IMM>::fetchAuxData()
 {
     auxData = cpu->PC++;
+
     return 0;
 }
 
-Addressing::ZPage::ZPage(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : MOS6502Instruction(cpu, numCycles, size) {}
-
-uint8_t Addressing::ZPage::fetchAuxData()
+/*
+ * Instruction is given an 8-bit address.
+ * The upper byte is implicitly 0x00, so
+ * it accesses the RAM's Page 0
+ */
+template <>
+uint8_t AddressingMode<Ricoh2A03::AddressingType::ZP>::fetchAuxData()
 {
     auxData = static_cast<uint16_t>(cpu->read(cpu->PC++));
+
     return 0;
 }
 
-Addressing::ZXPage::ZXPage(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : MOS6502Instruction(cpu, numCycles, size) {}
-
-uint8_t Addressing::ZXPage::fetchAuxData()
+/*
+ * Zero Page Addressing with an offset
+ * equal to CPU REG X
+ */
+template <>
+uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPX>::fetchAuxData()
 {
     auxData = static_cast<uint16_t>(cpu->read(cpu->PC++)) + cpu->X;
+
     return 0;
 }
 
-Addressing::ZYPage::ZYPage(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : MOS6502Instruction(cpu, numCycles, size) {}
-
-uint8_t Addressing::ZYPage::fetchAuxData()
+/*
+ * Zero Page Addressing with an offset
+ * equal to CPU REG Y
+ */
+template <>
+uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPY>::fetchAuxData()
 {
     auxData = static_cast<uint16_t>(cpu->read(cpu->PC++)) + cpu->Y;
+
     return 0;
 }
 
-Addressing::Relative::Relative(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : MOS6502Instruction(cpu, numCycles, size) {}
-
-uint8_t Addressing::Relative::fetchAuxData()
+/*
+ * Branch offset located at CPU's PC
+ * Offset is only 8-bit, so must be sign-extended
+ */
+template <>
+uint8_t AddressingMode<Ricoh2A03::AddressingType::REL>::fetchAuxData()
 {
     auxData = static_cast<uint16_t>(cpu->read(cpu->PC++));
     auxData |= (((0x80 & auxData) != 0x0000) * 0xFF00);
+
     return 0;
 }
 
-Addressing::Absolute::Absolute(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : MOS6502Instruction(cpu, numCycles, size) {}
-
-uint8_t Addressing::Absolute::fetchAuxData()
+/*
+ * Given a direct 16-bit address
+ * to retrieve the contents of
+ */
+template <>
+uint8_t AddressingMode<Ricoh2A03::AddressingType::AB>::fetchAuxData()
 {
     auxData = (static_cast<uint16_t>(cpu->read(cpu->PC + 0x1)) << 8) |
               static_cast<uint16_t>(cpu->read(cpu->PC));
     cpu->PC += 0x2;
+
     return 0;
 }
 
-Addressing::AbsoluteX::AbsoluteX(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : MOS6502Instruction(cpu, numCycles, size) {}
-
-uint8_t Addressing::AbsoluteX::fetchAuxData()
+/*
+ * Absolute addressing with an offset of CPU REG X
+ * Page cross => 1 cycle penalty
+ */
+template <>
+uint8_t AddressingMode<Ricoh2A03::AddressingType::ABX>::fetchAuxData()
 {
     auxData = ((static_cast<uint16_t>(cpu->read(cpu->PC + 0x1)) << 8) |
                static_cast<uint16_t>(cpu->read(cpu->PC))) +
               cpu->X;
     cpu->PC += 0x2;
+
     return (auxData & 0xFF00) != ((auxData - cpu->X) & 0xFF00);
 }
 
-Addressing::AbsoluteY::AbsoluteY(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : MOS6502Instruction(cpu, numCycles, size) {}
-
-uint8_t Addressing::AbsoluteY::fetchAuxData()
+/*
+ * Absolute addressing with an offset of CPU REG Y
+ * Page cross => 1 cycle penalty
+ */
+template <>
+uint8_t AddressingMode<Ricoh2A03::AddressingType::ABY>::fetchAuxData()
 {
     auxData = ((static_cast<uint16_t>(cpu->read(cpu->PC + 0x1)) << 8) |
                static_cast<uint16_t>(cpu->read(cpu->PC))) +
               cpu->Y;
     cpu->PC += 0x2;
+
     return (auxData & 0xFF00) != ((auxData - cpu->Y) & 0xFF00);
 }
 
-Addressing::Indirect::Indirect(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : MOS6502Instruction(cpu, numCycles, size) {}
-
-uint8_t Addressing::Indirect::fetchAuxData()
+/*
+ * Address of pointer is encoded in instruction
+ * instead of an address of data (like the above
+ * addressing modes).
+ */
+template <>
+uint8_t AddressingMode<Ricoh2A03::AddressingType::IN>::fetchAuxData()
 {
     auxData = ((static_cast<uint16_t>(cpu->read(cpu->PC + 0x1)) << 8) |
                static_cast<uint16_t>(cpu->read(cpu->PC)));
@@ -105,9 +155,12 @@ uint8_t Addressing::Indirect::fetchAuxData()
     return 0;
 }
 
-Addressing::IndirectZX::IndirectZX(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : MOS6502Instruction(cpu, numCycles, size) {}
-
-uint8_t Addressing::IndirectZX::fetchAuxData()
+/*
+ * Indirect addressing, but address of pointer
+ * is offset by CPU REG X
+ */
+template <>
+uint8_t AddressingMode<Ricoh2A03::AddressingType::INX>::fetchAuxData()
 {
     auxData = static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->X);
     auxData = ((static_cast<uint16_t>(cpu->read(auxData + 0x1)) << 8) |
@@ -116,9 +169,14 @@ uint8_t Addressing::IndirectZX::fetchAuxData()
     return 0;
 }
 
-Addressing::IndirectZY::IndirectZY(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : MOS6502Instruction(cpu, numCycles, size) {}
-
-uint8_t Addressing::IndirectZY::fetchAuxData()
+/*
+ * Indirect addressing, but the actual pointer
+ * in memory is offset by CPU REG Y right before
+ * the data read.
+ * Page cross => 1 cycle penalty
+ */
+template <>
+uint8_t AddressingMode<Ricoh2A03::AddressingType::INY>::fetchAuxData()
 {
     auxData = static_cast<uint16_t>(cpu->read(cpu->PC++));
     auxData = ((static_cast<uint16_t>(cpu->read(auxData + 0x1)) << 8) |
