@@ -10,3 +10,10 @@ public:
     BRK(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size);
     uint8_t exec() override final;
 };
+
+class ORA : public Addressing::Implied
+{
+public:
+    ORA(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size);
+    uint8_t exec() override final;
+};

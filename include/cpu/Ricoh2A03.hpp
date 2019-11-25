@@ -24,6 +24,18 @@ public:
         N = (1 << 7),
     };
 
+    enum AddressingType
+    {
+        C = (1 << 0),
+        Z = (1 << 1),
+        I = (1 << 2),
+        D = (1 << 3),
+        B = (1 << 4),
+        U = (1 << 5),
+        V = (1 << 6),
+        N = (1 << 7),
+    };
+
     uint8_t A;
     uint8_t X;
     uint8_t Y;
