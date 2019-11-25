@@ -27,6 +27,12 @@ protected:
     */
     uint8_t auxData;
 
+    /* 
+     * The address of the byte accessed by the instruction.
+     * Used to write back values to ram
+    */
+    uint16_t absoluteAddress;
+
     /*
      * Number of cycles for instruction to complete
      * Note that this would be the base number, and the
