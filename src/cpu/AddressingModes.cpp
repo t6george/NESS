@@ -46,7 +46,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IMM>::fetchAuxData()
 }
 
 template <>
-void AddressingMode<Ricoh2A03::AddressingType::IMP>::writeBack()
+void AddressingMode<Ricoh2A03::AddressingType::IMM>::writeBack()
 {
     cpu->write(cpu->PC - 1, auxData);
 }
@@ -82,6 +82,11 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPX>::fetchAuxData()
     return 0;
 }
 
+template <>
+void AddressingMode<Ricoh2A03::AddressingType::ZPX>::writeBack()
+{
+}
+
 /*
  * Zero Page Addressing with an offset
  * equal to CPU REG Y
@@ -92,6 +97,11 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPY>::fetchAuxData()
     auxData = cpu->read(cpu->PC++) + cpu->Y;
 
     return 0;
+}
+
+template <>
+void AddressingMode<Ricoh2A03::AddressingType::ZPY>::writeBack()
+{
 }
 
 /*
@@ -107,6 +117,11 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::REL>::fetchAuxData()
     return 0;
 }
 
+template <>
+void AddressingMode<Ricoh2A03::AddressingType::REL>::writeBack()
+{
+}
+
 /*
  * Given a direct 16-bit address
  * to retrieve the contents of
@@ -119,6 +134,11 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::AB>::fetchAuxData()
     cpu->PC += 0x2;
 
     return 0;
+}
+
+template <>
+void AddressingMode<Ricoh2A03::AddressingType::AB>::writeBack()
+{
 }
 
 /*
@@ -136,6 +156,11 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ABX>::fetchAuxData()
     return (auxData & 0xFF00) != ((auxData - cpu->X) & 0xFF00);
 }
 
+template <>
+void AddressingMode<Ricoh2A03::AddressingType::ABX>::writeBack()
+{
+}
+
 /*
  * Absolute addressing with an offset of CPU REG Y
  * Page cross => 1 cycle penalty
@@ -149,6 +174,11 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ABY>::fetchAuxData()
     cpu->PC += 0x2;
 
     return (auxData & 0xFF00) != ((auxData - cpu->Y) & 0xFF00);
+}
+
+template <>
+void AddressingMode<Ricoh2A03::AddressingType::ABY>::writeBack()
+{
 }
 
 /*
@@ -178,6 +208,11 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IN>::fetchAuxData()
     return 0;
 }
 
+template <>
+void AddressingMode<Ricoh2A03::AddressingType::IN>::writeBack()
+{
+}
+
 /*
  * Indirect addressing, but address of pointer
  * is offset by CPU REG X
@@ -190,6 +225,11 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::INX>::fetchAuxData()
                static_cast<uint16_t>(cpu->read(auxData)));
 
     return 0;
+}
+
+template <>
+void AddressingMode<Ricoh2A03::AddressingType::INX>::writeBack()
+{
 }
 
 /*
@@ -207,4 +247,9 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::INY>::fetchAuxData()
               cpu->Y;
 
     return (auxData & 0xFF00) != ((auxData - cpu->Y) & 0xFF00);
+}
+
+template <>
+void AddressingMode<Ricoh2A03::AddressingType::INY>::writeBack()
+{
 }

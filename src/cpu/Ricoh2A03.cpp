@@ -90,7 +90,7 @@ void Ricoh2A03::irq()
 
 bool Ricoh2A03::getFlag(Flags6502 f) const
 {
-    return static_cast<bool>(S & (1 << f));
+    return static_cast<bool>(S & f);
 }
 
 void Ricoh2A03::setFlag(Flags6502 f, bool b)
