@@ -10,6 +10,11 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::NOP>::fetchAuxData()
     return 0;
 }
 
+template <>
+void AddressingMode<Ricoh2A03::AddressingType::NOP>::writeBack()
+{
+}
+
 /*
  * Instruction is acting on some register, and
  * does not need data from RAM
@@ -22,6 +27,12 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IMP>::fetchAuxData()
     return 0;
 }
 
+template <>
+void AddressingMode<Ricoh2A03::AddressingType::IMP>::writeBack()
+{
+    cpu->A = auxData;
+}
+
 /*
  * Instruction has been given an immediate value,
  * so no need to access RAM either
@@ -29,9 +40,15 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IMP>::fetchAuxData()
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::IMM>::fetchAuxData()
 {
-    auxData = cpu->PC++;
+    auxData = cpu->read(cpu->PC++);
 
     return 0;
+}
+
+template <>
+void AddressingMode<Ricoh2A03::AddressingType::IMP>::writeBack()
+{
+    cpu->write(cpu->PC - 1, auxData);
 }
 
 /*
@@ -42,9 +59,15 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IMM>::fetchAuxData()
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ZP>::fetchAuxData()
 {
-    auxData = static_cast<uint16_t>(cpu->read(cpu->PC++));
+    auxData = cpu->read(cpu->PC++);
 
     return 0;
+}
+
+template <>
+void AddressingMode<Ricoh2A03::AddressingType::ZP>::writeBack()
+{
+    cpu->write(cpu->PC - 1, auxData);
 }
 
 /*
@@ -66,7 +89,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPX>::fetchAuxData()
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPY>::fetchAuxData()
 {
-    auxData = static_cast<uint16_t>(cpu->read(cpu->PC++)) + cpu->Y;
+    auxData = cpu->read(cpu->PC++) + cpu->Y;
 
     return 0;
 }
@@ -78,7 +101,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPY>::fetchAuxData()
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::REL>::fetchAuxData()
 {
-    auxData = static_cast<uint16_t>(cpu->read(cpu->PC++));
+    auxData = cpu->read(cpu->PC++);
     auxData |= (((0x80 & auxData) != 0x0000) * 0xFF00);
 
     return 0;

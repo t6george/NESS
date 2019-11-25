@@ -66,9 +66,9 @@ void Ricoh2A03::reset()
 
 void Ricoh2A03::nmi(uint16_t interruptAddr)
 {
-    SetFlag(B, false);
-    SetFlag(U, true);
-    SetFlag(I, true);
+    setFlag(U, true);
+    setFlag(I, true);
+    setFlag(B, false);
 
     pushDoubleWord(PC);
     pushWord(S);
@@ -81,19 +81,19 @@ void Ricoh2A03::nmi(uint16_t interruptAddr)
 
 void Ricoh2A03::irq()
 {
-    if (GetFlag(I) == 0)
+    if (getFlag(I) == 0)
     {
         nmi(0xFFFE);
         --cycles;
     }
 }
 
-bool Ricoh2A03::GetFlag(Flags6502 f) const
+bool Ricoh2A03::getFlag(Flags6502 f) const
 {
     return static_cast<bool>(S & (1 << f));
 }
 
-void Ricoh2A03::SetFlag(Flags6502 f, bool b)
+void Ricoh2A03::setFlag(Flags6502 f, bool b)
 {
     S &= ~(1 << f);
     S |= (1 << static_cast<uint8_t>(b));

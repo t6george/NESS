@@ -25,7 +25,7 @@ protected:
      * The additional data the instruction would read
      * from memory would get stored here
     */
-    uint16_t auxData;
+    uint8_t auxData;
 
     /*
      * Number of cycles for instruction to complete
@@ -40,6 +40,9 @@ protected:
 
     // Fetches any data from RAM that the instruction will execute on
     virtual uint8_t fetchAuxData() = 0;
+
+    // Writes back to location where auxiliary data was read from
+    virtual void writeBack() = 0;
 
 public:
     // Size of asm instruction in bytes

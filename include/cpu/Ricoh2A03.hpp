@@ -65,6 +65,6 @@ public:
     uint8_t popWord();
     uint16_t popDoubleWord();
 
-    bool GetFlag(Flags6502 f) const;
-    void SetFlag(Flags6502 f, bool b);
+    bool getFlag(Flags6502 f) const;
+    void setFlag(Flags6502 f, bool b);
 };
