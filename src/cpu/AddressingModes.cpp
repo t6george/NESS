@@ -23,7 +23,6 @@ template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::IMP>::fetchAuxData()
 {
     auxData = cpu->A;
-
     return 0;
 }
 
@@ -41,7 +40,6 @@ template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::IMM>::fetchAuxData()
 {
     auxData = cpu->read(cpu->PC++);
-
     return 0;
 }
 
@@ -59,15 +57,14 @@ void AddressingMode<Ricoh2A03::AddressingType::IMM>::writeBack()
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ZP>::fetchAuxData()
 {
-    auxData = cpu->read(cpu->PC++);
-
+    auxData = cpu->read(static_cast<uint16_t>(cpu->read(cpu->PC++)));
     return 0;
 }
 
 template <>
 void AddressingMode<Ricoh2A03::AddressingType::ZP>::writeBack()
 {
-    cpu->write(cpu->PC - 1, auxData);
+    cpu->write(static_cast<uint16_t>(cpu->read(cpu->PC - 1)), auxData);
 }
 
 /*
@@ -77,14 +74,14 @@ void AddressingMode<Ricoh2A03::AddressingType::ZP>::writeBack()
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPX>::fetchAuxData()
 {
-    auxData = static_cast<uint16_t>(cpu->read(cpu->PC++)) + cpu->X;
-
+    auxData = cpu->read(static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->X));
     return 0;
 }
 
 template <>
 void AddressingMode<Ricoh2A03::AddressingType::ZPX>::writeBack()
 {
+    cpu->write(static_cast<uint16_t>(cpu->read(cpu->PC - 1) + cpu->X), auxData);
 }
 
 /*
@@ -94,14 +91,14 @@ void AddressingMode<Ricoh2A03::AddressingType::ZPX>::writeBack()
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPY>::fetchAuxData()
 {
-    auxData = cpu->read(cpu->PC++) + cpu->Y;
-
+    auxData = cpu->read(static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->X));
     return 0;
 }
 
 template <>
 void AddressingMode<Ricoh2A03::AddressingType::ZPY>::writeBack()
 {
+    cpu->write(static_cast<uint16_t>(cpu->read(cpu->PC - 1) + cpu->Y), auxData);
 }
 
 /*
@@ -129,16 +126,20 @@ void AddressingMode<Ricoh2A03::AddressingType::REL>::writeBack()
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::AB>::fetchAuxData()
 {
-    auxData = (static_cast<uint16_t>(cpu->read(cpu->PC + 0x1)) << 8) |
-              static_cast<uint16_t>(cpu->read(cpu->PC));
+    uint16_t absoluteAddress = (static_cast<uint16_t>(cpu->read(cpu->PC + 0x1)) << 8) |
+                               static_cast<uint16_t>(cpu->read(cpu->PC));
     cpu->PC += 0x2;
 
+    auxData = cpu->read(absoluteAddress);
     return 0;
 }
 
 template <>
 void AddressingMode<Ricoh2A03::AddressingType::AB>::writeBack()
 {
+    uint16_t absoluteAddress = (static_cast<uint16_t>(cpu->read(cpu->PC - 0x1)) << 8) |
+                               static_cast<uint16_t>(cpu->read(cpu->PC - 0x2));
+    cpu->write(absoluteAddress, auxData);
 }
 
 /*
