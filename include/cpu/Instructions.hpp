@@ -419,6 +419,81 @@ public:
 };
 
 template <Ricoh2A03::AddressingType T>
+class ROR : public AddressingMode<T>
+{
+public:
+    ROR(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+
+    uint8_t exec() override final
+    {
+        fetchAuxData();
+        uint8_t oldCarry = static_cast<uint8_t>(cpu->getFlag(Ricoh2A03::C)) << 7;
+        cpu->setFlag(Ricoh2A03::C, auxData & 0x01);
+
+        auxData = (auxData >> 1) | oldCarry;
+        writeBack();
+
+        cpu->setFlag(Ricoh2A03::N, auxData & 0x80);
+        cpu->setFlag(Ricoh2A03::Z, auxData == 0x00);
+
+        return numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class PLA : public AddressingMode<T>
+{
+public:
+    PLA(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+
+    uint8_t exec() override final
+    {
+        cpu->A = cpu->popWord();
+
+        cpu->setFlag(Ricoh2A03::Z, cpu->A == 0x00);
+        cpu->setFlag(Ricoh2A03::N, cpu->A & 0x80);
+
+        return numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class BVS : public AddressingMode<T>
+{
+public:
+    BVS(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+
+    uint8_t exec() override final
+    {
+        int cyclePenalty = 0;
+        fetchData();
+        if (cpu->getFlag(Ricoh2A03::V))
+        {
+            cyclePenalty = 1;
+            absoluteAddress = cpu->PC + auxData;
+
+            if ((cpu->PC & 0xFF00) != (absoluteAddress & 0xFF00))
+                cyclePenalty = 2;
+        }
+
+        return numCycles + cyclePenalty;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class SEI : public AddressingMode<T>
+{
+public:
+    SEC(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+
+    uint8_t exec() override final
+    {
+        cpu->setFlag(Ricoh2A03::I, true);
+        return numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
 class SBC : public AddressingMode<T>
 {
 public:
