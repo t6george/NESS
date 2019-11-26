@@ -484,11 +484,89 @@ template <Ricoh2A03::AddressingType T>
 class SEI : public AddressingMode<T>
 {
 public:
-    SEC(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    SEI(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
 
     uint8_t exec() override final
     {
         cpu->setFlag(Ricoh2A03::I, true);
+        return numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class STA : public AddressingMode<T>
+{
+public:
+    STA(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+
+    uint8_t exec() override final
+    {
+        fetchAuxData();
+        auxData = cpu->A;
+        writeBack();
+        return numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class STY : public AddressingMode<T>
+{
+public:
+    STY(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+
+    uint8_t exec() override final
+    {
+        fetchAuxData();
+        auxData = cpu->Y;
+        writeBack();
+        return numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class STX : public AddressingMode<T>
+{
+public:
+    STX(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+
+    uint8_t exec() override final
+    {
+        fetchAuxData();
+        auxData = cpu->X;
+        writeBack();
+        return numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class DEY : public AddressingMode<T>
+{
+public:
+    DEY(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+
+    uint8_t exec() override final
+    {
+        --cpu->Y;
+
+        cpu->setFlag(Ricoh2A03::Z, cpu->Y == 0x00);
+        cpu->setFlag(Ricoh2A03::N, cpu->Y & 0x80);
+        return numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class TXA : public AddressingMode<T>
+{
+public:
+    TXA(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+
+    uint8_t exec() override final
+    {
+        cpu->A = cpu->X;
+
+        cpu->setFlag(Ricoh2A03::Z, cpu->A == 0x00);
+        cpu->setFlag(Ricoh2A03::N, cpu->A & 0x80);
+
         return numCycles;
     }
 };
