@@ -7,7 +7,6 @@ Ricoh2A03::Ricoh2A03(std::shared_ptr<Bus> bus) : bus{bus} {}
 uint8_t Ricoh2A03::read(uint16_t addr)
 {
     return bus->read(addr);
-    // return 0;
 }
 
 void Ricoh2A03::write(uint16_t addr, uint8_t data)
@@ -54,12 +53,10 @@ void Ricoh2A03::reset()
 {
     A = X = Y = 0;
     SP = 0xFD;
-    S = 0x0 | U;
+    S = U;
 
-    uint16_t lo = read(0xFFFC);
-    uint16_t hi = read(0xFFFD);
-
-    PC = (hi << 8) | lo;
+    PC = (static_cast<uint16_t>(read(0xFFFD)) << 8) |
+         static_cast<uint16_t>(read(0xFFFC));
 
     cycles = 8;
 }
@@ -81,7 +78,7 @@ void Ricoh2A03::nmi(uint16_t interruptAddr)
 
 void Ricoh2A03::irq()
 {
-    if (getFlag(I) == 0)
+    if (!getFlag(I))
     {
         nmi(0xFFFE);
         --cycles;

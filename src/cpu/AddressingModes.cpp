@@ -17,7 +17,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::NOP>::fetchAuxData()
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::IMP>::fetchAuxData()
 {
-    return 0;
+    return cpu->A;
 }
 
 /*

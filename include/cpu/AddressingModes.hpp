@@ -12,6 +12,9 @@ protected:
 
     void writeBack() override final
     {
-        cpu->write(absoluteAddress, auxData);
+        if (T == Ricoh2A03::AddressingType::IMP)
+            cpu->A = auxData;
+        else
+            cpu->write(absoluteAddress, auxData);
     }
 };
