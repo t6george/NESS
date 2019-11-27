@@ -1,14 +1,17 @@
 #pragma once
 #include <memory>
 #include <cstdint>
+#include <array>
 
 #define STACK_BASE 0x0100
-
+#define NUM_POSSIBLE_OPCODES 0x100
 class Bus;
+class MOS6502Instruction;
 
 class Ricoh2A03
 {
     std::shared_ptr<Bus> bus;
+    std::array<std::unique_ptr<MOS6502Instruction>, 1> instructions;
     uint8_t cycles;
 
 public:

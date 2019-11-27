@@ -10,17 +10,18 @@ public:
 
     uint8_t exec() override final
     {
-        ++cpu->PC;
-        cpu->setFlag(Ricoh2A03::I, true);
-        cpu->setFlag(Ricoh2A03::B, true);
+        ++this->cpu->PC;
+        this->cpu->setFlag(Ricoh2A03::I, true);
+        this->cpu->setFlag(Ricoh2A03::B, true);
 
-        cpu->pushDoubleWord(cpu->PC);
-        cpu->pushWord(cpu->S);
+        this->cpu->pushDoubleWord(cpu->PC);
+        this->cpu->pushWord(cpu->S);
 
-        cpu->PC = (static_cast<uint16_t>(cpu->read(0xFFFF)) << 8) | static_cast<uint16_t>(cpu->read(0xFFFE));
-        cpu->setFlag(Ricoh2A03::B, false);
+        this->cpu->PC = (static_cast<uint16_t>(this->cpu->read(0xFFFF)) << 8) |
+                        static_cast<uint16_t>(this->cpu->read(0xFFFE));
+        this->cpu->setFlag(Ricoh2A03::B, false);
 
-        return numCycles;
+        return this->numCycles;
     }
 };
 
@@ -32,12 +33,12 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->S = cpu->popWord();
-        cpu->setFlag(Ricoh2A03::U, false);
-        cpu->setFlag(Ricoh2A03::B, false);
+        this->cpu->S = this->cpu->popWord();
+        this->cpu->setFlag(Ricoh2A03::U, false);
+        this->cpu->setFlag(Ricoh2A03::B, false);
 
-        cpu->PC = cpu->popDoubleWord();
-        return numCycles;
+        this->cpu->PC = this->cpu->popDoubleWord();
+        return this->numCycles;
     }
 };
 
@@ -50,10 +51,10 @@ public:
 
     uint8_t exec() override final
     {
-        fetchAuxData();
-        cpu->pushDoubleWord(cpu->PC - 1);
-        cpu->PC = absoluteAddr;
-        return numCycles;
+        this->fetchAuxData();
+        this->cpu->pushDoubleWord(this->cpu->PC - 1);
+        this->cpu->PC = this->absoluteAddr;
+        return this->numCycles;
     }
 };
 
@@ -65,9 +66,9 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->PC = cpu->popDoubleWord();
-        ++cpu->PC;
-        return numCycles;
+        this->cpu->PC = this->cpu->popDoubleWord();
+        ++this->cpu->PC;
+        return this->numCycles;
     }
 };
 
@@ -80,12 +81,12 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->A = cpu->popWord();
+        this->cpu->A = this->cpu->popWord();
 
-        cpu->setFlag(Ricoh2A03::Z, cpu->A == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->A & 0x80);
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
 
-        return numCycles;
+        return this->numCycles;
     }
 };
 
@@ -97,8 +98,8 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->pushWord(cpu->A);
-        return numCycles;
+        this->cpu->pushWord(this->cpu->A);
+        return this->numCycles;
     }
 };
 
@@ -110,8 +111,8 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->S = cpu->popWord() | Ricoh2A03::U;
-        return numCycles;
+        this->cpu->S = this->cpu->popWord() | Ricoh2A03::U;
+        return this->numCycles;
     }
 };
 
@@ -123,15 +124,15 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->setFlag(Ricoh2A03::U, true);
-        cpu->setFlag(Ricoh2A03::B, true);
+        this->cpu->setFlag(Ricoh2A03::U, true);
+        this->cpu->setFlag(Ricoh2A03::B, true);
 
-        cpu->pushWord(cpu->S);
+        this->cpu->pushWord(this->cpu->S);
 
-        cpu->setFlag(Ricoh2A03::U, false);
-        cpu->setFlag(Ricoh2A03::B, false);
+        this->cpu->setFlag(Ricoh2A03::U, false);
+        this->cpu->setFlag(Ricoh2A03::B, false);
 
-        return numCycles;
+        return this->numCycles;
     }
 };
 
@@ -144,13 +145,13 @@ public:
 
     uint8_t exec() override final
     {
-        uint8_t cyclePenalty = fetchAuxData();
-        cpu->Y = auxData;
+        uint8_t cyclePenalty = this->fetchAuxData();
+        this->cpu->Y = this->auxData;
 
-        cpu->setFlag(Ricoh2A03::Z, cpu->Y == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->Y & 0x80);
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->Y == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->Y & 0x80);
 
-        return numCycles + cyclePenalty;
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -162,13 +163,13 @@ public:
 
     uint8_t exec() override final
     {
-        uint8_t cyclePenalty = fetchAuxData();
-        cpu->A = auxData;
+        uint8_t cyclePenalty = this->fetchAuxData();
+        this->cpu->A = this->auxData;
 
-        cpu->setFlag(Ricoh2A03::Z, cpu->A == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->A & 0x80);
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
 
-        return numCycles + cyclePenalty;
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -180,13 +181,13 @@ public:
 
     uint8_t exec() override final
     {
-        uint8_t cyclePenalty = fetchAuxData();
-        cpu->X = auxData;
+        uint8_t cyclePenalty = this->fetchAuxData();
+        this->cpu->X = this->auxData;
 
-        cpu->setFlag(Ricoh2A03::Z, cpu->X == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->X & 0x80);
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->X == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->X & 0x80);
 
-        return numCycles + cyclePenalty;
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -199,10 +200,10 @@ public:
 
     uint8_t exec() override final
     {
-        fetchAuxData();
-        auxData = cpu->A;
-        writeBack();
-        return numCycles;
+        this->fetchAuxData();
+        this->auxData = this->cpu->A;
+        this->writeBack();
+        return this->numCycles;
     }
 };
 
@@ -214,10 +215,10 @@ public:
 
     uint8_t exec() override final
     {
-        fetchAuxData();
-        auxData = cpu->Y;
-        writeBack();
-        return numCycles;
+        this->fetchAuxData();
+        this->auxData = this->cpu->Y;
+        this->writeBack();
+        return this->numCycles;
     }
 };
 
@@ -229,10 +230,10 @@ public:
 
     uint8_t exec() override final
     {
-        fetchAuxData();
-        auxData = cpu->X;
-        writeBack();
-        return numCycles;
+        this->fetchAuxData();
+        this->auxData = this->cpu->X;
+        this->writeBack();
+        return this->numCycles;
     }
 };
 
@@ -245,12 +246,12 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->X = cpu->A;
+        this->cpu->X = this->cpu->A;
 
-        cpu->setFlag(Ricoh2A03::Z, cpu->X == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->X & 0x80);
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->X == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->X & 0x80);
 
-        return numCycles;
+        return this->numCycles;
     }
 };
 
@@ -262,12 +263,12 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->X = cpu->SP;
+        this->cpu->X = this->cpu->SP;
 
-        cpu->setFlag(Ricoh2A03::Z, cpu->X == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->X & 0x80);
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->X == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->X & 0x80);
 
-        return numCycles;
+        return this->numCycles;
     }
 };
 
@@ -279,12 +280,12 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->Y = cpu->A;
+        this->cpu->Y = this->cpu->A;
 
-        cpu->setFlag(Ricoh2A03::Z, cpu->Y == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->Y & 0x80);
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->Y == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->Y & 0x80);
 
-        return numCycles;
+        return this->numCycles;
     }
 };
 
@@ -296,12 +297,12 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->A = cpu->Y;
+        this->cpu->A = this->cpu->Y;
 
-        cpu->setFlag(Ricoh2A03::Z, cpu->A == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->A & 0x80);
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
 
-        return numCycles;
+        return this->numCycles;
     }
 };
 
@@ -313,8 +314,8 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->SP = cpu->X;
-        return numCycles;
+        this->cpu->SP = this->cpu->X;
+        return this->numCycles;
     }
 };
 
@@ -326,12 +327,12 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->A = cpu->X;
+        this->cpu->A = this->cpu->X;
 
-        cpu->setFlag(Ricoh2A03::Z, cpu->A == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->A & 0x80);
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
 
-        return numCycles;
+        return this->numCycles;
     }
 };
 
@@ -344,10 +345,11 @@ public:
 
     uint8_t exec() override final
     {
-        fetchData();
-        int cyclePenalty = cpu->branch(auxData, absoluteAddress, cpu->getFlag(Ricoh2A03::Z));
+        this->fetchData();
+        int cyclePenalty = this->cpu->branch(this->auxData, this->absoluteAddress,
+                                             this->cpu->getFlag(Ricoh2A03::Z));
 
-        return numCycles + cyclePenalty;
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -359,10 +361,11 @@ public:
 
     uint8_t exec() override final
     {
-        fetchData();
-        int cyclePenalty = cpu->branch(auxData, absoluteAddress, !cpu->getFlag(Ricoh2A03::Z));
+        this->fetchData();
+        int cyclePenalty = this->cpu->branch(this->auxData, this->absoluteAddress,
+                                             !this->cpu->getFlag(Ricoh2A03::Z));
 
-        return numCycles + cyclePenalty;
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -374,10 +377,11 @@ public:
 
     uint8_t exec() override final
     {
-        fetchData();
-        int cyclePenalty = cpu->branch(auxData, absoluteAddress, cpu->getFlag(Ricoh2A03::C));
+        this->fetchData();
+        int cyclePenalty = this->cpu->branch(this->auxData, this->absoluteAddress,
+                                             this->cpu->getFlag(Ricoh2A03::C));
 
-        return numCycles + cyclePenalty;
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -389,10 +393,11 @@ public:
 
     uint8_t exec() override final
     {
-        fetchData();
-        int cyclePenalty = cpu->branch(auxData, absoluteAddress, !cpu->getFlag(Ricoh2A03::C));
+        this->fetchData();
+        int cyclePenalty = this->cpu->branch(this->auxData, this->absoluteAddress,
+                                             !this->cpu->getFlag(Ricoh2A03::C));
 
-        return numCycles + cyclePenalty;
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -404,10 +409,11 @@ public:
 
     uint8_t exec() override final
     {
-        fetchData();
-        int cyclePenalty = cpu->branch(auxData, absoluteAddress, cpu->getFlag(Ricoh2A03::V));
+        this->fetchData();
+        int cyclePenalty = this->cpu->branch(this->auxData, this->absoluteAddress,
+                                             this->cpu->getFlag(Ricoh2A03::V));
 
-        return numCycles + cyclePenalty;
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -419,10 +425,11 @@ public:
 
     uint8_t exec() override final
     {
-        fetchData();
-        int cyclePenalty = cpu->branch(auxData, absoluteAddress, !cpu->getFlag(Ricoh2A03::V));
+        this->fetchData();
+        int cyclePenalty = this->cpu->branch(this->auxData, this->absoluteAddress,
+                                             !this->cpu->getFlag(Ricoh2A03::V));
 
-        return numCycles + cyclePenalty;
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -434,10 +441,11 @@ public:
 
     uint8_t exec() override final
     {
-        fetchData();
-        int cyclePenalty = cpu->branch(auxData, absoluteAddress, !cpu->getFlag(Ricoh2A03::N));
+        this->fetchData();
+        int cyclePenalty = this->cpu->branch(this->auxData, this->absoluteAddress,
+                                             !this->cpu->getFlag(Ricoh2A03::N));
 
-        return numCycles + cyclePenalty;
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -449,10 +457,11 @@ public:
 
     uint8_t exec() override final
     {
-        fetchData();
-        int cyclePenalty = cpu->branch(auxData, absoluteAddress, cpu->getFlag(Ricoh2A03::N));
+        this->fetchData();
+        int cyclePenalty = this->cpu->branch(this->auxData, this->absoluteAddress,
+                                             this->cpu->getFlag(Ricoh2A03::N));
 
-        return numCycles + cyclePenalty;
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -465,14 +474,14 @@ public:
 
     uint8_t exec() override final
     {
-        fetchAuxData();
-        ++auxData;
+        this->fetchAuxData();
+        ++this->auxData;
 
-        writeBack();
-        cpu->setFlag(Ricoh2A03::Z, auxData == 0x00);
-        cpu->setFlag(Ricoh2A03::N, auxData & 0x80);
+        this->writeBack();
+        this->cpu->setFlag(Ricoh2A03::Z, this->auxData == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->auxData & 0x80);
 
-        return numCycles;
+        return this->numCycles;
     }
 };
 
@@ -484,11 +493,11 @@ public:
 
     uint8_t exec() override final
     {
-        ++cpu->Y;
-        cpu->setFlag(Ricoh2A03::Z, cpu->Y == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->Y & 0x80);
+        ++this->cpu->Y;
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->Y == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->Y & 0x80);
 
-        return numCycles;
+        return this->numCycles;
     }
 };
 
@@ -500,11 +509,11 @@ public:
 
     uint8_t exec() override final
     {
-        --cpu->X;
-        cpu->setFlag(Ricoh2A03::Z, cpu->X == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->X & 0x80);
+        --this->cpu->X;
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->X == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->X & 0x80);
 
-        return numCycles;
+        return this->numCycles;
     }
 };
 
@@ -516,14 +525,14 @@ public:
 
     uint8_t exec() override final
     {
-        fetchAuxData();
-        --auxData;
+        this->fetchAuxData();
+        --this->auxData;
 
-        writeBack();
-        cpu->setFlag(Ricoh2A03::Z, auxData == 0x00);
-        cpu->setFlag(Ricoh2A03::N, auxData & 0x80);
+        this->writeBack();
+        this->cpu->setFlag(Ricoh2A03::Z, this->auxData == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->auxData & 0x80);
 
-        return numCycles;
+        return this->numCycles;
     }
 };
 
@@ -535,11 +544,11 @@ public:
 
     uint8_t exec() override final
     {
-        --cpu->Y;
+        --this->cpu->Y;
 
-        cpu->setFlag(Ricoh2A03::Z, cpu->Y == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->Y & 0x80);
-        return numCycles;
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->Y == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->Y & 0x80);
+        return this->numCycles;
     }
 };
 
@@ -552,14 +561,14 @@ public:
 
     uint8_t exec() override final
     {
-        fetchAuxData();
-        uint8_t result = cpu->X - auxData;
+        this->fetchAuxData();
+        uint8_t result = this->cpu->X - this->auxData;
 
-        cpu->setFlag(Ricoh2A03::Z, result == 0x00);
-        cpu->setFlag(Ricoh2A03::N, result & 0x80);
-        cpu->setFlag(Ricoh2A03::C, cpu->X >= auxData);
+        this->cpu->setFlag(Ricoh2A03::Z, result == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, result & 0x80);
+        this->cpu->setFlag(Ricoh2A03::C, this->cpu->X >= this->auxData);
 
-        return numCycles;
+        return this->numCycles;
     }
 };
 
@@ -571,14 +580,14 @@ public:
 
     uint8_t exec() override final
     {
-        fetchAuxData();
-        uint8_t result = cpu->Y - auxData;
+        this->fetchAuxData();
+        uint8_t result = this->cpu->Y - this->auxData;
 
-        cpu->setFlag(Ricoh2A03::Z, result == 0x00);
-        cpu->setFlag(Ricoh2A03::N, result & 0x80);
-        cpu->setFlag(Ricoh2A03::C, cpu->Y >= auxData);
+        this->cpu->setFlag(Ricoh2A03::Z, result == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, result & 0x80);
+        this->cpu->setFlag(Ricoh2A03::C, this->cpu->Y >= this->auxData);
 
-        return numCycles;
+        return this->numCycles;
     }
 };
 
@@ -590,14 +599,14 @@ public:
 
     uint8_t exec() override final
     {
-        uint8_t cyclePenalty = fetchAuxData();
-        uint8_t result = cpu->A - auxData;
+        uint8_t cyclePenalty = this->fetchAuxData();
+        uint8_t result = this->cpu->A - this->auxData;
 
-        cpu->setFlag(Ricoh2A03::Z, result == 0x00);
-        cpu->setFlag(Ricoh2A03::N, result & 0x80);
-        cpu->setFlag(Ricoh2A03::C, cpu->A >= auxData);
+        this->cpu->setFlag(Ricoh2A03::Z, result == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, result & 0x80);
+        this->cpu->setFlag(Ricoh2A03::C, this->cpu->A >= this->auxData);
 
-        return numCycles + cyclePenalty;
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -609,15 +618,15 @@ public:
 
     uint8_t exec() override final
     {
-        fetchAuxData();
+        this->fetchAuxData();
 
-        cpu->setFlag(Ricoh2A03::N, auxData & 0x80);
-        cpu->setFlag(Ricoh2A03::V, auxData & 0x40);
+        this->cpu->setFlag(Ricoh2A03::N, this->auxData & 0x80);
+        this->cpu->setFlag(Ricoh2A03::V, this->auxData & 0x40);
 
-        auxData &= cpu->A;
-        cpu->setFlag(Ricoh2A03::Z, auxData == 0x00);
+        this->auxData &= this->cpu->A;
+        this->cpu->setFlag(Ricoh2A03::Z, this->auxData == 0x00);
 
-        return numCycles;
+        return this->numCycles;
     }
 };
 
@@ -630,8 +639,8 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->setFlag(Ricoh2A03::D, true);
-        return numCycles;
+        this->cpu->setFlag(Ricoh2A03::D, true);
+        return this->numCycles;
     }
 };
 
@@ -643,8 +652,8 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->setFlag(Ricoh2A03::D, false);
-        return numCycles;
+        this->cpu->setFlag(Ricoh2A03::D, false);
+        return this->numCycles;
     }
 };
 
@@ -656,8 +665,8 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->setFlag(Ricoh2A03::V, false);
-        return numCycles;
+        this->cpu->setFlag(Ricoh2A03::V, false);
+        return this->numCycles;
     }
 };
 
@@ -669,8 +678,8 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->setFlag(Ricoh2A03::I, true);
-        return numCycles;
+        this->cpu->setFlag(Ricoh2A03::I, true);
+        return this->numCycles;
     }
 };
 
@@ -682,8 +691,8 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->setFlag(Ricoh2A03::C, false);
-        return numCycles;
+        this->cpu->setFlag(Ricoh2A03::C, false);
+        return this->numCycles;
     }
 };
 
@@ -695,21 +704,8 @@ public:
 
     uint8_t exec() override final
     {
-        cpu->setFlag(Ricoh2A03::I, false);
-        return numCycles;
-    }
-};
-
-template <Ricoh2A03::AddressingType T>
-class SEC : public AddressingMode<T>
-{
-public:
-    SEC(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
-
-    uint8_t exec() override final
-    {
-        cpu->setFlag(Ricoh2A03::C, true);
-        return numCycles;
+        this->cpu->setFlag(Ricoh2A03::I, false);
+        return this->numCycles;
     }
 };
 
@@ -722,12 +718,12 @@ public:
 
     uint8_t exec() override final
     {
-        uint8_t cyclePenalty = fetchAuxData();
-        cpu->A |= auxData;
+        uint8_t cyclePenalty = this->fetchAuxData();
+        this->cpu->A |= this->auxData;
 
-        cpu->setFlag(Ricoh2A03::Z, cpu->A == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->A & 0x80);
-        return numCycles + cyclePenalty;
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -739,15 +735,15 @@ public:
 
     uint8_t exec() override final
     {
-        fetchAuxData();
-        cpu->setFlag(Ricoh2A03::C, auxData & 0x80);
+        this->fetchAuxData();
+        this->cpu->setFlag(Ricoh2A03::C, this->auxData & 0x80);
 
-        auxData <<= 1;
-        writeBack();
+        this->auxData <<= 1;
+        this->writeBack();
 
-        cpu->setFlag(Ricoh2A03::Z, auxData == 0x00);
-        cpu->setFlag(Ricoh2A03::N, auxData & 0x80);
-        return numCycles;
+        this->cpu->setFlag(Ricoh2A03::Z, this->auxData == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->auxData & 0x80);
+        return this->numCycles;
     }
 };
 
@@ -759,13 +755,13 @@ public:
 
     uint8_t exec() override final
     {
-        uint8_t cyclePenalty = fetchAuxData();
-        cpu->A &= auxData;
+        uint8_t cyclePenalty = this->fetchAuxData();
+        this->cpu->A &= this->auxData;
 
-        cpu->setFlag(Ricoh2A03::Z, cpu->A == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->A & 0x80);
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
 
-        return numCycles + cyclePenalty;
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -777,13 +773,13 @@ public:
 
     uint8_t exec() override final
     {
-        uint8_t cyclePenalty = fetchAuxData();
+        uint8_t cyclePenalty = this->fetchAuxData();
 
-        cpu->A ^= auxData;
+        this->cpu->A ^= this->auxData;
 
-        cpu->setFlag(Ricoh2A03::Z, cpu->A == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->A & 0x80);
-        return numCycles + cyclePenalty;
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -795,16 +791,16 @@ public:
 
     uint8_t exec() override final
     {
-        fetchAuxData();
+        this->fetchAuxData();
 
-        cpu->setFlag(Ricoh2A03::C, auxData & 0x01);
+        this->cpu->setFlag(Ricoh2A03::C, this->auxData & 0x01);
 
-        auxData >>= 1;
-        writeBack();
+        this->auxData >>= 1;
+        this->writeBack();
 
-        cpu->setFlag(Ricoh2A03::Z, auxData == 0x00);
-        cpu->setFlag(Ricoh2A03::N, false);
-        return numCycles;
+        this->cpu->setFlag(Ricoh2A03::Z, this->auxData == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, false);
+        return this->numCycles;
     }
 };
 
@@ -816,17 +812,39 @@ public:
 
     uint8_t exec() override final
     {
-        fetchAuxData();
-        uint8_t oldCarry = static_cast<uint8_t>(cpu->getFlag(Ricoh2A03::C)) << 7;
-        cpu->setFlag(Ricoh2A03::C, auxData & 0x01);
+        this->fetchAuxData();
+        uint8_t oldCarry = static_cast<uint8_t>(this->cpu->getFlag(Ricoh2A03::C)) << 7;
+        this->cpu->setFlag(Ricoh2A03::C, this->auxData & 0x01);
 
-        auxData = (auxData >> 1) | oldCarry;
-        writeBack();
+        this->auxData = (this->auxData >> 1) | oldCarry;
+        this->writeBack();
 
-        cpu->setFlag(Ricoh2A03::N, auxData & 0x80);
-        cpu->setFlag(Ricoh2A03::Z, auxData == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->auxData & 0x80);
+        this->cpu->setFlag(Ricoh2A03::Z, this->auxData == 0x00);
 
-        return numCycles;
+        return this->numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class ROL : public AddressingMode<T>
+{
+public:
+    ROL(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+
+    uint8_t exec() override final
+    {
+        this->fetchAuxData();
+        uint8_t oldCarry = static_cast<uint8_t>(this->cpu->getFlag(Ricoh2A03::C));
+        this->cpu->setFlag(Ricoh2A03::C, this->auxData & 0x80);
+
+        this->auxData = (this->auxData << 1) | oldCarry;
+        this->writeBack();
+
+        this->cpu->setFlag(Ricoh2A03::N, this->auxData & 0x80);
+        this->cpu->setFlag(Ricoh2A03::Z, this->auxData == 0x00);
+
+        return this->numCycles;
     }
 };
 
@@ -839,20 +857,21 @@ public:
 
     uint8_t exec() override final
     {
-        uint8_t cyclePenalty = fetchAuxData();
-        uint32_t overflowCheck = cpu->A + auxData + static_cast<uint8_t>(cpu->getFlag(Ricoh2A03::C));
+        uint8_t cyclePenalty = this->fetchAuxData();
+        uint32_t overflowCheck = this->cpu->A + this->auxData +
+                                 static_cast<uint8_t>(this->cpu->getFlag(Ricoh2A03::C));
 
-        cpu->setFlag(Ricoh2A03::C, overflowCheck > 0xFF);
-        cpu->setFlag(Ricoh2A03::V,
-                     ~(cpu->A ^ auxData) &
-                         (cpu->A ^ static_cast<uint8_t>(overflowCheck)) &
-                         0x80);
+        this->cpu->setFlag(Ricoh2A03::C, overflowCheck > 0xFF);
+        this->cpu->setFlag(Ricoh2A03::V,
+                           ~(this->cpu->A ^ this->auxData) &
+                               (this->cpu->A ^ static_cast<uint8_t>(overflowCheck)) &
+                               0x80);
 
-        cpu->A = overflowCheck & 0xFF;
-        cpu->setFlag(Ricoh2A03::Z, cpu->A == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->A & 0x80);
+        this->cpu->A = overflowCheck & 0xFF;
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
 
-        return numCycles + cyclePenalty;
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -864,43 +883,22 @@ public:
 
     uint8_t exec() override final
     {
-        uint8_t cyclePenalty = fetchAuxData();
+        uint8_t cyclePenalty = this->fetchAuxData();
 
-        uint32_t overflowCheck = cpu->A + auxData + static_cast<uint8_t>(cpu->getFlag(Ricoh2A03::C));
+        uint32_t overflowCheck = this->cpu->A + this->auxData +
+                                 static_cast<uint8_t>(this->cpu->getFlag(Ricoh2A03::C));
 
-        cpu->setFlag(Ricoh2A03::C, overflowCheck > 0xFF);
-        cpu->setFlag(Ricoh2A03::V,
-                     ~(cpu->A ^ (~auxData)) &
-                         (cpu->A ^ static_cast<uint8_t>(overflowCheck)) &
-                         0x80);
+        this->cpu->setFlag(Ricoh2A03::C, overflowCheck > 0xFF);
+        this->cpu->setFlag(Ricoh2A03::V,
+                           ~(this->cpu->A ^ (~this->auxData)) &
+                               (this->cpu->A ^ static_cast<uint8_t>(overflowCheck)) &
+                               0x80);
 
-        cpu->A = overflowCheck & 0xFF;
-        cpu->setFlag(Ricoh2A03::Z, cpu->A == 0x00);
-        cpu->setFlag(Ricoh2A03::N, cpu->A & 0x80);
+        this->cpu->A = overflowCheck & 0xFF;
+        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
+        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
 
-        return numCycles + cyclePenalty;
-    }
-};
-
-template <Ricoh2A03::AddressingType T>
-class ROL : public AddressingMode<T>
-{
-public:
-    ROL(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
-
-    uint8_t exec() override final
-    {
-        fetchAuxData();
-        uint8_t oldCarry = static_cast<uint8_t>(cpu->getFlag(Ricoh2A03::C));
-        cpu->setFlag(Ricoh2A03::C, auxData & 0x80);
-
-        auxData = (auxData << 1) | oldCarry;
-        writeBack();
-
-        cpu->setFlag(Ricoh2A03::N, auxData & 0x80);
-        cpu->setFlag(Ricoh2A03::Z, auxData == 0x00);
-
-        return numCycles;
+        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -913,9 +911,9 @@ public:
 
     uint8_t exec() override final
     {
-        fetchAuxData();
-        cpu->PC = absoluteAddress;
-        return numCycles;
+        this->fetchAuxData();
+        this->cpu->PC = this->absoluteAddress;
+        return this->numCycles;
     }
 };
 
@@ -927,6 +925,6 @@ public:
 
     uint8_t exec() override final
     {
-        return numCycles;
+        return this->numCycles;
     }
 };

@@ -1,8 +1,11 @@
 #include <Ricoh2A03.hpp>
 #include <Bus.hpp>
-#include <MOS6502Instruction.hpp>
+#include <Instructions.hpp>
 
-Ricoh2A03::Ricoh2A03(std::shared_ptr<Bus> bus) : bus{bus} {}
+Ricoh2A03::Ricoh2A03(std::shared_ptr<Bus> bus) : bus{bus}
+{
+    instructions = {new BRK<IMM>(this, 0, 2)};
+}
 
 uint8_t Ricoh2A03::read(uint16_t addr)
 {
