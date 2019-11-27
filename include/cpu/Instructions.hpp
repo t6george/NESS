@@ -88,16 +88,8 @@ public:
 
     uint8_t exec() override final
     {
-        int cyclePenalty = 0;
         fetchData();
-        if (!cpu->getFlag(Ricoh2A03::N))
-        {
-            cyclePenalty = 1;
-            absoluteAddress = cpu->PC + auxData;
-
-            if ((cpu->PC & 0xFF00) != (absoluteAddress & 0xFF00))
-                cyclePenalty = 2;
-        }
+        int cyclePenalty = cpu->branch(auxData, absoluteAddress, !cpu->getFlag(Ricoh2A03::N));
 
         return numCycles + cyclePenalty;
     }
@@ -170,26 +162,6 @@ public:
 };
 
 template <Ricoh2A03::AddressingType T>
-class BIT : public AddressingMode<T>
-{
-public:
-    BIT(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
-
-    uint8_t exec() override final
-    {
-        fetchAuxData();
-
-        cpu->setFlag(Ricoh2A03::N, auxData & 0x80);
-        cpu->setFlag(Ricoh2A03::V, auxData & 0x40);
-
-        auxData &= cpu->A;
-        cpu->setFlag(Ricoh2A03::Z, auxData == 0x00);
-
-        return numCycles;
-    }
-};
-
-template <Ricoh2A03::AddressingType T>
 class ROL : public AddressingMode<T>
 {
 public:
@@ -232,16 +204,8 @@ public:
 
     uint8_t exec() override final
     {
-        int cyclePenalty = 0;
         fetchData();
-        if (cpu->getFlag(Ricoh2A03::N))
-        {
-            cyclePenalty = 1;
-            absoluteAddress = cpu->PC + auxData;
-
-            if ((cpu->PC & 0xFF00) != (absoluteAddress & 0xFF00))
-                cyclePenalty = 2;
-        }
+        int cyclePenalty = cpu->branch(auxData, absoluteAddress, cpu->getFlag(Ricoh2A03::N));
 
         return numCycles + cyclePenalty;
     }
@@ -351,16 +315,8 @@ public:
 
     uint8_t exec() override final
     {
-        int cyclePenalty = 0;
         fetchData();
-        if (!cpu->getFlag(Ricoh2A03::V))
-        {
-            cyclePenalty = 1;
-            absoluteAddress = cpu->PC + auxData;
-
-            if ((cpu->PC & 0xFF00) != (absoluteAddress & 0xFF00))
-                cyclePenalty = 2;
-        }
+        int cyclePenalty = cpu->branch(auxData, absoluteAddress, !cpu->getFlag(Ricoh2A03::V));
 
         return numCycles + cyclePenalty;
     }
@@ -579,16 +535,8 @@ public:
 
     uint8_t exec() override final
     {
-        int cyclePenalty = 0;
         fetchData();
-        if (!cpu->getFlag(Ricoh2A03::C))
-        {
-            cyclePenalty = 1;
-            absoluteAddress = cpu->PC + auxData;
-
-            if ((cpu->PC & 0xFF00) != (absoluteAddress & 0xFF00))
-                cyclePenalty = 2;
-        }
+        int cyclePenalty = cpu->branch(auxData, absoluteAddress, !cpu->getFlag(Ricoh2A03::C));
 
         return numCycles + cyclePenalty;
     }
@@ -720,16 +668,8 @@ public:
 
     uint8_t exec() override final
     {
-        int cyclePenalty = 0;
         fetchData();
-        if (cpu->getFlag(Ricoh2A03::C))
-        {
-            cyclePenalty = 1;
-            absoluteAddress = cpu->PC + auxData;
-
-            if ((cpu->PC & 0xFF00) != (absoluteAddress & 0xFF00))
-                cyclePenalty = 2;
-        }
+        int cyclePenalty = cpu->branch(auxData, absoluteAddress, cpu->getFlag(Ricoh2A03::C));
 
         return numCycles + cyclePenalty;
     }
@@ -862,16 +802,8 @@ public:
 
     uint8_t exec() override final
     {
-        int cyclePenalty = 0;
         fetchData();
-        if (!cpu->getFlag(Ricoh2A03::Z))
-        {
-            cyclePenalty = 1;
-            absoluteAddress = cpu->PC + auxData;
-
-            if ((cpu->PC & 0xFF00) != (absoluteAddress & 0xFF00))
-                cyclePenalty = 2;
-        }
+        int cyclePenalty = cpu->branch(auxData, absoluteAddress, !cpu->getFlag(Ricoh2A03::Z));
 
         return numCycles + cyclePenalty;
     }
@@ -974,16 +906,8 @@ public:
 
     uint8_t exec() override final
     {
-        int cyclePenalty = 0;
         fetchData();
-        if (cpu->getFlag(Ricoh2A03::Z))
-        {
-            cyclePenalty = 1;
-            absoluteAddress = cpu->PC + auxData;
-
-            if ((cpu->PC & 0xFF00) != (absoluteAddress & 0xFF00))
-                cyclePenalty = 2;
-        }
+        int cyclePenalty = cpu->branch(auxData, absoluteAddress, cpu->getFlag(Ricoh2A03::Z));
 
         return numCycles + cyclePenalty;
     }

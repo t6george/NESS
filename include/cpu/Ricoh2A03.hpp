@@ -67,4 +67,6 @@ public:
 
     bool getFlag(Flags6502 f) const;
     void setFlag(Flags6502 f, bool b);
+
+    uint8_t branch(uint8_t auxData, uint16_t absoluteAddress, bool cond);
 };
