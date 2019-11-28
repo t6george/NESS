@@ -2,15 +2,6 @@
 #include <Ricoh2A03.hpp>
 
 /*
- * Undefined opcode
- */
-template <>
-uint8_t AddressingMode<Ricoh2A03::AddressingType::NOP>::fetchAuxData()
-{
-    return 0;
-}
-
-/*
  * Instruction is acting on some register, and
  * does not need data from RAM
  */

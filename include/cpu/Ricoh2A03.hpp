@@ -29,7 +29,6 @@ public:
 
     enum AddressingType
     {
-        NOP,
         IMP,
         IMM,
         ZP,

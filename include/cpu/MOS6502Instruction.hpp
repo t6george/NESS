@@ -42,7 +42,7 @@ protected:
     */
     uint8_t numCycles;
 
-    MOS6502Instruction(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size);
+    MOS6502Instruction(Ricoh2A03 *cpu, uint8_t numCycles);
 
     // Fetches any data from RAM that the instruction will execute on
     virtual uint8_t fetchAuxData() = 0;
@@ -51,9 +51,6 @@ protected:
     virtual void writeBack() = 0;
 
 public:
-    // Size of asm instruction in bytes
-    uint8_t size;
-
     virtual ~MOS6502Instruction() = default;
 
     // The instruction's actual functionality

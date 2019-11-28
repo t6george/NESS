@@ -3,10 +3,11 @@
 #include <AddressingModes.hpp>
 
 // Interrupt Instructions ------------------------------------------------------
-class BRK : public AddressingMode<Ricoh2A03::AddressingType::IMP>
+template <Ricoh2A03::AddressingType T>
+class BRK : public AddressingMode<Ricoh2A03::AddressingType>
 {
 public:
-    BRK(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<Ricoh2A03::AddressingType::IMP>(cpu, numCycles, size) {}
+    BRK(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<Ricoh2A03::AddressingType::IMP>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -29,7 +30,7 @@ template <Ricoh2A03::AddressingType T>
 class RTI : public AddressingMode<T>
 {
 public:
-    RTI(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    RTI(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -47,7 +48,7 @@ template <Ricoh2A03::AddressingType T>
 class JSR : public AddressingMode<T>
 {
 public:
-    JSR(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    JSR(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -62,7 +63,7 @@ template <Ricoh2A03::AddressingType T>
 class RTS : public AddressingMode<T>
 {
 public:
-    RTS(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    RTS(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -77,7 +78,7 @@ template <Ricoh2A03::AddressingType T>
 class PLA : public AddressingMode<T>
 {
 public:
-    PLA(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    PLA(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -94,7 +95,7 @@ template <Ricoh2A03::AddressingType T>
 class PHA : public AddressingMode<T>
 {
 public:
-    PHA(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    PHA(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -107,7 +108,7 @@ template <Ricoh2A03::AddressingType T>
 class PLP : public AddressingMode<T>
 {
 public:
-    PLP(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    PLP(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -120,7 +121,7 @@ template <Ricoh2A03::AddressingType T>
 class PHP : public AddressingMode<T>
 {
 public:
-    PHP(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    PHP(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -141,7 +142,7 @@ template <Ricoh2A03::AddressingType T>
 class LDY : public AddressingMode<T>
 {
 public:
-    LDY(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    LDY(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -159,7 +160,7 @@ template <Ricoh2A03::AddressingType T>
 class LDA : public AddressingMode<T>
 {
 public:
-    LDA(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    LDA(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -177,7 +178,7 @@ template <Ricoh2A03::AddressingType T>
 class LDX : public AddressingMode<T>
 {
 public:
-    LDX(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    LDX(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -196,7 +197,7 @@ template <Ricoh2A03::AddressingType T>
 class STA : public AddressingMode<T>
 {
 public:
-    STA(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    STA(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -211,7 +212,7 @@ template <Ricoh2A03::AddressingType T>
 class STY : public AddressingMode<T>
 {
 public:
-    STY(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    STY(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -226,7 +227,7 @@ template <Ricoh2A03::AddressingType T>
 class STX : public AddressingMode<T>
 {
 public:
-    STX(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    STX(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -242,7 +243,7 @@ template <Ricoh2A03::AddressingType T>
 class TAX : public AddressingMode<T>
 {
 public:
-    TAX(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    TAX(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -259,7 +260,7 @@ template <Ricoh2A03::AddressingType T>
 class TSX : public AddressingMode<T>
 {
 public:
-    TSX(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    TSX(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -276,7 +277,7 @@ template <Ricoh2A03::AddressingType T>
 class TAY : public AddressingMode<T>
 {
 public:
-    TAY(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    TAY(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -293,7 +294,7 @@ template <Ricoh2A03::AddressingType T>
 class TYA : public AddressingMode<T>
 {
 public:
-    TYA(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    TYA(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -310,7 +311,7 @@ template <Ricoh2A03::AddressingType T>
 class TXS : public AddressingMode<T>
 {
 public:
-    TXS(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    TXS(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -323,7 +324,7 @@ template <Ricoh2A03::AddressingType T>
 class TXA : public AddressingMode<T>
 {
 public:
-    TXA(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    TXA(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -341,7 +342,7 @@ template <Ricoh2A03::AddressingType T>
 class BEQ : public AddressingMode<T>
 {
 public:
-    BEQ(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    BEQ(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -357,7 +358,7 @@ template <Ricoh2A03::AddressingType T>
 class BNE : public AddressingMode<T>
 {
 public:
-    BNE(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    BNE(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -373,7 +374,7 @@ template <Ricoh2A03::AddressingType T>
 class BCS : public AddressingMode<T>
 {
 public:
-    BCS(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    BCS(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -389,7 +390,7 @@ template <Ricoh2A03::AddressingType T>
 class BCC : public AddressingMode<T>
 {
 public:
-    BCC(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    BCC(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -405,7 +406,7 @@ template <Ricoh2A03::AddressingType T>
 class BVS : public AddressingMode<T>
 {
 public:
-    BVS(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    BVS(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -421,7 +422,7 @@ template <Ricoh2A03::AddressingType T>
 class BVC : public AddressingMode<T>
 {
 public:
-    BVC(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    BVC(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -437,7 +438,7 @@ template <Ricoh2A03::AddressingType T>
 class BPL : public AddressingMode<T>
 {
 public:
-    BPL(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    BPL(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -453,7 +454,7 @@ template <Ricoh2A03::AddressingType T>
 class BMI : public AddressingMode<T>
 {
 public:
-    BMI(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    BMI(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -470,7 +471,7 @@ template <Ricoh2A03::AddressingType T>
 class INC : public AddressingMode<T>
 {
 public:
-    INC(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    INC(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -489,7 +490,7 @@ template <Ricoh2A03::AddressingType T>
 class INY : public AddressingMode<T>
 {
 public:
-    INY(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    INY(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -505,7 +506,7 @@ template <Ricoh2A03::AddressingType T>
 class DEX : public AddressingMode<T>
 {
 public:
-    DEX(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    DEX(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -521,7 +522,7 @@ template <Ricoh2A03::AddressingType T>
 class DEC : public AddressingMode<T>
 {
 public:
-    DEC(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    DEC(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -540,7 +541,7 @@ template <Ricoh2A03::AddressingType T>
 class DEY : public AddressingMode<T>
 {
 public:
-    DEY(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    DEY(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -557,7 +558,7 @@ template <Ricoh2A03::AddressingType T>
 class CPX : public AddressingMode<T>
 {
 public:
-    CPX(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    CPX(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -576,7 +577,7 @@ template <Ricoh2A03::AddressingType T>
 class CPY : public AddressingMode<T>
 {
 public:
-    CPY(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    CPY(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -595,7 +596,7 @@ template <Ricoh2A03::AddressingType T>
 class CMP : public AddressingMode<T>
 {
 public:
-    CMP(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    CMP(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -614,7 +615,7 @@ template <Ricoh2A03::AddressingType T>
 class BIT : public AddressingMode<T>
 {
 public:
-    BIT(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    BIT(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -635,7 +636,7 @@ template <Ricoh2A03::AddressingType T>
 class SEC : public AddressingMode<T>
 {
 public:
-    SEC(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    SEC(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -648,7 +649,7 @@ template <Ricoh2A03::AddressingType T>
 class CLD : public AddressingMode<T>
 {
 public:
-    CLD(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    CLD(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -661,7 +662,7 @@ template <Ricoh2A03::AddressingType T>
 class CLV : public AddressingMode<T>
 {
 public:
-    CLV(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    CLV(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -674,7 +675,7 @@ template <Ricoh2A03::AddressingType T>
 class SEI : public AddressingMode<T>
 {
 public:
-    SEI(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    SEI(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -687,7 +688,7 @@ template <Ricoh2A03::AddressingType T>
 class CLC : public AddressingMode<T>
 {
 public:
-    CLC(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    CLC(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -700,7 +701,7 @@ template <Ricoh2A03::AddressingType T>
 class CLI : public AddressingMode<T>
 {
 public:
-    CLI(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    CLI(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -714,7 +715,7 @@ template <Ricoh2A03::AddressingType T>
 class ORA : public AddressingMode<T>
 {
 public:
-    ORA(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    ORA(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -731,7 +732,7 @@ template <Ricoh2A03::AddressingType T>
 class ASL : public AddressingMode<T>
 {
 public:
-    ASL(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    ASL(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -751,7 +752,7 @@ template <Ricoh2A03::AddressingType T>
 class AND : public AddressingMode<T>
 {
 public:
-    AND(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    AND(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -769,7 +770,7 @@ template <Ricoh2A03::AddressingType T>
 class EOR : public AddressingMode<T>
 {
 public:
-    EOR(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    EOR(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -787,7 +788,7 @@ template <Ricoh2A03::AddressingType T>
 class LSR : public AddressingMode<T>
 {
 public:
-    LSR(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    LSR(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -808,7 +809,7 @@ template <Ricoh2A03::AddressingType T>
 class ROR : public AddressingMode<T>
 {
 public:
-    ROR(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    ROR(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -830,7 +831,7 @@ template <Ricoh2A03::AddressingType T>
 class ROL : public AddressingMode<T>
 {
 public:
-    ROL(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    ROL(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -853,7 +854,7 @@ template <Ricoh2A03::AddressingType T>
 class ADC : public AddressingMode<T>
 {
 public:
-    ADC(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    ADC(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -879,7 +880,7 @@ template <Ricoh2A03::AddressingType T>
 class SBC : public AddressingMode<T>
 {
 public:
-    SBC(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    SBC(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -907,7 +908,7 @@ template <Ricoh2A03::AddressingType T>
 class JMP : public AddressingMode<T>
 {
 public:
-    JMP(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    JMP(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -921,7 +922,7 @@ template <Ricoh2A03::AddressingType T>
 class NOP : public AddressingMode<T>
 {
 public:
-    NOP(Ricoh2A03 *cpu, uint8_t numCycles, uint8_t size) : AddressingMode<T>(cpu, numCycles, size) {}
+    NOP(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {

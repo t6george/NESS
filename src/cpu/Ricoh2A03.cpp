@@ -2,26 +2,26 @@
 #include <Bus.hpp>
 #include <Instructions.hpp>
 
-#define GEN_INSTR(name, templ, cycles, size) std::unique_ptr<MOS6502Instruction>(new name templ(this, (cycles), (size)))
+#define GEN_INSTR(name, type, cycles) std::unique_ptr<MOS6502Instruction>(new name<AddressingType::type>(this, (cycles))
 
 Ricoh2A03::Ricoh2A03(std::shared_ptr<Bus> bus) : bus{bus},
                                                  instructions{
-                                                     GEN_INSTR(BRK, , 0, 2),
-                                                     GEN_INSTR(ORA, <AddressingType::IMP>, 0, 2),
-                                                     GEN_INSTR(NOP, , 0, 2),
-                                                     GEN_INSTR(NOP, <AddressingType::IMP>, 0, 2),
-                                                     GEN_INSTR(NOP, , 0, 2),
-                                                     GEN_INSTR(ORA, <AddressingType::IMP>, 0, 2),
-                                                     GEN_INSTR(ASL, , 0, 2),
-                                                     GEN_INSTR(NOP, <AddressingType::IMP>, 0, 2),
-                                                     GEN_INSTR(PHP, , 0, 2),
-                                                     GEN_INSTR(ORA, <AddressingType::IMP>, 0, 2),
-                                                     GEN_INSTR(ASL, , 0, 2),
-                                                     GEN_INSTR(NOP, <AddressingType::IMP>, 0, 2),
-                                                     GEN_INSTR(NOP, , 0, 2),
-                                                     GEN_INSTR(ORA, <AddressingType::IMP>, 0, 2),
-                                                     GEN_INSTR(ASL, , 0, 2),
-                                                     GEN_INSTR(NOP, <AddressingType::IMP>, 0, 2),
+                                                     GEN_INSTR(BRK, IMM, 7),
+                                                     GEN_INSTR(ORA, INX, 6),
+                                                     GEN_INSTR(NOP, IMP, 2),
+                                                     GEN_INSTR(NOP, IMP, 8),
+                                                     GEN_INSTR(NOP, IMP, 3),
+                                                     GEN_INSTR(ORA, ZP, 3),
+                                                     GEN_INSTR(ASL, ZP, 5),
+                                                     GEN_INSTR(NOP, IMP, 5),
+                                                     GEN_INSTR(PHP, IMP, 4),
+                                                     GEN_INSTR(ORA, IMM, 2),
+                                                     GEN_INSTR(ASL, IMP, 2),
+                                                     GEN_INSTR(NOP, IMP, 2),
+                                                     GEN_INSTR(NOP, IMP, 4),
+                                                     GEN_INSTR(ORA, AB, 4),
+                                                     GEN_INSTR(ASL, AB, 6),
+                                                     GEN_INSTR(NOP, IMP, 6),
 
                                                      GEN_INSTR(BPL, , 0, 2),
                                                      GEN_INSTR(ORA, <AddressingType::IMP>, 0, 2),
