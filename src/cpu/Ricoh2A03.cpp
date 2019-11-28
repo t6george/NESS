@@ -2,9 +2,11 @@
 #include <Bus.hpp>
 #include <Instructions.hpp>
 
-Ricoh2A03::Ricoh2A03(std::shared_ptr<Bus> bus) : bus{bus}
+#define GEN_INSTR(name, templ, cycles, size) std::unique_ptr<MOS6502Instruction>(new name templ(this, (cycles), (size)))
+
+Ricoh2A03::Ricoh2A03(std::shared_ptr<Bus> bus) : bus{bus}, instructions{GEN_INSTR(RTI, <Ricoh2A03::AddressingType::IMP>, 0, 2)} //instructions{std::unique_ptr<MOS6502Instruction>(new BRK(nullptr, 1, 2))} //instructions{std::unique_ptr<MOS6502Instruction>(new RTI<Ricoh2A03::AddressingType::IMP>(nullptr, 1, 2))}
 {
-    instructions = {new BRK<IMM>(this, 0, 2)};
+    // instructions[0] = new RTI<Ricoh2A03::AddressingType::IMP>(nullptr, 1, 2);
 }
 
 uint8_t Ricoh2A03::read(uint16_t addr)

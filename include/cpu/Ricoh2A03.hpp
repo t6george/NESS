@@ -12,6 +12,7 @@ class Ricoh2A03
 {
     std::shared_ptr<Bus> bus;
     std::array<std::unique_ptr<MOS6502Instruction>, 1> instructions;
+    // std::array<MOS6502Instruction *, 1> instructions;
     uint8_t cycles;
 
 public:
