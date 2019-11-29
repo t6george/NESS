@@ -153,7 +153,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IN>::fetchAuxData()
  * is offset by CPU REG X
  */
 template <>
-uint8_t AddressingMode<Ricoh2A03::AddressingType::INX>::fetchAuxData()
+uint8_t AddressingMode<Ricoh2A03::AddressingType::IX>::fetchAuxData()
 {
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->X);
     absoluteAddress = ((static_cast<uint16_t>(cpu->read(absoluteAddress + 0x1)) << 8) |
@@ -171,7 +171,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::INX>::fetchAuxData()
  * Page cross => 1 cycle penalty
  */
 template <>
-uint8_t AddressingMode<Ricoh2A03::AddressingType::INY>::fetchAuxData()
+uint8_t AddressingMode<Ricoh2A03::AddressingType::IY>::fetchAuxData()
 {
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++));
     absoluteAddress = ((static_cast<uint16_t>(cpu->read(absoluteAddress + 0x1)) << 8) |

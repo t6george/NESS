@@ -11,7 +11,7 @@ class MOS6502Instruction;
 class Ricoh2A03
 {
     std::shared_ptr<Bus> bus;
-    std::array<std::unique_ptr<MOS6502Instruction>, NUM_POSSIBLE_OPCODES> instructions;
+    std::array<std::unique_ptr<MOS6502Instruction>, NUM_POSSIBLE_OPCODES - 1> instructions;
     uint8_t cycles;
 
 public:
@@ -27,7 +27,7 @@ public:
         N = (1 << 7),
     };
 
-    enum AddressingType
+    enum class AddressingType
     {
         IMP,
         IMM,
@@ -39,8 +39,8 @@ public:
         ABX,
         ABY,
         IN,
-        INX,
-        INY,
+        IX,
+        IY,
     };
 
     uint8_t A;
