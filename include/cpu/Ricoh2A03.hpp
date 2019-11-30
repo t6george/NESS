@@ -56,9 +56,12 @@ public:
     uint8_t read(uint16_t addr);
     uint16_t readDoubleWord(uint16_t addr);
 
+    uint8_t readZ(uint16_t &addr);
+    uint16_t readZDoubleWord(uint16_t &addr);
+
     void write(uint16_t addr, uint8_t data);
 
-    void tick();
+    void fetch();
     void reset();
     void irq();
     void nmi(uint16_t interruptAddr = 0xFFFA);
@@ -72,5 +75,5 @@ public:
     bool getFlag(Flags6502 f) const;
     void setFlag(Flags6502 f, bool b);
 
-    uint8_t branch(uint8_t auxData, uint16_t absoluteAddress, bool cond);
+    uint8_t branch(uint16_t absoluteAddress, bool cond);
 };

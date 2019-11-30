@@ -10,9 +10,22 @@ uint8_t Ricoh2A03::read(uint16_t addr)
     return bus->read(addr);
 }
 
-uint8_t Ricoh2A03::readDoubleWord(uint16_t addr)
+uint16_t Ricoh2A03::readDoubleWord(uint16_t addr)
 {
-    return (static_cast<uint16_t>(bus->read(addr + 0x1)) << 8) |
+    return (static_cast<uint16_t>(bus->read((addr + 0x1) & 0x00FF)) << 8) |
+           (static_cast<uint16_t>(bus->read(addr)));
+}
+
+uint8_t Ricoh2A03::readZ(uint16_t &addr)
+{
+    addr &= 0x00FF;
+    return bus->read(addr);
+}
+
+uint16_t Ricoh2A03::readZDoubleWord(uint16_t &addr)
+{
+    addr &= 0x00FF;
+    return (static_cast<uint16_t>(bus->read((addr + 0x1) & 0x00FF)) << 8) |
            (static_cast<uint16_t>(bus->read(addr)));
 }
 
@@ -44,13 +57,13 @@ uint16_t Ricoh2A03::popDoubleWord()
     return (hi << 8) | lo;
 }
 
-void Ricoh2A03::tick()
+// Fetch-Execute Cycle
+void Ricoh2A03::fetch()
 {
     if (cycles == 0)
     {
         uint8_t opcode = read(PC++);
-        MOS6502Instruction *currentInstr = instructions[opcode];
-        cycles = currentInstr->exec();
+        cycles = instructions[opcode]->exec();
     }
     --cycles;
 }
@@ -96,20 +109,21 @@ bool Ricoh2A03::getFlag(Flags6502 f) const
 
 void Ricoh2A03::setFlag(Flags6502 f, bool b)
 {
-    S &= ~(1 << f);
-    S |= (1 << static_cast<uint8_t>(b));
+    S &= ~f;
+    S |= (f * static_cast<uint8_t>(b));
 }
 
-uint8_t Ricoh2A03::branch(uint8_t auxData, uint16_t absoluteAddress, bool cond)
+uint8_t Ricoh2A03::branch(uint16_t absoluteAddress, bool cond)
 {
     uint8_t cyclePenalty = 0;
 
     if (cond)
     {
         cyclePenalty = 1;
-        absoluteAddress = PC + auxData;
+        PC += static_cast<int16_t>(absoluteAddress);
 
-        if ((PC & 0xFF00) != (absoluteAddress & 0xFF00))
+        if ((PC & 0xFF00) !=
+            ((PC - static_cast<int16_t>(absoluteAddress)) & 0xFF00))
             cyclePenalty = 2;
     }
 

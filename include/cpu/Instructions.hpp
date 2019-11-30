@@ -347,7 +347,7 @@ public:
     uint8_t exec() override final
     {
         this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->auxData, this->absoluteAddress,
+        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              this->cpu->getFlag(Ricoh2A03::Z));
 
         return this->numCycles + cyclePenalty;
@@ -363,7 +363,7 @@ public:
     uint8_t exec() override final
     {
         this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->auxData, this->absoluteAddress,
+        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              !this->cpu->getFlag(Ricoh2A03::Z));
 
         return this->numCycles + cyclePenalty;
@@ -379,7 +379,7 @@ public:
     uint8_t exec() override final
     {
         this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->auxData, this->absoluteAddress,
+        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              this->cpu->getFlag(Ricoh2A03::C));
 
         return this->numCycles + cyclePenalty;
@@ -395,7 +395,7 @@ public:
     uint8_t exec() override final
     {
         this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->auxData, this->absoluteAddress,
+        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              !this->cpu->getFlag(Ricoh2A03::C));
 
         return this->numCycles + cyclePenalty;
@@ -411,7 +411,7 @@ public:
     uint8_t exec() override final
     {
         this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->auxData, this->absoluteAddress,
+        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              this->cpu->getFlag(Ricoh2A03::V));
 
         return this->numCycles + cyclePenalty;
@@ -427,7 +427,7 @@ public:
     uint8_t exec() override final
     {
         this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->auxData, this->absoluteAddress,
+        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              !this->cpu->getFlag(Ricoh2A03::V));
 
         return this->numCycles + cyclePenalty;
@@ -443,7 +443,7 @@ public:
     uint8_t exec() override final
     {
         this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->auxData, this->absoluteAddress,
+        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              !this->cpu->getFlag(Ricoh2A03::N));
 
         return this->numCycles + cyclePenalty;
@@ -459,7 +459,7 @@ public:
     uint8_t exec() override final
     {
         this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->auxData, this->absoluteAddress,
+        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              this->cpu->getFlag(Ricoh2A03::N));
 
         return this->numCycles + cyclePenalty;

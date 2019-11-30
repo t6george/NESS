@@ -8,7 +8,8 @@
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::IMP>::fetchAuxData()
 {
-    return cpu->A;
+    auxData = cpu->A;
+    return 0;
 }
 
 /*
@@ -32,7 +33,7 @@ template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ZP>::fetchAuxData()
 {
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++));
-    auxData = cpu->read(absoluteAddress);
+    auxData = cpu->readZ(absoluteAddress);
     return 0;
 }
 
@@ -44,7 +45,7 @@ template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPX>::fetchAuxData()
 {
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->X);
-    auxData = cpu->read(absoluteAddress);
+    auxData = cpu->readZ(absoluteAddress);
     return 0;
 }
 
@@ -56,7 +57,7 @@ template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPY>::fetchAuxData()
 {
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->Y);
-    auxData = cpu->read(absoluteAddress);
+    auxData = cpu->readZ(absoluteAddress);
     return 0;
 }
 
@@ -68,8 +69,8 @@ template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::REL>::fetchAuxData()
 {
     absoluteAddress = cpu->PC++;
-    auxData = cpu->read(absoluteAddress);
-    auxData |= (((0x80 & auxData) != 0x0000) * 0xFF00);
+    absoluteAddress = cpu->read(absoluteAddress);
+    absoluteAddress |= ((static_cast<uint8_t>(0x80 & auxData) != 0x0000) * 0xFF00);
 
     return 0;
 }
@@ -150,8 +151,8 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IN>::fetchAuxData()
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::IX>::fetchAuxData()
 {
-    absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->X);
-    absoluteAddress = cpu->readDoubleWord(absoluteAddress);
+    absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++)) + static_cast<uint16_t>(cpu->X);
+    absoluteAddress = cpu->readZDoubleWord(absoluteAddress);
 
     auxData = cpu->read(absoluteAddress);
 
@@ -168,7 +169,7 @@ template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::IY>::fetchAuxData()
 {
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++));
-    absoluteAddress = cpu->readDoubleWord(absoluteAddress) + cpu->Y;
+    absoluteAddress = cpu->readZDoubleWord(absoluteAddress) + cpu->Y;
 
     auxData = cpu->read(absoluteAddress);
 
