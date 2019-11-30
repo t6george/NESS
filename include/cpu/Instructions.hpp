@@ -2,6 +2,10 @@
 #include <cstdint>
 #include <AddressingModes.hpp>
 
+#define SET_ZN(val)                                  \
+    this->cpu->setFlag(Ricoh2A03::Z, (val) == 0x00); \
+    this->cpu->setFlag(Ricoh2A03::N, (val)&0x80);
+
 // Interrupt Instructions ------------------------------------------------------
 template <Ricoh2A03::AddressingType T>
 class BRK : public AddressingMode<T>
@@ -18,8 +22,7 @@ public:
         this->cpu->pushDoubleWord(this->cpu->PC);
         this->cpu->pushWord(this->cpu->S);
 
-        this->cpu->PC = (static_cast<uint16_t>(this->cpu->read(0xFFFF)) << 8) |
-                        static_cast<uint16_t>(this->cpu->read(0xFFFE));
+        this->cpu->PC = this->cpu->readDoubleWord(0xFFFE);
         this->cpu->setFlag(Ricoh2A03::B, false);
 
         return this->numCycles;
@@ -83,9 +86,7 @@ public:
     uint8_t exec() override final
     {
         this->cpu->A = this->cpu->popWord();
-
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
+        SET_ZN(this->cpu->A)
 
         return this->numCycles;
     }
@@ -112,7 +113,9 @@ public:
 
     uint8_t exec() override final
     {
-        this->cpu->S = this->cpu->popWord() | Ricoh2A03::U;
+        this->cpu->S = this->cpu->popWord();
+        this->cpu->setFlag(Ricoh2A03::U, true);
+
         return this->numCycles;
     }
 };
@@ -139,24 +142,6 @@ public:
 
 // Load Instructions ------------------------------------------------------
 template <Ricoh2A03::AddressingType T>
-class LDY : public AddressingMode<T>
-{
-public:
-    LDY(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
-
-    uint8_t exec() override final
-    {
-        uint8_t cyclePenalty = this->fetchAuxData();
-        this->cpu->Y = this->auxData;
-
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->Y == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->Y & 0x80);
-
-        return this->numCycles + cyclePenalty;
-    }
-};
-
-template <Ricoh2A03::AddressingType T>
 class LDA : public AddressingMode<T>
 {
 public:
@@ -166,9 +151,7 @@ public:
     {
         uint8_t cyclePenalty = this->fetchAuxData();
         this->cpu->A = this->auxData;
-
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
+        SET_ZN(this->cpu->A)
 
         return this->numCycles + cyclePenalty;
     }
@@ -184,9 +167,23 @@ public:
     {
         uint8_t cyclePenalty = this->fetchAuxData();
         this->cpu->X = this->auxData;
+        SET_ZN(this->cpu->X)
 
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->X == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->X & 0x80);
+        return this->numCycles + cyclePenalty;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class LDY : public AddressingMode<T>
+{
+public:
+    LDY(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
+
+    uint8_t exec() override final
+    {
+        uint8_t cyclePenalty = this->fetchAuxData();
+        this->cpu->Y = this->auxData;
+        SET_ZN(this->cpu->Y)
 
         return this->numCycles + cyclePenalty;
     }
@@ -209,21 +206,6 @@ public:
 };
 
 template <Ricoh2A03::AddressingType T>
-class STY : public AddressingMode<T>
-{
-public:
-    STY(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
-
-    uint8_t exec() override final
-    {
-        this->fetchAuxData();
-        this->auxData = this->cpu->Y;
-        this->writeBack();
-        return this->numCycles;
-    }
-};
-
-template <Ricoh2A03::AddressingType T>
 class STX : public AddressingMode<T>
 {
 public:
@@ -233,6 +215,21 @@ public:
     {
         this->fetchAuxData();
         this->auxData = this->cpu->X;
+        this->writeBack();
+        return this->numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class STY : public AddressingMode<T>
+{
+public:
+    STY(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
+
+    uint8_t exec() override final
+    {
+        this->fetchAuxData();
+        this->auxData = this->cpu->Y;
         this->writeBack();
         return this->numCycles;
     }
@@ -248,9 +245,22 @@ public:
     uint8_t exec() override final
     {
         this->cpu->X = this->cpu->A;
+        SET_ZN(this->cpu->X)
 
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->X == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->X & 0x80);
+        return this->numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class TXA : public AddressingMode<T>
+{
+public:
+    TXA(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
+
+    uint8_t exec() override final
+    {
+        this->cpu->A = this->cpu->X;
+        SET_ZN(this->cpu->A)
 
         return this->numCycles;
     }
@@ -265,43 +275,7 @@ public:
     uint8_t exec() override final
     {
         this->cpu->X = this->cpu->SP;
-
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->X == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->X & 0x80);
-
-        return this->numCycles;
-    }
-};
-
-template <Ricoh2A03::AddressingType T>
-class TAY : public AddressingMode<T>
-{
-public:
-    TAY(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
-
-    uint8_t exec() override final
-    {
-        this->cpu->Y = this->cpu->A;
-
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->Y == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->Y & 0x80);
-
-        return this->numCycles;
-    }
-};
-
-template <Ricoh2A03::AddressingType T>
-class TYA : public AddressingMode<T>
-{
-public:
-    TYA(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
-
-    uint8_t exec() override final
-    {
-        this->cpu->A = this->cpu->Y;
-
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
+        SET_ZN(this->cpu->X)
 
         return this->numCycles;
     }
@@ -321,17 +295,30 @@ public:
 };
 
 template <Ricoh2A03::AddressingType T>
-class TXA : public AddressingMode<T>
+class TAY : public AddressingMode<T>
 {
 public:
-    TXA(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
+    TAY(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
-        this->cpu->A = this->cpu->X;
+        this->cpu->Y = this->cpu->A;
+        SET_ZN(this->cpu->Y)
 
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
+        return this->numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class TYA : public AddressingMode<T>
+{
+public:
+    TYA(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
+
+    uint8_t exec() override final
+    {
+        this->cpu->A = this->cpu->Y;
+        SET_ZN(this->cpu->A)
 
         return this->numCycles;
     }
@@ -435,22 +422,6 @@ public:
 };
 
 template <Ricoh2A03::AddressingType T>
-class BPL : public AddressingMode<T>
-{
-public:
-    BPL(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
-
-    uint8_t exec() override final
-    {
-        this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
-                                             !this->cpu->getFlag(Ricoh2A03::N));
-
-        return this->numCycles + cyclePenalty;
-    }
-};
-
-template <Ricoh2A03::AddressingType T>
 class BMI : public AddressingMode<T>
 {
 public:
@@ -461,6 +432,22 @@ public:
         this->fetchAuxData();
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              this->cpu->getFlag(Ricoh2A03::N));
+
+        return this->numCycles + cyclePenalty;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class BPL : public AddressingMode<T>
+{
+public:
+    BPL(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
+
+    uint8_t exec() override final
+    {
+        this->fetchAuxData();
+        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
+                                             !this->cpu->getFlag(Ricoh2A03::N));
 
         return this->numCycles + cyclePenalty;
     }
@@ -479,56 +466,7 @@ public:
         ++this->auxData;
 
         this->writeBack();
-        this->cpu->setFlag(Ricoh2A03::Z, this->auxData == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->auxData & 0x80);
-
-        return this->numCycles;
-    }
-};
-
-template <Ricoh2A03::AddressingType T>
-class INX : public AddressingMode<T>
-{
-public:
-    INX(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
-
-    uint8_t exec() override final
-    {
-        ++this->cpu->X;
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->X == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->X & 0x80);
-
-        return this->numCycles;
-    }
-};
-
-template <Ricoh2A03::AddressingType T>
-class INY : public AddressingMode<T>
-{
-public:
-    INY(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
-
-    uint8_t exec() override final
-    {
-        ++this->cpu->Y;
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->Y == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->Y & 0x80);
-
-        return this->numCycles;
-    }
-};
-
-template <Ricoh2A03::AddressingType T>
-class DEX : public AddressingMode<T>
-{
-public:
-    DEX(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
-
-    uint8_t exec() override final
-    {
-        --this->cpu->X;
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->X == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->X & 0x80);
+        SET_ZN(this->auxData)
 
         return this->numCycles;
     }
@@ -546,8 +484,52 @@ public:
         --this->auxData;
 
         this->writeBack();
-        this->cpu->setFlag(Ricoh2A03::Z, this->auxData == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->auxData & 0x80);
+        SET_ZN(this->auxData)
+
+        return this->numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class INX : public AddressingMode<T>
+{
+public:
+    INX(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
+
+    uint8_t exec() override final
+    {
+        ++this->cpu->X;
+        SET_ZN(this->cpu->X)
+
+        return this->numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class DEX : public AddressingMode<T>
+{
+public:
+    DEX(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
+
+    uint8_t exec() override final
+    {
+        --this->cpu->X;
+        SET_ZN(this->cpu->X)
+
+        return this->numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class INY : public AddressingMode<T>
+{
+public:
+    INY(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
+
+    uint8_t exec() override final
+    {
+        ++this->cpu->Y;
+        SET_ZN(this->cpu->Y)
 
         return this->numCycles;
     }
@@ -562,14 +544,31 @@ public:
     uint8_t exec() override final
     {
         --this->cpu->Y;
+        SET_ZN(this->cpu->Y)
 
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->Y == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->Y & 0x80);
         return this->numCycles;
     }
 };
 
 // Compare Instructions ------------------------------------------------------
+template <Ricoh2A03::AddressingType T>
+class CMP : public AddressingMode<T>
+{
+public:
+    CMP(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
+
+    uint8_t exec() override final
+    {
+        uint8_t cyclePenalty = this->fetchAuxData();
+        uint8_t result = this->cpu->A - this->auxData;
+
+        SET_ZN(result)
+        this->cpu->setFlag(Ricoh2A03::C, this->cpu->A >= this->auxData);
+
+        return this->numCycles + cyclePenalty;
+    }
+};
+
 template <Ricoh2A03::AddressingType T>
 class CPX : public AddressingMode<T>
 {
@@ -581,8 +580,7 @@ public:
         this->fetchAuxData();
         uint8_t result = this->cpu->X - this->auxData;
 
-        this->cpu->setFlag(Ricoh2A03::Z, result == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, result & 0x80);
+        SET_ZN(result)
         this->cpu->setFlag(Ricoh2A03::C, this->cpu->X >= this->auxData);
 
         return this->numCycles;
@@ -600,30 +598,10 @@ public:
         this->fetchAuxData();
         uint8_t result = this->cpu->Y - this->auxData;
 
-        this->cpu->setFlag(Ricoh2A03::Z, result == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, result & 0x80);
+        SET_ZN(result)
         this->cpu->setFlag(Ricoh2A03::C, this->cpu->Y >= this->auxData);
 
         return this->numCycles;
-    }
-};
-
-template <Ricoh2A03::AddressingType T>
-class CMP : public AddressingMode<T>
-{
-public:
-    CMP(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
-
-    uint8_t exec() override final
-    {
-        uint8_t cyclePenalty = this->fetchAuxData();
-        uint8_t result = this->cpu->A - this->auxData;
-
-        this->cpu->setFlag(Ricoh2A03::Z, result == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, result & 0x80);
-        this->cpu->setFlag(Ricoh2A03::C, this->cpu->A >= this->auxData);
-
-        return this->numCycles + cyclePenalty;
     }
 };
 
@@ -656,6 +634,32 @@ public:
 
     uint8_t exec() override final
     {
+        this->cpu->setFlag(Ricoh2A03::C, true);
+        return this->numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class CLC : public AddressingMode<T>
+{
+public:
+    CLC(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
+
+    uint8_t exec() override final
+    {
+        this->cpu->setFlag(Ricoh2A03::C, false);
+        return this->numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class SED : public AddressingMode<T>
+{
+public:
+    SED(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
+
+    uint8_t exec() override final
+    {
         this->cpu->setFlag(Ricoh2A03::D, true);
         return this->numCycles;
     }
@@ -675,32 +679,6 @@ public:
 };
 
 template <Ricoh2A03::AddressingType T>
-class SED : public AddressingMode<T>
-{
-public:
-    SED(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
-
-    uint8_t exec() override final
-    {
-        this->cpu->setFlag(Ricoh2A03::D, true);
-        return this->numCycles;
-    }
-};
-
-template <Ricoh2A03::AddressingType T>
-class CLV : public AddressingMode<T>
-{
-public:
-    CLV(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
-
-    uint8_t exec() override final
-    {
-        this->cpu->setFlag(Ricoh2A03::V, false);
-        return this->numCycles;
-    }
-};
-
-template <Ricoh2A03::AddressingType T>
 class SEI : public AddressingMode<T>
 {
 public:
@@ -709,19 +687,6 @@ public:
     uint8_t exec() override final
     {
         this->cpu->setFlag(Ricoh2A03::I, true);
-        return this->numCycles;
-    }
-};
-
-template <Ricoh2A03::AddressingType T>
-class CLC : public AddressingMode<T>
-{
-public:
-    CLC(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
-
-    uint8_t exec() override final
-    {
-        this->cpu->setFlag(Ricoh2A03::C, false);
         return this->numCycles;
     }
 };
@@ -739,44 +704,20 @@ public:
     }
 };
 
-// Bitwise Logic Instructions ------------------------------------------------------
 template <Ricoh2A03::AddressingType T>
-class ORA : public AddressingMode<T>
+class CLV : public AddressingMode<T>
 {
 public:
-    ORA(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
+    CLV(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
 
     uint8_t exec() override final
     {
-        uint8_t cyclePenalty = this->fetchAuxData();
-        this->cpu->A |= this->auxData;
-
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
-        return this->numCycles + cyclePenalty;
-    }
-};
-
-template <Ricoh2A03::AddressingType T>
-class ASL : public AddressingMode<T>
-{
-public:
-    ASL(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
-
-    uint8_t exec() override final
-    {
-        this->fetchAuxData();
-        this->cpu->setFlag(Ricoh2A03::C, this->auxData & 0x80);
-
-        this->auxData <<= 1;
-        this->writeBack();
-
-        this->cpu->setFlag(Ricoh2A03::Z, this->auxData == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->auxData & 0x80);
+        this->cpu->setFlag(Ricoh2A03::V, false);
         return this->numCycles;
     }
 };
 
+// Bitwise Logic Instructions ------------------------------------------------------
 template <Ricoh2A03::AddressingType T>
 class AND : public AddressingMode<T>
 {
@@ -787,9 +728,23 @@ public:
     {
         uint8_t cyclePenalty = this->fetchAuxData();
         this->cpu->A &= this->auxData;
+        SET_ZN(this->cpu->A)
 
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
+        return this->numCycles + cyclePenalty;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class ORA : public AddressingMode<T>
+{
+public:
+    ORA(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
+
+    uint8_t exec() override final
+    {
+        uint8_t cyclePenalty = this->fetchAuxData();
+        this->cpu->A |= this->auxData;
+        SET_ZN(this->cpu->A)
 
         return this->numCycles + cyclePenalty;
     }
@@ -804,11 +759,9 @@ public:
     uint8_t exec() override final
     {
         uint8_t cyclePenalty = this->fetchAuxData();
-
         this->cpu->A ^= this->auxData;
+        SET_ZN(this->cpu->A)
 
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
         return this->numCycles + cyclePenalty;
     }
 };
@@ -827,9 +780,27 @@ public:
 
         this->auxData >>= 1;
         this->writeBack();
+        SET_ZN(this->auxData)
 
-        this->cpu->setFlag(Ricoh2A03::Z, this->auxData == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, false);
+        return this->numCycles;
+    }
+};
+
+template <Ricoh2A03::AddressingType T>
+class ASL : public AddressingMode<T>
+{
+public:
+    ASL(Ricoh2A03 *cpu, uint8_t numCycles) : AddressingMode<T>(cpu, numCycles) {}
+
+    uint8_t exec() override final
+    {
+        this->fetchAuxData();
+        this->cpu->setFlag(Ricoh2A03::C, this->auxData & 0x80);
+
+        this->auxData <<= 1;
+        this->writeBack();
+        SET_ZN(this->auxData)
+
         return this->numCycles;
     }
 };
@@ -848,9 +819,7 @@ public:
 
         this->auxData = (this->auxData >> 1) | oldCarry;
         this->writeBack();
-
-        this->cpu->setFlag(Ricoh2A03::N, this->auxData & 0x80);
-        this->cpu->setFlag(Ricoh2A03::Z, this->auxData == 0x00);
+        SET_ZN(this->auxData)
 
         return this->numCycles;
     }
@@ -870,9 +839,7 @@ public:
 
         this->auxData = (this->auxData << 1) | oldCarry;
         this->writeBack();
-
-        this->cpu->setFlag(Ricoh2A03::N, this->auxData & 0x80);
-        this->cpu->setFlag(Ricoh2A03::Z, this->auxData == 0x00);
+        SET_ZN(this->auxData)
 
         return this->numCycles;
     }
@@ -888,18 +855,17 @@ public:
     uint8_t exec() override final
     {
         uint8_t cyclePenalty = this->fetchAuxData();
-        uint32_t overflowCheck = this->cpu->A + this->auxData +
+        uint16_t overflowCheck = this->cpu->A + this->auxData +
                                  static_cast<uint8_t>(this->cpu->getFlag(Ricoh2A03::C));
 
-        this->cpu->setFlag(Ricoh2A03::C, overflowCheck > 0xFF);
+        this->cpu->setFlag(Ricoh2A03::C, overflowCheck & 0xFF00);
         this->cpu->setFlag(Ricoh2A03::V,
                            ~(this->cpu->A ^ this->auxData) &
                                (this->cpu->A ^ static_cast<uint8_t>(overflowCheck)) &
                                0x80);
 
         this->cpu->A = overflowCheck & 0xFF;
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
+        SET_ZN(this->cpu->A)
 
         return this->numCycles + cyclePenalty;
     }
@@ -914,19 +880,19 @@ public:
     uint8_t exec() override final
     {
         uint8_t cyclePenalty = this->fetchAuxData();
+        this->auxData = ~this->auxData;
 
-        uint32_t overflowCheck = this->cpu->A + this->auxData +
+        uint16_t overflowCheck = this->cpu->A + this->auxData +
                                  static_cast<uint8_t>(this->cpu->getFlag(Ricoh2A03::C));
 
-        this->cpu->setFlag(Ricoh2A03::C, overflowCheck > 0xFF);
+        this->cpu->setFlag(Ricoh2A03::C, overflowCheck & 0xFF00);
         this->cpu->setFlag(Ricoh2A03::V,
-                           ~(this->cpu->A ^ (~this->auxData)) &
+                           (this->auxData ^ static_cast<uint8_t>(overflowCheck)) &
                                (this->cpu->A ^ static_cast<uint8_t>(overflowCheck)) &
                                0x80);
 
         this->cpu->A = overflowCheck & 0xFF;
-        this->cpu->setFlag(Ricoh2A03::Z, this->cpu->A == 0x00);
-        this->cpu->setFlag(Ricoh2A03::N, this->cpu->A & 0x80);
+        SET_ZN(this->cpu->A)
 
         return this->numCycles + cyclePenalty;
     }

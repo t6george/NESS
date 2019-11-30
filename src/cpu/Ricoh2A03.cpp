@@ -12,7 +12,7 @@ uint8_t Ricoh2A03::read(uint16_t addr)
 
 uint16_t Ricoh2A03::readDoubleWord(uint16_t addr)
 {
-    return (static_cast<uint16_t>(bus->read((addr + 0x1) & 0x00FF)) << 8) |
+    return (static_cast<uint16_t>(bus->read(addr + 0x1)) << 8) |
            (static_cast<uint16_t>(bus->read(addr)));
 }
 
@@ -47,13 +47,13 @@ void Ricoh2A03::pushDoubleWord(uint16_t dWord)
 
 uint8_t Ricoh2A03::popWord()
 {
-    return read(STACK_BASE + SP++);
+    return read(STACK_BASE + ++SP);
 }
 
 uint16_t Ricoh2A03::popDoubleWord()
 {
-    uint16_t lo = read(STACK_BASE + SP++);
-    uint16_t hi = read(STACK_BASE + SP++);
+    uint16_t lo = read(STACK_BASE + ++SP);
+    uint16_t hi = read(STACK_BASE + ++SP);
     return (hi << 8) | lo;
 }
 
