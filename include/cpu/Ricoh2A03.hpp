@@ -11,7 +11,7 @@ class MOS6502Instruction;
 class Ricoh2A03
 {
     std::shared_ptr<Bus> bus;
-    std::array<std::unique_ptr<MOS6502Instruction>, NUM_POSSIBLE_OPCODES - 1> instructions;
+    std::array<std::unique_ptr<MOS6502Instruction>, NUM_POSSIBLE_OPCODES> instructions;
     uint8_t cycles;
 
 public:
