@@ -54,6 +54,8 @@ public:
     ~Ricoh2A03() = default;
 
     uint8_t read(uint16_t addr);
+    uint16_t readDoubleWord(uint16_t addr);
+
     void write(uint16_t addr, uint8_t data);
 
     void tick();

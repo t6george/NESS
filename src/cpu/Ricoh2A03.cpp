@@ -10,6 +10,12 @@ uint8_t Ricoh2A03::read(uint16_t addr)
     return bus->read(addr);
 }
 
+uint8_t Ricoh2A03::readDoubleWord(uint16_t addr)
+{
+    return (static_cast<uint16_t>(bus->read(addr + 0x1)) << 8) |
+           (static_cast<uint16_t>(bus->read(addr)));
+}
+
 void Ricoh2A03::write(uint16_t addr, uint8_t data)
 {
     bus->write(addr, data);
@@ -40,12 +46,11 @@ uint16_t Ricoh2A03::popDoubleWord()
 
 void Ricoh2A03::tick()
 {
-    MOS6502Instruction *currentInstr = nullptr;
     if (cycles == 0)
     {
-        (void)currentInstr;
-        // opcode = read(PC++);
-        // cycles = ;
+        uint8_t opcode = read(PC++);
+        MOS6502Instruction *currentInstr = instructions[opcode];
+        cycles = currentInstr->exec();
     }
     --cycles;
 }
@@ -56,8 +61,7 @@ void Ricoh2A03::reset()
     SP = 0xFD;
     S = U;
 
-    PC = (static_cast<uint16_t>(read(0xFFFD)) << 8) |
-         static_cast<uint16_t>(read(0xFFFC));
+    PC = readDoubleWord(0xFFFC);
 
     cycles = 8;
 }
@@ -71,8 +75,7 @@ void Ricoh2A03::nmi(uint16_t interruptAddr)
     pushDoubleWord(PC);
     pushWord(S);
 
-    PC = (static_cast<uint16_t>(read(interruptAddr + 0x1)) << 8) |
-         static_cast<uint16_t>(read(interruptAddr));
+    PC = readDoubleWord(interruptAddr);
 
     cycles = 8;
 }

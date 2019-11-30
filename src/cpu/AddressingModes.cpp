@@ -81,8 +81,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::REL>::fetchAuxData()
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::AB>::fetchAuxData()
 {
-    absoluteAddress = (static_cast<uint16_t>(cpu->read(cpu->PC + 0x1)) << 8) |
-                      static_cast<uint16_t>(cpu->read(cpu->PC));
+    absoluteAddress = cpu->readDoubleWord(cpu->PC);
     cpu->PC += 0x2;
 
     auxData = cpu->read(absoluteAddress);
@@ -96,8 +95,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::AB>::fetchAuxData()
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ABX>::fetchAuxData()
 {
-    absoluteAddress = (static_cast<uint16_t>(cpu->read(cpu->PC + 0x1)) << 8) |
-                      static_cast<uint16_t>(cpu->read(cpu->PC)) + cpu->X;
+    absoluteAddress = cpu->readDoubleWord(cpu->PC) + cpu->X;
     cpu->PC += 0x2;
 
     auxData = cpu->read(absoluteAddress);
@@ -111,8 +109,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ABX>::fetchAuxData()
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ABY>::fetchAuxData()
 {
-    absoluteAddress = (static_cast<uint16_t>(cpu->read(cpu->PC + 0x1)) << 8) |
-                      static_cast<uint16_t>(cpu->read(cpu->PC)) + cpu->Y;
+    absoluteAddress = cpu->readDoubleWord(cpu->PC) + cpu->Y;
     cpu->PC += 0x2;
 
     auxData = cpu->read(absoluteAddress);
@@ -127,8 +124,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ABY>::fetchAuxData()
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::IN>::fetchAuxData()
 {
-    absoluteAddress = ((static_cast<uint16_t>(cpu->read(cpu->PC + 0x1)) << 8) |
-                       static_cast<uint16_t>(cpu->read(cpu->PC)));
+    absoluteAddress = cpu->readDoubleWord(cpu->PC);
     cpu->PC += 0x2;
 
     // Hardware bug: wrap around if low addr byte's bits are all set (no carry is propagated)
@@ -139,8 +135,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IN>::fetchAuxData()
     }
     else
     {
-        absoluteAddress = ((static_cast<uint16_t>(cpu->read(absoluteAddress + 0x1)) << 8) |
-                           static_cast<uint16_t>(cpu->read(absoluteAddress)));
+        absoluteAddress = cpu->readDoubleWord(absoluteAddress);
     }
 
     auxData = cpu->read(absoluteAddress);
@@ -156,8 +151,7 @@ template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::IX>::fetchAuxData()
 {
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->X);
-    absoluteAddress = ((static_cast<uint16_t>(cpu->read(absoluteAddress + 0x1)) << 8) |
-                       static_cast<uint16_t>(cpu->read(absoluteAddress)));
+    absoluteAddress = cpu->readDoubleWord(absoluteAddress);
 
     auxData = cpu->read(absoluteAddress);
 
@@ -174,9 +168,7 @@ template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::IY>::fetchAuxData()
 {
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++));
-    absoluteAddress = ((static_cast<uint16_t>(cpu->read(absoluteAddress + 0x1)) << 8) |
-                       static_cast<uint16_t>(cpu->read(absoluteAddress))) +
-                      cpu->Y;
+    absoluteAddress = cpu->readDoubleWord(absoluteAddress) + cpu->Y;
 
     auxData = cpu->read(absoluteAddress);
 
