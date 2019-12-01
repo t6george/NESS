@@ -2,11 +2,13 @@
 #include <cstdint>
 #include <memory>
 
-class RamDevice;
+class MemoryDevice;
+class RicohRP2C02;
 
 class Bus
 {
-    std::shared_ptr<RamDevice> memory;
+    std::shared_ptr<MemoryDevice> memory;
+    std::shared_ptr<MemoryDevice> ppu;
 
 public:
     Bus();
