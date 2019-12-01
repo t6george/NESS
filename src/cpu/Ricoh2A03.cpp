@@ -1,4 +1,5 @@
 #include <Ricoh2A03.hpp>
+#include <RicohRP2C02.hpp>
 #include <Bus.hpp>
 #include <Instructions.hpp>
 
@@ -130,41 +131,25 @@ uint8_t Ricoh2A03::branch(uint16_t absoluteAddress, bool cond)
     return cyclePenalty;
 }
 
-Ricoh2A03::Ricoh2A03(std::shared_ptr<Bus> bus) : bus{bus},
-                                                 instructions{
-                                                     GEN_INSTR(BRK, IMM, 7),
-                                                     GEN_INSTR(ORA, IX, 6),
-                                                     GEN_INSTR(NOP, IMP, 2),
-                                                     GEN_INSTR(NOP, IMP, 8),
-                                                     GEN_INSTR(NOP, IMP, 3),
-                                                     GEN_INSTR(ORA, ZP, 3),
-                                                     GEN_INSTR(ASL, ZP, 5),
-                                                     GEN_INSTR(NOP, IMP, 5),
-                                                     GEN_INSTR(PHP, IMP, 3),
-                                                     GEN_INSTR(ORA, IMM, 2),
-                                                     GEN_INSTR(ASL, IMP, 2),
-                                                     GEN_INSTR(NOP, IMP, 2),
-                                                     GEN_INSTR(NOP, IMP, 4),
-                                                     GEN_INSTR(ORA, AB, 4),
-                                                     GEN_INSTR(ASL, AB, 6),
-                                                     GEN_INSTR(NOP, IMP, 6),
+Ricoh2A03::Ricoh2A03() : bus{new Bus{}}, ppu{new RicohRP2C02{0x8, 0x2000, 0x3FFF}}
+instructions{
+    GEN_INSTR(BRK, IMM, 7), GEN_INSTR(ORA, IX, 6),
+    GEN_INSTR(NOP, IMP, 2), GEN_INSTR(NOP, IMP, 8),
+    GEN_INSTR(NOP, IMP, 3), GEN_INSTR(ORA, ZP, 3),
+    GEN_INSTR(ASL, ZP, 5), GEN_INSTR(NOP, IMP, 5),
+    GEN_INSTR(PHP, IMP, 3), GEN_INSTR(ORA, IMM, 2),
+    GEN_INSTR(ASL, IMP, 2), GEN_INSTR(NOP, IMP, 2),
+    GEN_INSTR(NOP, IMP, 4), GEN_INSTR(ORA, AB, 4),
+    GEN_INSTR(ASL, AB, 6), GEN_INSTR(NOP, IMP, 6),
 
-                                                     GEN_INSTR(BPL, REL, 2),
-                                                     GEN_INSTR(ORA, IY, 5),
-                                                     GEN_INSTR(NOP, IMP, 2),
-                                                     GEN_INSTR(NOP, IMP, 8),
-                                                     GEN_INSTR(NOP, IMP, 4),
-                                                     GEN_INSTR(ORA, ZPX, 4),
-                                                     GEN_INSTR(ASL, ZPX, 6),
-                                                     GEN_INSTR(NOP, IMP, 6),
-                                                     GEN_INSTR(CLC, IMP, 2),
-                                                     GEN_INSTR(ORA, ABY, 4),
-                                                     GEN_INSTR(NOP, IMP, 2),
-                                                     GEN_INSTR(NOP, IMP, 7),
-                                                     GEN_INSTR(NOP, IMP, 4),
-                                                     GEN_INSTR(ORA, ABX, 4),
-                                                     GEN_INSTR(ASL, ABX, 7),
-                                                     GEN_INSTR(NOP, IMP, 7),
+    GEN_INSTR(BPL, REL, 2), GEN_INSTR(ORA, IY, 5),
+    GEN_INSTR(NOP, IMP, 2), GEN_INSTR(NOP, IMP, 8),
+    GEN_INSTR(NOP, IMP, 4), GEN_INSTR(ORA, ZPX, 4),
+    GEN_INSTR(ASL, ZPX, 6), GEN_INSTR(NOP, IMP, 6),
+    GEN_INSTR(CLC, IMP, 2), GEN_INSTR(ORA, ABY, 4),
+    GEN_INSTR(NOP, IMP, 2), GEN_INSTR(NOP, IMP, 7),
+    GEN_INSTR(NOP, IMP, 4), GEN_INSTR(ORA, ABX, 4),
+    GEN_INSTR(ASL, ABX, 7), GEN_INSTR(NOP, IMP, 7),
 
                                                      GEN_INSTR(JSR, AB, 6),
                                                      GEN_INSTR(AND, IX, 6),
