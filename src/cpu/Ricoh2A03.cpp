@@ -1,6 +1,6 @@
 #include <Ricoh2A03.hpp>
 #include <RicohRP2C02.hpp>
-#include <Bus.hpp>
+#include <CpuBus.hpp>
 #include <Instructions.hpp>
 
 // Nested template syntax can be damaging to the eye - I only want to write it out once :)
@@ -131,7 +131,7 @@ uint8_t Ricoh2A03::branch(uint16_t absoluteAddress, bool cond)
     return cyclePenalty;
 }
 
-Ricoh2A03::Ricoh2A03() : bus{new Bus{}}, ppu{new RicohRP2C02{0x8, 0x2000, 0x3FFF}}
+Ricoh2A03::Ricoh2A03() : bus{new CpuBus{}}, ppu{new RicohRP2C02{}}, 
 instructions{
     GEN_INSTR(BRK, IMM, 7), GEN_INSTR(ORA, IX, 6),
     GEN_INSTR(NOP, IMP, 2), GEN_INSTR(NOP, IMP, 8),

@@ -13,8 +13,8 @@ class Ram : public AddressableDevice
     std::vector<uint8_t> memory;
 
 public:
-    AddressableDevice(const uint16_t size);
-    virtual ~AddressableDevice() = default;
+    Ram(const uint16_t size);
+    ~Ram() = default;
 
     uint8_t read(uint16_t addr, bool readOnly = false) const override;
     void write(uint16_t addr, uint8_t data) override;

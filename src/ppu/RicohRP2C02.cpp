@@ -1,10 +1,9 @@
 #include <RicohRP2C02.hpp>
-#include <Bus.hpp>
+#include <PpuBus.hpp>
 
-RicohRP2C02::RicohRP2C02(const uint16_t size, const uint16_t addrBase, const uint16_t addrEnd): 
-AddressableDevice::AddressableDevice{size, addrBase, addrEnd}, bus{new Bus{}} {}
+RicohRP2C02::RicohRP2C02(): bus{new PpuBus{}} {}
 
-void RicohRP2C02::setByte(uint16_t addr, uint8_t data)
+void RicohRP2C02::write(uint16_t addr, uint8_t data)
 {
     switch(addr)
     {
@@ -29,7 +28,7 @@ void RicohRP2C02::setByte(uint16_t addr, uint8_t data)
     }
 }
 
-uint8_t RicohRP2C02::getByte(uint16_t addr, bool readOnly) const
+uint8_t RicohRP2C02::read(uint16_t addr, bool readOnly) const
 {
     switch(addr)
     {

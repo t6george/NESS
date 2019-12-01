@@ -1,12 +1,7 @@
 #include <Ram.hpp>
-#include <cassert>
 
 Ram::Ram(const uint16_t size) : 
-contents{std::vector<uint8_t>(size, 0x00)} 
-{
-    // Ensure that memory size is a power of 2
-    assert((size & (size - 1)) == 0);
-}
+contents{std::vector<uint8_t>(size, 0x00)} {}
 
 uint8_t Ram::read(uint16_t addr, bool readOnly) const
 {
