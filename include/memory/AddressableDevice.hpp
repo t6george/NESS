@@ -11,16 +11,16 @@
 
 class AddressableDevice
 {
+protected:
     const uint16_t addrBase;
     const uint16_t addrEnd;
     std::vector<uint8_t> contents;
-
-protected:
+    
     virtual void setByte(uint16_t addr, uint8_t data) = 0;
     virtual uint8_t getByte(uint16_t addr, bool readOnly) const = 0;
 public:
-    MemoryDevice(const uint16_t size, const uint16_t addrBase, const uint16_t addrEnd);
-    ~MemoryDevice() = default;
+    AddressableDevice(const uint16_t size, const uint16_t addrBase, const uint16_t addrEnd);
+    virtual ~AddressableDevice() = default;
     void write(uint16_t addr, uint8_t data);
     uint8_t read(uint16_t addr, bool readOnly = false) const;
 };

@@ -1,8 +1,5 @@
 #pragma once
-#include <vector>
-#include <cstdint>
-
-class AddressableDevice;
+#include <AddressableDevice.hpp>
 
 /*
  * NES RAM's address space is 8KB, but it is only 2KB in size
@@ -11,9 +8,11 @@ class AddressableDevice;
  * and physical RAM size is the actual address being accessed
  */
 
-class Ram : AddressableDevice
+class Ram : public AddressableDevice
 {
 protected:
     virtual void setByte(uint16_t addr, uint8_t data) override;
     virtual uint8_t getByte(uint16_t addr, bool readOnly) const override;
+public:
+    Ram(const uint16_t size, const uint16_t addrBase, const uint16_t addrEnd);
 };

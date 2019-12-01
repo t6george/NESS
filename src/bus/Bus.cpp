@@ -1,7 +1,7 @@
 #include <Bus.hpp>
 #include <Ram.hpp>
 
-Bus::Bus() : memory{new MemoryDevice{0x800, 0x0000, 0x1FFF}} {}
+Bus::Bus() : memory{new Ram{0x800, 0x0000, 0x1FFF}} {}
 
 void Bus::write(uint16_t addr, uint8_t data)
 {
