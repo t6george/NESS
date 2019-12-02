@@ -2,11 +2,13 @@
 #include <memory>
 #include <cstdint>
 #include <array>
+
 #include <Bus.hpp>
+#include <MOS6502Instruction.hpp>
+
 #define STACK_BASE 0x0100
 #define NUM_POSSIBLE_OPCODES 0x100
 
-class MOS6502Instruction;
 class GamePak;
 
 class Ricoh2A03

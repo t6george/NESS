@@ -1,13 +1,10 @@
 #include <AddressableDevice.hpp>
-#include <cassert>
 
-AddressableDevice::AddressableDevice(const uint16_t size, const uint16_t addrBase, const uint16_t addrEnd) : addrBase{addrBase}, addrEnd{addrEnd}, contents{std::vector<uint8_t>(size, 0x00)}
-{
-    // Ensure that memory size is a power of 2
-    assert((size & (size - 1)) == 0);
-}
+AddressableDevice::AddressableDevice(const uint16_t addrBase, const uint16_t addrEnd) : addrBase{addrBase}, addrEnd{addrEnd} {}
 
-uint8_t AddressableDevice::read(uint16_t addr, bool readOnly) const
+AddressableDevice::AddressableDevice(const uint16_t size, const uint16_t addrBase, const uint16_t addrEnd) : addrBase{addrBase}, addrEnd{addrEnd}, contents{std::vector<uint8_t>(size, 0x00)} {}
+
+uint8_t AddressableDevice::readFrom(uint16_t addr, bool readOnly) const
 {
     uint8_t data = 0x00;
     // Bitwise and performs the address mirroring
@@ -19,7 +16,7 @@ uint8_t AddressableDevice::read(uint16_t addr, bool readOnly) const
     return data;
 }
 
-bool AddressableDevice::write(uint16_t addr, uint8_t data)
+bool AddressableDevice::writeTo(uint16_t addr, uint8_t data)
 {
     bool success = false;
     // Bitwise and performs the address mirroring

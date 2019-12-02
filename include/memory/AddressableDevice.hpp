@@ -20,8 +20,9 @@ protected:
     virtual uint8_t getByte(uint16_t addr, bool readOnly) const = 0;
 
 public:
+    AddressableDevice(const uint16_t addrBase, const uint16_t addrEnd);
     AddressableDevice(const uint16_t size, const uint16_t addrBase, const uint16_t addrEnd);
     virtual ~AddressableDevice() = default;
-    bool write(uint16_t addr, uint8_t data);
-    uint8_t read(uint16_t addr, bool readOnly = false) const;
+    bool writeTo(uint16_t addr, uint8_t data);
+    uint8_t readFrom(uint16_t addr, bool readOnly = false) const;
 };

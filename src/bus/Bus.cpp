@@ -5,7 +5,7 @@ void Bus::write(uint16_t addr, uint8_t data)
 {
     for (const auto dev : addressableDevices)
     {
-        if (dev->write(addr, data))
+        if (dev->writeTo(addr, data))
             break;
     }
 }
@@ -16,9 +16,9 @@ uint8_t Bus::read(uint16_t addr, bool readOnly)
 
     for (const auto dev : addressableDevices)
     {
-        data = dev->read(addr, readOnly);
+        data = dev->readFrom(addr, readOnly);
 
-        if (data != 0)
+        if (data != 0x00)
             break;
     }
     return data;
