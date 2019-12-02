@@ -1,7 +1,8 @@
 #include <RicohRP2C02.hpp>
 #include <Bus.hpp>
 
-RicohRP2C02::RicohRP2C02(const uint16_t size, const uint16_t addrBase, const uint16_t addrEnd) : AddressableDevice::AddressableDevice{size, addrBase, addrEnd}, bus{new Bus{}}
+RicohRP2C02::RicohRP2C02(const uint16_t size, const uint16_t addrBase, const uint16_t addrEnd)
+    : AddressableDevice::AddressableDevice{{size}, addrBase, addrEnd}, bus{new Bus{}}
 {
     //bus->attachDevice();
 }
