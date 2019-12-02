@@ -2,20 +2,17 @@
 #include <memory>
 #include <cstdint>
 #include <array>
-
+#include <Bus.hpp>
 #define STACK_BASE 0x0100
 #define NUM_POSSIBLE_OPCODES 0x100
 
-class Bus;
 class MOS6502Instruction;
 class GamePak;
-class RicohRP2C02;
 
 class Ricoh2A03
 {
     std::unique_ptr<Bus> bus;
-    std::unique_ptr<RicohRP2C02> ppu;
-    
+
     std::shared_ptr<GamePak> cartridge;
     std::array<std::unique_ptr<MOS6502Instruction>, NUM_POSSIBLE_OPCODES> instructions;
 
@@ -83,8 +80,4 @@ public:
     void setFlag(Flags6502 f, bool b);
 
     uint8_t branch(uint16_t absoluteAddress, bool cond);
-
-    void insertGamePak(const std::shared_ptr<GamePak> cartridge);
-    void reset();
-    void tick();
 };
