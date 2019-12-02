@@ -131,6 +131,11 @@ uint8_t Ricoh2A03::branch(uint16_t absoluteAddress, bool cond)
     return cyclePenalty;
 }
 
+void Ricoh2A03::addCartridge(std::shared_ptr<AddressableDevice> cart)
+{
+    bus->attachDevice(cart);
+}
+
 Ricoh2A03::Ricoh2A03() : bus{new Bus{}},
                          instructions{
                              GEN_INSTR(BRK, IMM, 7), GEN_INSTR(ORA, IX, 6),

@@ -69,6 +69,11 @@ uint8_t RicohRP2C02::read(uint16_t addr) const
     return 0;
 }
 
-void RicohRP2C02::addCartridge()
+void RicohRP2C02::addCartridge(std::shared_ptr<AddressableDevice> cart)
+{
+    bus->attachDevice(cart);
+}
+
+void RicohRP2C02::run()
 {
 }

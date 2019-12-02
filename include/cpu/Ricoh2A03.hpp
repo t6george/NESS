@@ -82,4 +82,5 @@ public:
     void setFlag(Flags6502 f, bool b);
 
     uint8_t branch(uint16_t absoluteAddress, bool cond);
+    void addCartridge(std::shared_ptr<AddressableDevice> cart);
 };
