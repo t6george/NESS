@@ -3,9 +3,10 @@
 
 class GamePak : public AddressableDevice
 {
-public:
-    AddressableDevice(const uint16_t size);
+protected:
+    virtual void setByte(uint16_t addr, uint8_t data) override;
+    virtual uint8_t getByte(uint16_t addr, bool readOnly) const override;
 
-    uint8_t read(uint16_t addr, bool readOnly = false) const override;
-    void write(uint16_t addr, uint8_t data) override;
+public:
+    GamePak(const uint16_t size, const uint16_t addrBase, const uint16_t addrEnd);
 };

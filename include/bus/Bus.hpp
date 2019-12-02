@@ -6,9 +6,7 @@ class AddressableDevice;
 
 class Bus
 {
-    uint32_t sysClock;
     std::shared_ptr<AddressableDevice> memory;
-    std::shared_ptr<GamePak> cartridge;
 
 public:
     Bus();

@@ -10,12 +10,9 @@
 
 class Ram : public AddressableDevice
 {
-    std::vector<uint8_t> memory;
-
+protected:
+    virtual void setByte(uint16_t addr, uint8_t data) override;
+    virtual uint8_t getByte(uint16_t addr, bool readOnly) const override;
 public:
-    AddressableDevice(const uint16_t size);
-    virtual ~AddressableDevice() = default;
-
-    uint8_t read(uint16_t addr, bool readOnly = false) const override;
-    void write(uint16_t addr, uint8_t data) override;
+    Ram(const uint16_t size, const uint16_t addrBase, const uint16_t addrEnd);
 };
