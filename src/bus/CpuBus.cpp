@@ -11,31 +11,31 @@ void CpuBus::initMmu()
 AddressableDevice* CpuBus::delegate(uint16_t& addr)
 {
     AddressableDevice* device = nullptr;
-    // Devices dev = RAM;
+    Devices dev = RAM;
 
-    // for(; dev < TOTAL_DEVICES; ++dev)
-    // {
-    //     if(addr <= mmu[dev].end && addr >= mmu[dev].base)
-    //     {
-    //         addr = (addr - mmu[dev].base) & (mmu[dev].mirrorSize - 1);
-    //         break;
-    //     }
-    // }
+    for(; dev < TOTAL_DEVICES; ++dev)
+    {
+        if(addr <= mmu[dev].end && addr >= mmu[dev].base)
+        {
+            addr = (addr - mmu[dev].base) & (mmu[dev].mirrorSize - 1);
+            break;
+        }
+    }
 
-    // switch(dev)
-    // {
-    //     case RAM:
-    //         device = ram.get();
-    //         break;
-    //     case PPU:
-    //         device = ppu.get();
-    //         break;
-    //     case CART:
-    //         device = cartridge.get();
-    //         break;
-    //     default:
-    //         break;
-    // }
+    switch(dev)
+    {
+        case RAM:
+            device = ram;
+            break;
+        case PPU:
+            device = ppu;
+            break;
+        case CART:
+            device = cartridge;
+            break;
+        default:
+            break;
+    }
 
     return device;
 }
