@@ -20,6 +20,10 @@ protected:
         uint8_t tv2;
     } GameHeader;
 
+    uint8_t mapperNum;
+    uint16_t prgBase;
+    uint16_t chrBase;
+
     GameHeader header;
 
     virtual void setByte(uint16_t addr, uint8_t data) override;
