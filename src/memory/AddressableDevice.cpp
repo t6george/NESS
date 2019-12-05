@@ -2,7 +2,7 @@
 #include <cassert>
 
 AddressableDevice::AddressableDevice(const uint16_t addrBase, const uint16_t addrEnd)
-    : addrBase{addrBase}, addrEnd{addrEnd}, mirrorSize{0} {}
+    : addrBase{addrBase}, addrEnd{addrEnd}, mirrorSize{0}, requestSrc{Request::CPU} {}
 
 AddressableDevice::AddressableDevice(const std::vector<uint16_t> &sizes, const uint16_t addrBase, const uint16_t addrEnd)
     : addrBase{addrBase}, addrEnd{addrEnd}, mirrorSize{0}, contents{std::vector<std::vector<uint8_t>>(sizes.size())}
