@@ -25,6 +25,7 @@ bool Mapper000::translateChrAddress(uint16_t &addr) const
     if (M000::PRG::Base <= addr && M000::PRG::Limit >= addr)
     {
         addressable = true;
+        addr -= M000::PRG::Base;
     }
 
     return addressable;
