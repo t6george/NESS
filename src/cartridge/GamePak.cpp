@@ -1,6 +1,8 @@
 #include <GamePak.hpp>
 #include <fstream>
-#include <HwConstants.hpp>
+#include <cassert>
+
+#include <Mapper000.hpp>
 
 GamePak::GamePak(const std::string &fname) : mem{CHR}
 {
@@ -15,17 +17,28 @@ GamePak::GamePak(const std::string &fname) : mem{CHR}
         if (header.mapper1 & 0x04)
             in.seekg(512, std::ios_base::cur);
 
-        mapperNum = ((header.mapper2 >> 4) << 4) | (header.mapper2 >> 4);
+        uint8_t mapperNum = ((header.mapper2 >> 4) << 4) | (header.mapper2 >> 4);
 
         uint8_t ftype = 1;
 
         if (ftype == 1)
         {
-            prg.resize(PRG_BANK_SIZE * header.prgBanks);
-            chr.resize(CHR_BANK_SIZE * header.chrBanks);
+            prg.resize(CARTRIDGE::PrgBankSize * header.prgBanks);
+            chr.resize(CARTRIDGE::ChrBankSize * header.chrBanks);
 
             in.read((char *)&prg, prg.size());
             in.read((char *)&chr, chr.size());
+        }
+
+        switch (mapperNum)
+        {
+        case 0:
+            mapper.reset(new Mapper000(header.prgBanks, header.chrBanks));
+            break;
+        default:
+            // Unsupported Mapper Type
+            assert(false);
+            break;
         }
 
         in.close();

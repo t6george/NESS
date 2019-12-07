@@ -40,3 +40,9 @@ const uint16_t Mirror = 0xBFE0;
 }; // namespace CARTRIDGE
 
 }; // namespace CPU
+
+namespace CARTRIDGE
+{
+const uint16_t PrgBankSize = 0x4000;
+const uint16_t ChrBankSize = 0x2000;
+}; // namespace CARTRIDGE

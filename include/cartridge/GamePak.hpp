@@ -1,12 +1,11 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <AddressableDevice.hpp>
 #include <Mapper.hpp>
-
-#define PRG_BANK_SIZE 0x4000
-#define CHR_BANK_SIZE 0x2000
+#include <HwConstants.hpp>
 
 class GamePak : public AddressableDevice
 {
@@ -28,13 +27,12 @@ class GamePak : public AddressableDevice
         uint8_t tv2;
     } GameHeader;
 
-    uint8_t mapperNum;
+    std::unique_ptr<Mapper> mapper;
 
     std::vector<uint8_t> prg;
     std::vector<uint8_t> chr;
 
     GameHeader header;
-
     ActiveMemory mem;
 
     void setByte(uint16_t addr, uint8_t data) override;

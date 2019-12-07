@@ -17,5 +17,5 @@ nes: $(OBJECTS)
 .PHONY: clean
 
 clean:
-	rm nes
 	find . -type f -name '*.o' -delete
+	rm nes
