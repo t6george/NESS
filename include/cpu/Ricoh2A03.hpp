@@ -10,6 +10,7 @@
 #define NUM_POSSIBLE_OPCODES 0x100
 
 class GamePak;
+class AddressableDevice;
 
 class Ricoh2A03
 {

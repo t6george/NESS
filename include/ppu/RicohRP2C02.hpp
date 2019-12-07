@@ -1,5 +1,6 @@
 #pragma once
 #include <AddressableDevice.hpp>
+#include <memory>
 
 class Bus;
 class GamePak;
@@ -10,13 +11,11 @@ class RicohRP2C02 : public AddressableDevice
     std::shared_ptr<GamePak> cartridge;
 
 protected:
-    virtual void setByte(uint16_t addr, uint8_t data) override;
-    virtual uint8_t getByte(uint16_t addr, bool readOnly) const override;
+    void setByte(uint16_t addr, uint8_t data) override;
+    uint8_t getByte(uint16_t addr, bool readOnly) const override;
 
 public:
-    RicohRP2C02(const uint16_t size, const uint16_t addrBase, const uint16_t addrEnd);
-    void write(uint16_t addr, uint8_t data);
-    uint8_t read(uint16_t addr) const;
+    RicohRP2C02();
     void addCartridge(std::shared_ptr<AddressableDevice> cart);
     void run();
 };

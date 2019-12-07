@@ -4,7 +4,7 @@
 #include <GamePak.hpp>
 
 NesSystem::NesSystem()
-    : cpu{new Ricoh2A03{}}, ppu{new RicohRP2C02{0x0008, 0x2000, 0x3FFF}} {}
+    : ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu}} {}
 
 void NesSystem::tick()
 {
@@ -21,7 +21,7 @@ void NesSystem::reset()
 }
 void NesSystem::insertCartridge(const std::string &romName)
 {
-    std::shared_ptr<AddressableDevice> cart(new GamePak(romName, 0x4020, 0xFFFF));
+    std::shared_ptr<AddressableDevice> cart(new GamePak(romName));
     cpu->addCartridge(cart);
     ppu->addCartridge(cart);
 }

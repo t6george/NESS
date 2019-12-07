@@ -1,15 +1,13 @@
 #include <Ram.hpp>
-#include <cassert>
 
-Ram::Ram(const uint16_t size, const uint16_t addrBase, const uint16_t addrEnd)
-    : AddressableDevice::AddressableDevice({size}, addrBase, addrEnd) {}
+Ram::Ram(const uint16_t size) : contents{std::vector<uint8_t>(size, 0x00)} {}
 
 void Ram::setByte(uint16_t addr, uint8_t data)
 {
-    contents[0][addr] = data;
+    contents[addr] = data;
 }
 
 uint8_t Ram::getByte(uint16_t addr, bool readOnly) const
 {
-    return contents[0][addr];
+    return contents[addr];
 }

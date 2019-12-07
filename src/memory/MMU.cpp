@@ -3,7 +3,7 @@
 
 MMU::MMU(const std::vector<AddressingInfo> &table) : virtToPhys{table} {}
 
-void MMU::addEntry(AddressingInfo entry)
+void MMU::addEntry(const AddressingInfo entry)
 {
     virtToPhys.emplace_back(entry);
 }
@@ -32,7 +32,7 @@ void MMU::write(uint16_t addr, uint8_t data) const
         if (addr <= virtToPhys[i].limit && addr >= virtToPhys[i].base)
         {
             addr -= virtToPhys[i].base;
-            data = virtToPhys[i].device->write(addr, virtToPhys[i].mirror, data);
+            virtToPhys[i].device->write(addr, virtToPhys[i].mirror, data);
             break;
         }
     }

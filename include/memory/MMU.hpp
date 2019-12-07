@@ -21,7 +21,7 @@ public:
     MMU(const std::vector<AddressingInfo> &table);
     ~MMU() = default;
 
-    void addEntry(AddressingInfo entry);
+    void addEntry(const AddressingInfo entry);
     uint8_t read(uint16_t addr) const;
     void write(uint16_t addr, uint8_t data) const;
 };

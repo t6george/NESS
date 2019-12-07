@@ -1,8 +1,7 @@
 #include <GamePak.hpp>
 #include <fstream>
 
-GamePak::GamePak(const std::string &fname, const uint16_t addrBase, const uint16_t addrEnd)
-    : AddressableDevice::AddressableDevice(addrBase, addrEnd), prgBase{0x0000}
+GamePak::GamePak(const std::string &fname)
 {
     std::ifstream in;
     in.open(fname, std::ifstream::binary);
@@ -21,20 +20,22 @@ GamePak::GamePak(const std::string &fname, const uint16_t addrBase, const uint16
 
         if (ftype == 1)
         {
-            chrBase = PRG_BANK_SIZE * header.prgBanks;
-            contents.resize(chrBase + CHR_BANK_SIZE * header.chrBanks);
-            in.read((char *)&contents, contents.size());
+            prg.resize(PRG_BANK_SIZE * header.prgBanks);
+            chr.resize(CHR_BANK_SIZE * header.chrBanks);
+
+            in.read((char *)&prg, prg.size());
+            in.read((char *)&chr, chr.size());
         }
 
         in.close();
     }
 }
 
-void GamePak::setByte(uint16_t addr, uint8_t data)
-{
-}
-
 uint8_t GamePak::getByte(uint16_t addr, bool readOnly) const
 {
     return 0;
+}
+
+void GamePak::setByte(uint16_t addr, uint8_t data)
+{
 }

@@ -1,30 +1,22 @@
-#include <AddressableDevice.hpp>
 #include <Bus.hpp>
+#include <MMU.hpp>
 
-void Bus::write(uint16_t addr, uint8_t data)
+uint8_t Bus::read(uint16_t addr, bool readOnly) const
 {
-    for (const auto dev : addressableDevices)
-    {
-        if (dev->writeTo(addr, data))
-            break;
-    }
+    return mmu->read(addr);
 }
 
-uint8_t Bus::read(uint16_t addr, bool readOnly)
+void Bus::write(uint16_t addr, uint8_t data) const
 {
-    uint8_t data = 0x00;
-
-    for (const auto dev : addressableDevices)
-    {
-        data = dev->readFrom(addr, readOnly);
-
-        if (data != 0x00)
-            break;
-    }
-    return data;
+    mmu->write(addr, data);
 }
 
-void Bus::attachDevice(std::shared_ptr<AddressableDevice> device)
+void Bus::attachDevice(const uint16_t base, const uint16_t limit,
+                       const uint16_t mirror, std::shared_ptr<AddressableDevice> device) const
 {
-    addressableDevices.emplace_back(device);
+    mmu->addEntry(AddressingInfo{
+        .base = base,
+        .limit = limit,
+        .mirror = mirror,
+        .device = device});
 }

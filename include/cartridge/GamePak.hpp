@@ -1,13 +1,13 @@
 #pragma once
 #include <AddressableDevice.hpp>
 #include <string>
+#include <vector>
 
 #define PRG_BANK_SIZE 0x4000
 #define CHR_BANK_SIZE 0x2000
 
 class GamePak : public AddressableDevice
 {
-protected:
     typedef struct
     {
         uint8_t name[4];
@@ -21,14 +21,15 @@ protected:
     } GameHeader;
 
     uint8_t mapperNum;
-    uint16_t prgBase;
-    uint16_t chrBase;
+
+    std::vector<uint8_t> prg;
+    std::vector<uint8_t> chr;
 
     GameHeader header;
 
-    virtual void setByte(uint16_t addr, uint8_t data) override;
-    virtual uint8_t getByte(uint16_t addr, bool readOnly) const override;
+    void setByte(uint16_t addr, uint8_t data) override;
+    uint8_t getByte(uint16_t addr, bool readOnly) const override;
 
 public:
-    GamePak(const std::string &fname, const uint16_t addrBase, const uint16_t addrEnd);
+    GamePak(const std::string &fname);
 };

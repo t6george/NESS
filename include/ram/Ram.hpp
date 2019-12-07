@@ -1,5 +1,6 @@
 #pragma once
 #include <AddressableDevice.hpp>
+#include <vector>
 
 /*
  * NES RAM's address space is 8KB, but it is only 2KB in size
@@ -10,9 +11,12 @@
 
 class Ram : public AddressableDevice
 {
+    std::vector<uint8_t> contents;
+
 protected:
-    virtual void setByte(uint16_t addr, uint8_t data) override;
-    virtual uint8_t getByte(uint16_t addr, bool readOnly) const override;
+    void setByte(uint16_t addr, uint8_t data) override;
+    uint8_t getByte(uint16_t addr, bool readOnly) const override;
+
 public:
-    Ram(const uint16_t size, const uint16_t addrBase, const uint16_t addrEnd);
+    Ram(const uint16_t size);
 };

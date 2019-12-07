@@ -283,7 +283,7 @@ Ricoh2A03::Ricoh2A03() : bus{new Bus{}},
                              GEN_INSTR(INC, ABX, 7), GEN_INSTR(INC, IMP, 7)}
 {
     bus->attachDevice(std::shared_ptr<AddressableDevice>(
-        new Ram(0x0800, 0x0000, 0x1FFF)));
+        new Ram(0x0800)));
 
     bus->attachDevice(std::shared_ptr<AddressableDevice>(
         new RicohRP2C02(0x0008, 0x0000, 0x1FFF)));
