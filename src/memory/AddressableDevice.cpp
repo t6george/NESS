@@ -1,6 +1,6 @@
 #include <AddressableDevice.hpp>
 
-uint8_t AddressableDevice::read(uint16_t addr, uint16_t mirror, bool readOnly) const
+uint8_t AddressableDevice::read(uint16_t addr, uint16_t mirror, bool readOnly)
 {
     return getByte(addr & (mirror - 1), readOnly);
 }

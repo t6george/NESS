@@ -18,7 +18,7 @@ class MMU
     std::vector<AddressingInfo> virtToPhys;
 
 public:
-    MMU(const std::vector<AddressingInfo> &table);
+    MMU() = default;
     ~MMU() = default;
 
     void addEntry(const AddressingInfo entry);

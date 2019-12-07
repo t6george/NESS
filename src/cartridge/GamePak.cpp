@@ -1,7 +1,8 @@
 #include <GamePak.hpp>
 #include <fstream>
+#include <HwConstants.hpp>
 
-GamePak::GamePak(const std::string &fname)
+GamePak::GamePak(const std::string &fname) : mem{CHR}
 {
     std::ifstream in;
     in.open(fname, std::ifstream::binary);
@@ -33,9 +34,58 @@ GamePak::GamePak(const std::string &fname)
 
 uint8_t GamePak::getByte(uint16_t addr, bool readOnly) const
 {
-    return 0;
+    uint8_t data = 0x00;
+
+    if (mem == PRG)
+    {
+        addr = mapper->translatePrgAddress(addr);
+        data = prg[addr];
+    }
+    else if (mem == CHR)
+    {
+        addr = mapper->translateChrAddress(addr);
+        data = chr[addr];
+    }
+
+    return data;
 }
 
 void GamePak::setByte(uint16_t addr, uint8_t data)
 {
+    if (mem == PRG)
+    {
+        addr = mapper->translatePrgAddress(addr);
+        prg[addr] = data;
+    }
+    else if (mem == CHR)
+    {
+        addr = mapper->translateChrAddress(addr);
+        chr[addr] = data;
+    }
+}
+
+uint8_t GamePak::read(uint16_t addr, uint16_t mirror, bool readOnly)
+{
+    if (mirror == CPU::CARTRIDGE::Mirror)
+    {
+        mem = PRG;
+    }
+    else if (mirror == PPU::CARTRIDGE::Mirror)
+    {
+        mem = CHR;
+    }
+    return getByte(addr, readOnly);
+}
+
+void GamePak::write(uint16_t addr, uint16_t mirror, uint8_t data)
+{
+    if (mirror == CPU::CARTRIDGE::Mirror)
+    {
+        mem = PRG;
+    }
+    else if (mirror == PPU::CARTRIDGE::Mirror)
+    {
+        mem = CHR;
+    }
+    setByte(addr, data);
 }

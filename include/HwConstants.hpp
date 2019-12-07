@@ -9,7 +9,7 @@ namespace CARTRIDGE
 {
 const uint16_t Base = 0x0000;
 const uint16_t Limit = 0x1FFF;
-const uint16_t Mirror = 0x0000;
+const uint16_t Mirror = 0x2000;
 }; // namespace CARTRIDGE
 
 }; // namespace PPU
@@ -36,7 +36,7 @@ namespace CARTRIDGE
 {
 const uint16_t Base = 0x4020;
 const uint16_t Limit = 0xFFFF;
-const uint16_t Mirror = 0x0000;
+const uint16_t Mirror = 0xBFE0;
 }; // namespace CARTRIDGE
 
 }; // namespace CPU

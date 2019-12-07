@@ -10,7 +10,7 @@ class Bus
     std::shared_ptr<MMU> mmu;
 
 public:
-    Bus() = default;
+    Bus();
     ~Bus() = default;
     void write(uint16_t addr, uint8_t data) const;
     uint8_t read(uint16_t addr, bool readOnly = false) const;

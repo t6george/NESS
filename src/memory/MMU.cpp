@@ -1,8 +1,6 @@
 #include <MMU.hpp>
 #include <AddressableDevice.hpp>
 
-MMU::MMU(const std::vector<AddressingInfo> &table) : virtToPhys{table} {}
-
 void MMU::addEntry(const AddressingInfo entry)
 {
     virtToPhys.emplace_back(entry);

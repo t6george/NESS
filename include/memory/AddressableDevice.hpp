@@ -11,6 +11,6 @@ public:
     AddressableDevice() = default;
     virtual ~AddressableDevice() = default;
 
-    virtual uint8_t read(uint16_t addr, uint16_t mirror, bool readOnly = false) const;
+    virtual uint8_t read(uint16_t addr, uint16_t mirror, bool readOnly = false);
     virtual void write(uint16_t addr, uint16_t mirror, uint8_t data);
 };

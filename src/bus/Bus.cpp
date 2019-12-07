@@ -1,6 +1,8 @@
 #include <Bus.hpp>
 #include <MMU.hpp>
 
+Bus::Bus() : mmu{new MMU{}} {}
+
 uint8_t Bus::read(uint16_t addr, bool readOnly) const
 {
     return mmu->read(addr);
