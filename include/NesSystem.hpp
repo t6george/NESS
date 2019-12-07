@@ -3,13 +3,14 @@
 #include <memory>
 #include <string>
 
-class AddressableDevice;
+class Ricoh2A03;
+class RicohRP2C02;
 
 class NesSystem
 {
     uint32_t clock;
-    std::unique_ptr<AddressableDevice> ppu;
-    std::unique_ptr<AddressableDevice> cpu;
+    std::shared_ptr<RicohRP2C02> ppu;
+    std::unique_ptr<Ricoh2A03> cpu;
 
 public:
     NesSystem();

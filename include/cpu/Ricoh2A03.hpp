@@ -57,7 +57,7 @@ public:
     uint16_t PC;
     uint8_t S;
 
-    Ricoh2A03();
+    Ricoh2A03(std::shared_ptr<AddressableDevice> ppu);
     ~Ricoh2A03() = default;
 
     uint8_t read(uint16_t addr);

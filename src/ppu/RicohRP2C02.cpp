@@ -1,5 +1,6 @@
 #include <RicohRP2C02.hpp>
 #include <Bus.hpp>
+#include <HwConstants.hpp>
 
 RicohRP2C02::RicohRP2C02() : bus{new Bus{}} {}
 
@@ -56,7 +57,10 @@ uint8_t RicohRP2C02::getByte(uint16_t addr, bool readOnly) const
 
 void RicohRP2C02::addCartridge(std::shared_ptr<AddressableDevice> cart)
 {
-    bus->attachDevice(cart);
+    bus->attachDevice(PPU::CARTRIDGE::Base,
+                      PPU::CARTRIDGE::Limit,
+                      PPU::CARTRIDGE::Mirror,
+                      cart);
 }
 
 void RicohRP2C02::run()
