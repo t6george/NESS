@@ -49,14 +49,12 @@ uint8_t GamePak::getByte(uint16_t addr, bool readOnly) const
 {
     uint8_t data = 0x00;
 
-    if (mem == PRG)
+    if (mem == PRG && mapper->translatePrgAddress(addr))
     {
-        addr = mapper->translatePrgAddress(addr);
         data = prg[addr];
     }
-    else if (mem == CHR)
+    else if (mem == CHR && mapper->translateChrAddress(addr))
     {
-        addr = mapper->translateChrAddress(addr);
         data = chr[addr];
     }
 
@@ -65,14 +63,12 @@ uint8_t GamePak::getByte(uint16_t addr, bool readOnly) const
 
 void GamePak::setByte(uint16_t addr, uint8_t data)
 {
-    if (mem == PRG)
+    if (mem == PRG && mapper->translatePrgAddress(addr))
     {
-        addr = mapper->translatePrgAddress(addr);
         prg[addr] = data;
     }
-    else if (mem == CHR)
+    else if (mem == CHR && mapper->translateChrAddress(addr))
     {
-        addr = mapper->translateChrAddress(addr);
         chr[addr] = data;
     }
 }
