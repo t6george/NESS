@@ -46,3 +46,12 @@ namespace CARTRIDGE
 const uint16_t PrgBankSize = 0x4000;
 const uint16_t ChrBankSize = 0x2000;
 }; // namespace CARTRIDGE
+
+/*********** Graphical Constants ***********/
+
+namespace DISPLAY
+{
+const uint16_t Height = 0x00F0;
+const uint16_t Width = 0x0100;
+const uint16_t ColorCount = 0x0040;
+}; // namespace DISPLAY

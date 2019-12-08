@@ -7,6 +7,8 @@ class GamePak;
 
 class RicohRP2C02 : public AddressableDevice
 {
+    uint16_t cycles;
+
     std::unique_ptr<Bus> bus;
     std::shared_ptr<GamePak> cartridge;
 
@@ -18,4 +20,5 @@ public:
     RicohRP2C02();
     void addCartridge(std::shared_ptr<AddressableDevice> cart);
     void run();
+    void getPatternTable(const uint8_t tblIndex);
 };
