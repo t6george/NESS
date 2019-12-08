@@ -11,11 +11,13 @@ class Display
     uint16_t scanline;
     uint16_t cycle;
 
-    std::unique_ptr<SDL_Window> window;
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    // SDL_Surface *screen;
 
     // std::array<uint8_t, DISPLAY::ColorCount> colors;
 
 public:
     Display(const uint16_t width, const uint16_t height);
-    ~Display() = default;
+    ~Display() noexcept;
 };
