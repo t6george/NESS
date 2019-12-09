@@ -8,6 +8,7 @@
 int main(int argc, char *argv[])
 {
     Display d(256, 240);
+    d.blit();
 
     return 0;
 }
