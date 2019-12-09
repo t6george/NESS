@@ -34,25 +34,29 @@ Display::Display(const uint16_t width, const uint16_t height)
 
 Display::~Display() noexcept
 {
+    SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
 
 void Display::blit()
 {
-    for (size_t y = 0; y < pixels.size(); ++y)
-    {
-        for (size_t x = 0; x < pixels[0].size(); ++x)
-        {
-            // SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-            // SDL_RenderClear(renderer);
+    SDL_Rect scr = {.x = 0, .y = 0, .w = 256 * 64, .h = 240 * 64};
 
-            SDL_SetRenderDrawColor(renderer, pixels[y][x].color.r, pixels[y][x].color.g,
-                                   pixels[y][x].color.b, pixels[y][x].color.a);
+    uint8_t x[256 * 240 * 4] = {0x40};
 
-            SDL_RenderFillRect(renderer, &pixels[y][x].rect);
-        }
-    }
+    SDL_Texture *gameTexture = SDL_CreateTexture(
+        renderer,
+        SDL_PIXELFORMAT_ARGB8888,
+        SDL_TEXTUREACCESS_STREAMING,
+        256, 240);
+
+    SDL_UpdateTexture(gameTexture, nullptr, x, 256 * 4);
+
+    SDL_SetRenderDrawColor(renderer, 100, 0, 0, 0xff);
+    SDL_RenderClear(renderer);
+
+    SDL_RenderCopy(renderer, gameTexture, nullptr, &scr);
     SDL_RenderPresent(renderer);
 
     bool quit = false;
@@ -65,6 +69,28 @@ void Display::blit()
             {
                 quit = true;
             }
+            // SDL_UpdateTexture(gameTexture, NULL, (uint8_t *)x, 256 * sizeof(uint32_t));
+
+            // SDL_SetRenderDrawColor(renderer, 100, 0, 0, 0xff);
+            // SDL_RenderClear(renderer);
+            // SDL_RenderCopy(renderer, gameTexture, NULL, NULL);
+            // SDL_RenderPresent(renderer);
+            // for (size_t y = 0; y < pixels.size(); ++y)
+            // {
+            //     for (size_t x = 0; x < pixels[0].size(); ++x)
+            //     {
+            //         // SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            //         // SDL_RenderClear(renderer);
+
+            //         SDL_SetRenderDrawColor(renderer, pixels[y][x].color.r, pixels[y][x].color.g,
+            //                                pixels[y][x].color.b, pixels[y][x].color.a);
+
+            //         ++pixels[y][x].color.r;
+            //         --pixels[y][x].color.g;
+            //         SDL_RenderFillRect(renderer, &pixels[y][x].rect);
+            //     }
+            // }
+            // SDL_RenderPresent(renderer);
         }
     }
 }
