@@ -10,11 +10,11 @@ Display::Display(const uint16_t width, const uint16_t height)
           SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN)},
       renderer{SDL_CreateRenderer(
           window, -1,
-          SDL_RENDERER_ACCELERATED)},
+          SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)},
       pixels{std::vector<std::vector<Pixel>>(
           height, std::vector<Pixel>(
                       width, {{.x = 0x0, .y = 0x0, .w = DISPLAY::PixelDim, .h = DISPLAY::PixelDim},
-                              {.r = 0x0, .g = 0x40, .b = 0x0, .a = 0xFF}}))}
+                              {.r = 0x0, .g = 0x0, .b = 0x0, .a = 0xFF}}))}
 {
     (void)frameDrawn;
     (void)scanline;
@@ -44,17 +44,16 @@ void Display::blit()
     {
         for (size_t x = 0; x < pixels[0].size(); ++x)
         {
-            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-            SDL_RenderClear(renderer);
+            // SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            // SDL_RenderClear(renderer);
 
             SDL_SetRenderDrawColor(renderer, pixels[y][x].color.r, pixels[y][x].color.g,
                                    pixels[y][x].color.b, pixels[y][x].color.a);
 
             SDL_RenderFillRect(renderer, &pixels[y][x].rect);
-
-            SDL_RenderPresent(renderer);
         }
     }
+    SDL_RenderPresent(renderer);
 
     bool quit = false;
     SDL_Event e;
