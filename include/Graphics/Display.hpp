@@ -8,22 +8,15 @@
 
 class Display
 {
-    typedef struct
-    {
-        SDL_Rect rect;
-        SDL_Color color;
-    } Pixel;
-
     bool frameDrawn;
     uint16_t scanline;
     uint16_t cycle;
 
     SDL_Window *window;
     SDL_Renderer *renderer;
+    SDL_Texture *texture;
 
     // std::array<SDL_Color, DISPLAY::ColorCount> colors;
-
-    std::vector<std::vector<Pixel>> pixels;
 
 public:
     Display(const uint16_t width, const uint16_t height);
