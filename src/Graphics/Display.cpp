@@ -35,15 +35,6 @@ Display::~Display() noexcept
 
 void Display::blit()
 {
-
-    // uint32_t x[256 * 240];
-
-    // memset((void *)x, 0x8F, 256 * 240 * sizeof(uint32_t));
-
-    // for (int i = 0; i < 4096; ++i)
-    // {
-    //     x[i] = 0xFFFF0000;
-    // }
     SDL_UpdateTexture(texture, nullptr, frameBuffer, DISPLAY::Width * sizeof(uint32_t));
 
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
