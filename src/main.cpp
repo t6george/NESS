@@ -7,7 +7,8 @@
 
 int main(int argc, char *argv[])
 {
-    Display d(256, 240);
+    SDL_Init(SDL_INIT_VIDEO);
+    Display d(256, 240, nullptr);
     d.blit();
 
     return 0;

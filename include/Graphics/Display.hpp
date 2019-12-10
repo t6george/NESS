@@ -16,10 +16,14 @@ class Display
     SDL_Renderer *renderer;
     SDL_Texture *texture;
 
+    const SDL_Rect canvas;
+
+    const uint32_t *frameBuffer;
+
     // std::array<SDL_Color, DISPLAY::ColorCount> colors;
 
 public:
-    Display(const uint16_t width, const uint16_t height);
+    Display(const uint16_t width, const uint16_t height, const uint32_t *fb);
     ~Display() noexcept;
     void blit();
 };
