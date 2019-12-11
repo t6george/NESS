@@ -19,7 +19,10 @@ RicohRP2C02::RicohRP2C02()
              0xFFFEFF, 0xC0DFFF, 0xD3D2FF, 0xE8C8FF,
              0xFBC2FF, 0xFEC4EA, 0xFECCC5, 0xF7D8A5,
              0xE4E594, 0xCFEF96, 0xBDF4AB, 0xB3F3CC,
-             0xB5EBF2, 0xB8B8B8, 0x000000, 0x000000} {}
+             0xB5EBF2, 0xB8B8B8, 0x000000, 0x000000},
+             frameBuffer{std::vector<uint32_t>(
+                 DISPLAY::Width * DISPLAY::Height, 
+                 DISPLAY::PixelOpacity)} {}
 
 void RicohRP2C02::setByte(uint16_t addr, uint8_t data)
 {
@@ -80,23 +83,37 @@ void RicohRP2C02::addCartridge(std::shared_ptr<AddressableDevice> cart)
                       cart);
 }
 
-void RicohRP2C02::getPatternTable(const uint8_t tblIndex)
+void RicohRP2C02::updateFrameBuffer(const uint8_t tblIndex)
 {
-    uint16_t tile;
-    uint8_t lsb, msb;
+    uint16_t chrBase = tblIndex * 0x1000, pixel;
+    uint8_t lsBits, msBits;
 
-    for (uint16_t y = 0; y < 16; ++y)
+    for (uint16_t offset = 0; offset < 128 * 128 * 2; offset += 2)
     {
-        for (uint16_t x = 0; x < 16; ++x)
+        for (uint16_t row = 0; row < 8; ++row)
         {
-            tile = 256 * y + 16 * x;
-            for (uint16_t row = 0; row < 8; ++row)
+            lsBits = bus->read(chrBase + row);
+            msBits = bus->read(chrBase + row + 8);
+
+            for (uint16_t col = 0; col < 8; ++col)
             {
-                lsb = bus->read(tblIndex * 0x1000 + tile + row);
-                msb = bus->read(tblIndex * 0x1000 + tile + row + 8);
+                pixel = ((lsBits & 0x80) >> 0x7) | ((msBits & 0x80) >> 0x6);
+                lsBits <<= 0x1;
+                msBits <<= 0x1;
+                frameBuffer[offset + row * 8 + col * 256] |= getRgb(tblIndex, pixel);
             }
         }
     }
+}
+
+uint32_t RicohRP2C02::getRgb(const uint8_t tblIndex, const uint16_t pixelVal) const
+{
+    return colors[(bus->read(0x3F00 + (tblIndex << 2) + pixelVal)) & 0x3F];
+}
+
+const uint32_t *RicohRP2C02::getFrameBuffData() const
+{
+    return frameBuffer.data();
 }
 
 void RicohRP2C02::run()

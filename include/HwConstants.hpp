@@ -55,4 +55,5 @@ const uint16_t Height = 0x00F0;
 const uint16_t Width = 0x0100;
 const uint16_t ColorCount = 0x0040;
 const uint16_t PixelDim = 0x0002;
+const uint32_t PixelOpacity = 0xFF000000;
 }; // namespace DISPLAY
