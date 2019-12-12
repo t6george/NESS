@@ -18,5 +18,6 @@ protected:
     uint8_t getByte(uint16_t addr, bool readOnly) const override;
 
 public:
-    Ram(const uint16_t size);
+    explicit Ram(const uint16_t size);
+    virtual ~Ram() = default;
 };
