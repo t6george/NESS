@@ -291,7 +291,7 @@ Ricoh2A03::Ricoh2A03(std::shared_ptr<AddressableDevice> ppu)
                       CPU::RAM::Limit,
                       CPU::RAM::Mirror,
                       std::shared_ptr<AddressableDevice>(
-                          new Ram(0x0800)));
+                          new Ram(CPU::RAM::Size)));
 
     bus->attachDevice(CPU::PPU::Base,
                       CPU::PPU::Limit,

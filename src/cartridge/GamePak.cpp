@@ -4,7 +4,7 @@
 
 #include <Mapper000.hpp>
 
-GamePak::GamePak(const std::string &fname) : mem{CHR}
+GamePak::GamePak(const std::string &fname) : active{false}, mem{CHR}
 {
     std::ifstream in;
     in.open(fname, std::ifstream::binary);

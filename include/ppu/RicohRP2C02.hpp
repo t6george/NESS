@@ -19,6 +19,9 @@ class RicohRP2C02 : public AddressableDevice
     std::array<uint32_t, DISPLAY::ColorCount> colors;
     std::vector<uint32_t> frameBuffer;
 
+    uint8_t localRead(uint16_t addr) const;
+    void localWrite(uint16_t addr, uint8_t data);
+    
 protected:
     void setByte(uint16_t addr, uint8_t data) override;
     uint8_t getByte(uint16_t addr, bool readOnly) const override;

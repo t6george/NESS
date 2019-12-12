@@ -7,7 +7,7 @@
 
 NesSystem::NesSystem()
     : ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu}},
-      screen{new Display{DISPLAY::Height, DISPLAY::Width}} {}
+      screen{new Display{DISPLAY::Height, DISPLAY::Width, ppu->getFrameBuffData()}} {}
 
 void NesSystem::tick()
 {

@@ -22,7 +22,20 @@ RicohRP2C02::RicohRP2C02()
              0xB5EBF2, 0xB8B8B8, 0x000000, 0x000000},
              frameBuffer{std::vector<uint32_t>(
                  DISPLAY::Width * DISPLAY::Height, 
-                 DISPLAY::PixelOpacity)} {}
+                 DISPLAY::PixelOpacity)} 
+{
+    bus->attachDevice(PPU::VRAM::Base,
+                      PPU::VRAM::Limit,
+                      PPU::VRAM::Mirror,
+                      std::shared_ptr<AddressableDevice>(
+                          new VRam(PPU::VRAM::Size)));
+
+    bus->attachDevice(PPU::PALETTE::Base,
+                      PPU::PALETTE::Limit,
+                      PPU::PALETTE::Mirror,
+                      std::shared_ptr<AddressableDevice>(
+                          new PaletteRam(PPU::PALETTE::Size)));
+}
 
 void RicohRP2C02::setByte(uint16_t addr, uint8_t data)
 {
@@ -85,22 +98,23 @@ void RicohRP2C02::addCartridge(std::shared_ptr<AddressableDevice> cart)
 
 void RicohRP2C02::updateFrameBuffer(const uint8_t tblIndex)
 {
-    uint16_t chrBase = tblIndex * 0x1000, pixel;
+    uint16_t chrBase = tblIndex * PPU::CARTRIDGE::CHR::PartitionSize, pixel;
     uint8_t lsBits, msBits;
 
-    for (uint16_t offset = 0; offset < 128 * 128 * 2; offset += 2)
+    for (uint16_t offset = 0; offset < PPU::CARTRIDGE::CHR::NumTiles; offset += 2)
     {
-        for (uint16_t row = 0; row < 8; ++row)
+        for (uint16_t row = 0; row < 0x8; ++row)
         {
-            lsBits = bus->read(chrBase + row);
-            msBits = bus->read(chrBase + row + 8);
+            lsBits = localRead(chrBase + row);
+            msBits = localRead(chrBase + row + 0x8);
 
-            for (uint16_t col = 0; col < 8; ++col)
+            for (uint16_t col = 0; col < 0x8; ++col)
             {
                 pixel = ((lsBits & 0x80) >> 0x7) | ((msBits & 0x80) >> 0x6);
                 lsBits <<= 0x1;
                 msBits <<= 0x1;
-                frameBuffer[offset + row * 8 + col * 256] |= getRgb(tblIndex, pixel);
+                frameBuffer[offset + row * DISPLAY::Width + col] |= 
+                    getRgb(tblIndex, pixel);
             }
         }
     }
@@ -108,12 +122,22 @@ void RicohRP2C02::updateFrameBuffer(const uint8_t tblIndex)
 
 uint32_t RicohRP2C02::getRgb(const uint8_t tblIndex, const uint16_t pixelVal) const
 {
-    return colors[(bus->read(0x3F00 + (tblIndex << 2) + pixelVal)) & 0x3F];
+    return colors[(localRead(PPU::PALETTE::Base + (tblIndex << 0x2) + pixelVal)) & 0x3F];
 }
 
 const uint32_t *RicohRP2C02::getFrameBuffData() const
 {
     return frameBuffer.data();
+}
+
+uint8_t RicohRP2C02::localRead(uint16_t addr) const
+{
+    return bus->read(addr & 0x3FFF);
+}
+
+void RicohRP2C02::localWrite(uint16_t addr, uint8_t data)
+{
+    bus->write(addr & 0x3FFF, base);
 }
 
 void RicohRP2C02::run()
