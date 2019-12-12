@@ -17,14 +17,6 @@ const uint16_t PartitionSize = 0x1000;
 const uint16_t NumTiles = 0x0100;
 };
 
-namespace VRAM
-{
-const uint16_t Base = 0x2000;
-const uint16_t Limit = 0x3EFF;
-const uint16_t Mirror = 0x1000;
-const uint16_t Size = 0x0800;
-}; // namespace VRAM
-
 }; // namespace CARTRIDGE
 
 namespace PALETTE
@@ -34,6 +26,14 @@ const uint16_t Limit = 0x3FFF;
 const uint16_t Mirror = 0x0020;
 const uint16_t Size = 0x0020;
 };
+
+namespace VRAM
+{
+const uint16_t Base = 0x2000;
+const uint16_t Limit = 0x3EFF;
+const uint16_t Mirror = 0x1000;
+const uint16_t Size = 0x0800;
+}; // namespace VRAM
 
 }; // namespace PPU
 

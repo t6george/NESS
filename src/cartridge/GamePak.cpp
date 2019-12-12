@@ -4,7 +4,7 @@
 
 #include <Mapper000.hpp>
 
-GamePak::GamePak(const std::string &fname) : active{false}, mem{CHR}
+GamePak::GamePak(const std::string &fname) : mem{CHR}
 {
     std::ifstream in;
     in.open(fname, std::ifstream::binary);
@@ -73,7 +73,7 @@ void GamePak::setByte(uint16_t addr, uint8_t data)
     }
 }
 
-uint8_t GamePak::read(uint16_t addr, uint16_t mirror, bool readOnly)
+uint16_t GamePak::mirrorAddress(uint16_t addr, uint16_t mirror)
 {
     if (mirror == CPU::CARTRIDGE::Mirror)
     {
@@ -83,18 +83,6 @@ uint8_t GamePak::read(uint16_t addr, uint16_t mirror, bool readOnly)
     {
         mem = CHR;
     }
-    return getByte(addr, readOnly);
-}
 
-void GamePak::write(uint16_t addr, uint16_t mirror, uint8_t data)
-{
-    if (mirror == CPU::CARTRIDGE::Mirror)
-    {
-        mem = PRG;
-    }
-    else if (mirror == PPU::CARTRIDGE::Mirror)
-    {
-        mem = CHR;
-    }
-    setByte(addr, data);
+    return addr;
 }

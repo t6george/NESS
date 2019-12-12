@@ -1,5 +1,7 @@
 #include <RicohRP2C02.hpp>
 #include <Bus.hpp>
+#include <Vram.hpp>
+#include <PaletteRam.hpp>
 #include <HwConstants.hpp>
 
 RicohRP2C02::RicohRP2C02()
@@ -137,7 +139,7 @@ uint8_t RicohRP2C02::localRead(uint16_t addr) const
 
 void RicohRP2C02::localWrite(uint16_t addr, uint8_t data)
 {
-    bus->write(addr & 0x3FFF, base);
+    bus->write(addr & 0x3FFF, data);
 }
 
 void RicohRP2C02::run()
