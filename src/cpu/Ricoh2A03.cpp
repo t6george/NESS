@@ -1,8 +1,11 @@
+#include <cassert>
+
 #include <Ricoh2A03.hpp>
 #include <Ram.hpp>
 #include <RicohRP2C02.hpp>
 #include <Instructions.hpp>
 #include <HwConstants.hpp>
+#include <GamePak.hpp>
 
 // Nested template syntax can be damaging to the eye - I only want to write it out once :)
 #define GEN_INSTR(name, type, cycles) std::unique_ptr<MOS6502Instruction>(new name<Ricoh2A03::AddressingType::type>(this, cycles))
@@ -134,6 +137,8 @@ uint8_t Ricoh2A03::branch(uint16_t absoluteAddress, bool cond)
 
 void Ricoh2A03::addCartridge(std::shared_ptr<AddressableDevice> cart)
 {
+    assert(dynamic_cast<GamePak*>(cart.get()));
+
     bus->attachDevice(CPU::CARTRIDGE::Base,
                       CPU::CARTRIDGE::Limit,
                       CPU::CARTRIDGE::Mirror,

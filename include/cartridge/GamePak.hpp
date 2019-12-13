@@ -9,7 +9,17 @@
 
 class GamePak : public AddressableDevice
 {
-    enum MirrorMode;
+public:
+    enum MirrorMode
+    {
+        VERTICAL,
+        HORIZONTAL
+    };
+
+    GamePak(const std::string &fname);
+    GamePak::MirrorMode getMirrorMode() const;
+
+private:
     enum ActiveMemory
     {
         PRG,
@@ -42,14 +52,4 @@ class GamePak : public AddressableDevice
 
     uint16_t mirrorAddress(uint16_t addr, uint16_t mirror) override;
     void parseFile(const std::string &fname);
-
-public:
-    enum MirrorMode
-    {
-        VERTICAL,
-        HORIZONTAL
-    };
-
-    GamePak(const std::string &fname);
-    GamePak::MirrorMode getMirrorMode() const;
 };

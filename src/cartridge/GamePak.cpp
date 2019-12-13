@@ -1,10 +1,13 @@
-#include <GamePak.hpp>
 #include <fstream>
 #include <cassert>
 
+#include <GamePak.hpp>
 #include <Mapper000.hpp>
 
-GamePak::GamePak(const std::string &fname) : mem{PRG}, parseFile(fname) {}
+GamePak::GamePak(const std::string &fname) : mem{PRG} 
+{
+    parseFile(fname);
+}
 
 void GamePak::parseFile(const std::string &fname)
 {
@@ -90,7 +93,7 @@ uint16_t GamePak::mirrorAddress(uint16_t addr, uint16_t mirror)
     return addr;
 }
 
-GamePak::MirrorMode getMirrorMode() const
+GamePak::MirrorMode GamePak::getMirrorMode() const
 {
     return mMode;
 }

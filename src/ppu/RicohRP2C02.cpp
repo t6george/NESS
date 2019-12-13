@@ -1,8 +1,11 @@
+#include <cassert>
+
 #include <RicohRP2C02.hpp>
 #include <Bus.hpp>
 #include <Vram.hpp>
 #include <PaletteRam.hpp>
 #include <HwConstants.hpp>
+#include <GamePak.hpp>
 
 RicohRP2C02::RicohRP2C02()
     : cycles{0}, bus{new Bus{}},
@@ -26,12 +29,6 @@ RicohRP2C02::RicohRP2C02()
                  DISPLAY::Width * DISPLAY::Height, 
                  DISPLAY::PixelOpacity)} 
 {
-    bus->attachDevice(PPU::VRAM::Base,
-                      PPU::VRAM::Limit,
-                      PPU::VRAM::Mirror,
-                      std::shared_ptr<AddressableDevice>(
-                          new VRam(PPU::VRAM::Size)));
-
     bus->attachDevice(PPU::PALETTE::Base,
                       PPU::PALETTE::Limit,
                       PPU::PALETTE::Mirror,
@@ -92,10 +89,19 @@ uint8_t RicohRP2C02::getByte(uint16_t addr, bool readOnly) const
 
 void RicohRP2C02::addCartridge(std::shared_ptr<AddressableDevice> cart)
 {
+    GamePak* game = nullptr;
+    assert(game = dynamic_cast<GamePak*>(cart.get()));
+
     bus->attachDevice(PPU::CARTRIDGE::Base,
                       PPU::CARTRIDGE::Limit,
                       PPU::CARTRIDGE::Mirror,
                       cart);
+
+    bus->attachDevice(PPU::VRAM::Base,
+                      PPU::VRAM::Limit,
+                      PPU::VRAM::Mirror,
+                      std::shared_ptr<AddressableDevice>(
+                          new VRam(PPU::VRAM::Size, game->getMirrorMode())));
 }
 
 void RicohRP2C02::updateFrameBuffer(const uint8_t tblIndex)

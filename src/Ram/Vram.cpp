@@ -1,6 +1,7 @@
 #include <Vram.hpp>
 
-VRam::VRam(const uint16_t size) : Ram::Ram{size} {}
+VRam::VRam(const uint16_t size, GamePak::MirrorMode mMode) 
+    : Ram::Ram{size}, mMode{mMode} {}
 
 uint16_t VRam::mirrorAddress(uint16_t addr, uint16_t mirror)
 {
@@ -16,11 +17,6 @@ uint16_t VRam::mirrorAddress(uint16_t addr, uint16_t mirror)
     {
         base = 0x0400;
     }
-    
-    return base + addr & 0x03FF;
-}
 
-void VRam::setMirrorType(GamePak::MirrorMode type)
-{
-    mMode = type;
+    return base + addr & 0x03FF;
 }
