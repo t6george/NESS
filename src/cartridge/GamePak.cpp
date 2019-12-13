@@ -4,7 +4,9 @@
 
 #include <Mapper000.hpp>
 
-GamePak::GamePak(const std::string &fname) : mem{CHR}
+GamePak::GamePak(const std::string &fname) : mem{PRG}, parseFile(fname) {}
+
+void GamePak::parseFile(const std::string &fname)
 {
     std::ifstream in;
     in.open(fname, std::ifstream::binary);
@@ -15,9 +17,10 @@ GamePak::GamePak(const std::string &fname) : mem{CHR}
         in.seekg(5, std::ios_base::cur);
 
         if (header.mapper1 & 0x04)
-            in.seekg(512, std::ios_base::cur);
+            in.seekg(0x200, std::ios_base::cur);
 
-        uint8_t mapperNum = ((header.mapper2 >> 4) << 4) | (header.mapper2 >> 4);
+        uint8_t mapperNum = (header.mapper2 & 0xFFF0) | (header.mapper2 >> 0x4);
+        mMode = (header.mapper1 & 0x01) ? VERTICAL : HORIZONTAL;
 
         uint8_t ftype = 1;
 
@@ -85,4 +88,9 @@ uint16_t GamePak::mirrorAddress(uint16_t addr, uint16_t mirror)
     }
 
     return addr;
+}
+
+GamePak::MirrorMode getMirrorMode() const
+{
+    return mMode;
 }
