@@ -7,8 +7,8 @@
 #include <HwConstants.hpp>
 #include <GamePak.hpp>
 
-RicohRP2C02::RicohRP2C02()
-    : cycles{0}, bus{new Bus{}},
+RicohRP2C02::RicohRP2C02() : cycles{0}, addrLatch{0x1}, 
+    ppuAddr{0x0000}, dataBuffer{0x00}, bus{new Bus{}},
       colors{0x666666, 0x002A88, 0x1412A7, 0x3B00A4,
              0x5C007E, 0x6E0040, 0x6C0600, 0x561D00,
              0x333500, 0x0B4800, 0x005200, 0x004F08,
@@ -36,13 +36,56 @@ RicohRP2C02::RicohRP2C02()
                           new PaletteRam(PPU::PALETTE::Size)));
 }
 
+uint8_t RicohRP2C02::getByte(uint16_t addr, bool readOnly) const
+{
+    uint8_t data = 0x00;
+
+    switch (addr)
+    {
+    case 0x0000:
+        break;
+    case 0x0001:
+        break;
+    case 0x0002:
+        statusRegister.unused = dataBuffer & 0x1F;
+        data = statusRegister.raw;
+        statusRegister.vertical_blank = 0;
+        addrLatch = 0x1;
+        break;
+    case 0x0003:
+        break;
+    case 0x0004:
+        break;
+    case 0x0005:
+        break;
+    case 0x0006:
+        break;
+    case 0x0007:
+        data = dataBuffer;
+        dataBuffer = localRead(ppuAddr);
+
+        if(addr >= PPU::PALETTE::Base && addr <= PPU::PALETTE:Limit)
+        {
+            data = dataBuffer;
+        }
+        ++ppuAddr;
+        break;
+    default:
+        break;
+    }
+
+    return data;
+}
+
 void RicohRP2C02::setByte(uint16_t addr, uint8_t data)
 {
     switch (addr)
     {
     case 0x0000:
+        control.raw = data;
         break;
     case 0x0001:
+        mask.raw = data;
         break;
     case 0x0002:
         break;
@@ -53,38 +96,16 @@ void RicohRP2C02::setByte(uint16_t addr, uint8_t data)
     case 0x0005:
         break;
     case 0x0006:
+        ppuAddr = (ppuAddr & ~(static_cast<uint16_t>(0xFF) << (addrLatch * 0x8))) 
+            | (static_cast<uint16_t>(data) << (addrLatch * 0x8));
+        addrLatch ^= 0x1;
         break;
     case 0x0007:
+        localWrite(ppuAddr++, data);
         break;
     default:
         break;
     }
-}
-
-uint8_t RicohRP2C02::getByte(uint16_t addr, bool readOnly) const
-{
-    switch (addr)
-    {
-    case 0x0000:
-        break;
-    case 0x0001:
-        break;
-    case 0x0002:
-        break;
-    case 0x0003:
-        break;
-    case 0x0004:
-        break;
-    case 0x0005:
-        break;
-    case 0x0006:
-        break;
-    case 0x0007:
-        break;
-    default:
-        break;
-    }
-    return 0;
 }
 
 void RicohRP2C02::addCartridge(std::shared_ptr<AddressableDevice> cart)

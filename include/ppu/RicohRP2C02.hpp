@@ -12,6 +12,9 @@ class GamePak;
 class RicohRP2C02 : public AddressableDevice
 {
     uint16_t cycles;
+    uint16_t addrLatch;
+    uint16_t ppuAddr;
+    uint8_t dataBuffer;
 
     std::unique_ptr<Bus> bus;
     std::shared_ptr<GamePak> cartridge;
@@ -21,6 +24,56 @@ class RicohRP2C02 : public AddressableDevice
 
     uint8_t localRead(uint16_t addr) const;
     void localWrite(uint16_t addr, uint8_t data);
+
+    union
+    {
+        uint8_t raw;
+
+        struct
+        {
+            uint8_t scratch            : 5;
+            uint8_t sprite_overflow    : 1;
+            uint8_t sprite_zero        : 1;
+            uint8_t vertical_blank     : 1;
+        };
+
+    } statusRegister;
+    
+    union
+    {
+        uint8_t raw;
+
+        struct
+        {
+            uint8_t grayscale              : 1;
+            uint8_t render_bg_left         : 1;
+            uint8_t render_sprites_left    : 1;
+            uint8_t render_bg              : 1;
+            uint8_t render_sprites         : 1;
+            uint8_t enhance_r              : 1;
+            uint8_t enhance_g              : 1;
+            uint8_t enhance_b              : 1;
+        };
+
+    } maskRegister;
+
+    union
+    {
+        uint8_t raw;
+
+        struct
+        {
+            uint8_t nametable_x       : 1;
+            uint8_t nametable_y       : 1;
+            uint8_t inc_mode          : 1;
+            uint8_t pattern_sprite    : 1;
+            uint8_t pattern_bg        : 1;
+            uint8_t sprite_size       : 1;
+            uint8_t slave_mode        : 1;
+            uint8_t enable_nmi        : 1;
+        };
+
+    } controlRegister;
     
 protected:
     void setByte(uint16_t addr, uint8_t data) override;
