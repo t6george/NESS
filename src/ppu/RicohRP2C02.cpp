@@ -7,8 +7,8 @@
 #include <HwConstants.hpp>
 #include <GamePak.hpp>
 
-RicohRP2C02::RicohRP2C02() : cycles{0}, addrLatch{0x1}, ppuAddr{0x0000}, 
-      dataBuffer{0x00}, scanline{0}, requestCpuNmi{false}, bus{new Bus{}},
+RicohRP2C02::RicohRP2C02() : cycles{0}, addrLatch{0x1}, dataBuffer{0x00}, 
+      scanline{0}, requestCpuNmi{false}, fine_x{0x00}, bus{new Bus{}},
       colors{0x666666, 0x002A88, 0x1412A7, 0x3B00A4,
              0x5C007E, 0x6E0040, 0x6C0600, 0x561D00,
              0x333500, 0x0B4800, 0x005200, 0x004F08,
@@ -62,13 +62,14 @@ uint8_t RicohRP2C02::getByte(uint16_t addr, bool readOnly)
         break;
     case 0x0007:
         data = dataBuffer;
-        dataBuffer = localRead(ppuAddr);
+        dataBuffer = localRead(vramAddr.raw);
 
-        if(addr >= PPU::PALETTE::Base && addr <= PPU::PALETTE::Limit)
+        if(vramAddr.raw >= PPU::PALETTE::Base && vramAddr.raw <= PPU::PALETTE::Limit)
         {
             data = dataBuffer;
         }
-        ++ppuAddr;
+
+        vramAddr.raw += (controlRegister.inc_mode ? 0x20 : 0x1);
         break;
     default:
         break;
@@ -83,6 +84,8 @@ void RicohRP2C02::setByte(uint16_t addr, uint8_t data)
     {
     case 0x0000:
         controlRegister.raw = data;
+        tramAddr.nametable_x = controlRegister.nametable_x;
+		tramAddr.nametable_y = controlRegister.nametable_y;
         break;
     case 0x0001:
         maskRegister.raw = data;
@@ -96,12 +99,16 @@ void RicohRP2C02::setByte(uint16_t addr, uint8_t data)
     case 0x0005:
         break;
     case 0x0006:
-        ppuAddr = (ppuAddr & ~(static_cast<uint16_t>(0xFF) << (addrLatch * 0x8))) 
+        tramAddr.raw = (tramAddr.raw & ~(static_cast<uint16_t>(0xFF) << (addrLatch * 0x8))) 
             | (static_cast<uint16_t>(data) << (addrLatch * 0x8));
-        addrLatch ^= 0x1;
+
+        if (addrLatch == 0x00)
+            vramAddr = tramAddr;
+        addrLatch ^= 0x01;
         break;
     case 0x0007:
-        localWrite(ppuAddr++, data);
+        localWrite(vramAddr.raw, data);
+        vramAddr.raw += (controlRegister.inc_mode ? 0x20 : 0x1);
         break;
     default:
         break;
@@ -151,7 +158,8 @@ void RicohRP2C02::updateFrameBuffer(const uint8_t tblIndex)
 
 uint32_t RicohRP2C02::getRgb(const uint8_t tblIndex, const uint16_t pixelVal) const
 {
-    return colors[(localRead(PPU::PALETTE::Base + (tblIndex << 0x2) + pixelVal)) & 0x3F];
+    return colors[(localRead(PPU::PALETTE::Base + (tblIndex << 0x2) + pixelVal)) 
+        & maskRegister.grascale ? 0x30 : 0x3F];
 }
 
 const uint32_t *RicohRP2C02::getFrameBuffData() const
@@ -196,4 +204,27 @@ void RicohRP2C02::run()
             // frameDrawn = true;
         }
     }
+}
+
+
+void RicohRP2C02::reset()
+{
+	fineX = 0x00;
+	addrLatch = 0x00;
+	dataBuffer = 0x00;
+	scanline = 0;
+	cycles = 0;
+	bg_next_tile_id = 0x00;
+	bg_next_tile_attrib = 0x00;
+	bg_next_tile_lsb = 0x00;
+	bg_next_tile_msb = 0x00;
+	bg_shifter_pattern_lo = 0x0000;
+	bg_shifter_pattern_hi = 0x0000;
+	bg_shifter_attrib_lo = 0x0000;
+	bg_shifter_attrib_hi = 0x0000;
+	statusRegister.reg = 0x00;
+	maskRegister.reg = 0x00;
+	controlRegister.reg = 0x00;
+	vramAddr.reg = 0x0000;
+	tramAddr.reg = 0x0000;
 }

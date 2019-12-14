@@ -14,10 +14,19 @@ class RicohRP2C02 : public AddressableDevice
 {
     uint16_t cycles;
     uint16_t addrLatch;
-    uint16_t ppuAddr;
     uint8_t dataBuffer;
     int16_t scanline;
     bool requestCpuNmi;
+    uint8_t fine_x;
+
+    uint8_t bg_next_tile_id     = 0x00;
+	uint8_t bg_next_tile_attrib = 0x00;
+	uint8_t bg_next_tile_lsb    = 0x00;
+	uint8_t bg_next_tile_msb    = 0x00;
+	uint16_t bg_shifter_pattern_lo = 0x0000;
+	uint16_t bg_shifter_pattern_hi = 0x0000;
+	uint16_t bg_shifter_attrib_lo  = 0x0000;
+	uint16_t bg_shifter_attrib_hi  = 0x0000;
     // bool frameDrawn;
 
     std::unique_ptr<Bus> bus;
@@ -79,6 +88,25 @@ class RicohRP2C02 : public AddressableDevice
 
     } controlRegister;
     
+    union LoopyRegister
+    {
+        uint16_t raw;
+
+        struct
+        {
+            uint8_t coarse_x       : 5;
+            uint8_t coarse_y       : 5;
+            uint8_t nametable_x    : 1;
+            uint8_t nametable_y    : 1;
+            uint8_t fine_y         : 3;
+            uint8_t scratch        : 1;
+        };
+
+    };
+
+    LoopyRegister vramAddr;
+    LoopyRegister tramAddr;
+
 protected:
     void setByte(uint16_t addr, uint8_t data) override;
     uint8_t getByte(uint16_t addr, bool readOnly) override;
@@ -91,6 +119,7 @@ public:
     void updateFrameBuffer(const uint8_t tblIndex);
     uint32_t getRgb(const uint8_t tblIndex, const uint16_t pixelVal) const;
     const uint32_t *getFrameBuffData() const;
+    void reset();
 
     friend class NesSystem;
 };
