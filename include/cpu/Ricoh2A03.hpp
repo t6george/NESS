@@ -11,6 +11,7 @@
 
 class GamePak;
 class AddressableDevice;
+class NesSystem;
 
 class Ricoh2A03
 {
@@ -84,4 +85,6 @@ public:
 
     uint8_t branch(uint16_t absoluteAddress, bool cond);
     void addCartridge(std::shared_ptr<AddressableDevice> cart);
+
+    friend class NesSystem;
 };

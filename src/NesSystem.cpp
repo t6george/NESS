@@ -6,22 +6,31 @@
 #include <HwConstants.hpp>
 
 NesSystem::NesSystem()
-    : ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu}},
+    : systemClock{0}, ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu}},
       screen{new Display{DISPLAY::Height, DISPLAY::Width, ppu->getFrameBuffData()}} {}
 
 void NesSystem::tick()
 {
     ppu->run();
 
-    if (clock % 3 == 0)
+    if (systemClock % 3 == 0)
+    {
         cpu->fetch();
-    ++clock;
+    }
+
+    if (ppu->requestCpuNmi)
+    {
+        cpu->nmi();
+        ppu->requestCpuNmi = false;
+    }
+
+    ++systemClock;
 }
 
 void NesSystem::reset()
 {
     cpu->reset();
-    clock = 0;
+    systemClock = 0;
 }
 
 void NesSystem::insertCartridge(const std::string &romName)

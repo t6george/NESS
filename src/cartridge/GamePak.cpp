@@ -51,7 +51,7 @@ void GamePak::parseFile(const std::string &fname)
     }
 }
 
-uint8_t GamePak::getByte(uint16_t addr, bool readOnly) const
+uint8_t GamePak::getByte(uint16_t addr, bool readOnly)
 {
     uint8_t data = 0x00;
 

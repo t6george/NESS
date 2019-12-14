@@ -7,7 +7,7 @@ void Ram::setByte(uint16_t addr, uint8_t data)
     contents[addr] = data;
 }
 
-uint8_t Ram::getByte(uint16_t addr, bool readOnly) const
+uint8_t Ram::getByte(uint16_t addr, bool readOnly)
 {
     return contents[addr];
 }

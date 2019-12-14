@@ -5,7 +5,7 @@ class AddressableDevice
 {
 protected:
     virtual void setByte(uint16_t addr, uint8_t data) = 0;
-    virtual uint8_t getByte(uint16_t addr, bool readOnly) const = 0;
+    virtual uint8_t getByte(uint16_t addr, bool readOnly) = 0;
 
     virtual uint16_t mirrorAddress(uint16_t addr, uint16_t mirror);
 

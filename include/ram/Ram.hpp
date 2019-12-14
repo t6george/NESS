@@ -15,7 +15,7 @@ class Ram : public AddressableDevice
 
 protected:
     void setByte(uint16_t addr, uint8_t data) override;
-    uint8_t getByte(uint16_t addr, bool readOnly) const override;
+    uint8_t getByte(uint16_t addr, bool readOnly) override;
 
 public:
     explicit Ram(const uint16_t size);

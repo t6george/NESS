@@ -8,6 +8,7 @@
 
 class Bus;
 class GamePak;
+class NesSystem;
 
 class RicohRP2C02 : public AddressableDevice
 {
@@ -15,6 +16,9 @@ class RicohRP2C02 : public AddressableDevice
     uint16_t addrLatch;
     uint16_t ppuAddr;
     uint8_t dataBuffer;
+    int16_t scanline;
+    bool requestCpuNmi;
+    // bool frameDrawn;
 
     std::unique_ptr<Bus> bus;
     std::shared_ptr<GamePak> cartridge;
@@ -77,7 +81,7 @@ class RicohRP2C02 : public AddressableDevice
     
 protected:
     void setByte(uint16_t addr, uint8_t data) override;
-    uint8_t getByte(uint16_t addr, bool readOnly) const override;
+    uint8_t getByte(uint16_t addr, bool readOnly) override;
 
 public:
     RicohRP2C02();
@@ -87,4 +91,6 @@ public:
     void updateFrameBuffer(const uint8_t tblIndex);
     uint32_t getRgb(const uint8_t tblIndex, const uint16_t pixelVal) const;
     const uint32_t *getFrameBuffData() const;
+
+    friend class NesSystem;
 };

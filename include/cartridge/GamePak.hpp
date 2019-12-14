@@ -48,7 +48,7 @@ private:
     MirrorMode mMode;
 
     void setByte(uint16_t addr, uint8_t data) override;
-    uint8_t getByte(uint16_t addr, bool readOnly) const override;
+    uint8_t getByte(uint16_t addr, bool readOnly) override;
 
     uint16_t mirrorAddress(uint16_t addr, uint16_t mirror) override;
     void parseFile(const std::string &fname);
