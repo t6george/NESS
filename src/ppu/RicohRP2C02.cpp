@@ -179,18 +179,69 @@ void RicohRP2C02::localWrite(uint16_t addr, uint8_t data)
 
 void RicohRP2C02::run()
 {
-    if (scanline == -1 && cycles == 1)
-    {
-        statusRegister.vertical_blank = 0x0;
-    }
-	else if (scanline == 241 && cycles == 1)
+    auto IncrementScrollX = [&]()
 	{
-		statusRegister.vertical_blank = 0x1;
+		if (maskRegister.render_bg || maskRegister.render_sprites)
+		{
+			if (vram_addr.coarse_x == 31)
+			{
+				vramAddr.coarse_x = 0;
+				vramAddr.nametable_x = ~vramAddr.nametable_x;
+			}
+			else
+			{
+				++vramAddr.coarse_x;
+			}
+		}
+	};
 
-		if (controlRegister.enable_nmi) 
-			requestCpuNmi = true;
-	}
 
+    auto IncrementScrollY = [&]()
+	{
+		if (maskRegister.render_bg || maskRegister.render_sprites)
+		{
+			if (vramAddr.fine_y < 7)
+			{
+				++vramAddr.fine_y;
+			}
+			else
+			{
+				vramAddr.fine_y = 0;
+
+				if (vramAddr.coarse_y == 29)
+				{
+					vramAddr.coarse_y = 0;
+					vramAddr.nametable_y = ~vramAddr.nametable_y;
+				}
+				else
+				{
+					++vramAddr.coarse_y;
+				}
+			}
+		}
+	};
+
+
+    auto TransferAddressX = [&]()
+	{
+		if (maskRegister.render_bg || maskRegister.render_sprites)
+		{
+			vramAddr.nametable_x = tramAddr.nametable_x;
+			vramAddr.coarse_x    = tramAddr.coarse_x;
+		}
+	};
+
+
+	auto TransferAddressY = [&]()
+	{
+		if (maskRegister.render_background || maskRegister.render_sprites)
+		{
+			vramAddr.fine_y      = tramAddr.fine_y;
+			vramAddr.nametable_y = tramAddr.nametable_y;
+			vramAddr.coarse_y    = tramAddr.coarse_y;
+		}
+	};
+    
     ++cycles;
 
     if (cycles >= 341)
