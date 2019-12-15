@@ -104,8 +104,8 @@ void RicohRP2C02::setByte(uint16_t addr, uint8_t data)
 		}
 		else
 		{
-			tram_addr.fine_y = data & 0x07;
-			tram_addr.coarse_y = data >> 3;
+			tramAddr.fine_y = data & 0x07;
+			tramAddr.coarse_y = data >> 3;
 		}
         addrLatch ^= 0x1;
 		break;
@@ -170,7 +170,7 @@ void RicohRP2C02::updateFrameBuffer(const uint8_t tblIndex)
 uint32_t RicohRP2C02::getRgb(const uint8_t tblIndex, const uint16_t pixelVal) const
 {
     return colors[(localRead(PPU::PALETTE::Base + (tblIndex << 0x2) + pixelVal)) 
-        & maskRegister.grascale ? 0x30 : 0x3F];
+        & maskRegister.grayscale ? 0x30 : 0x3F];
 }
 
 const uint32_t *RicohRP2C02::getFrameBuffData() const
@@ -194,7 +194,7 @@ void RicohRP2C02::run()
 	{
 		if (maskRegister.render_bg || maskRegister.render_sprites)
 		{
-			if (vram_addr.coarse_x == 31)
+			if (vramAddr.coarse_x == 31)
 			{
 				vramAddr.coarse_x = 0;
 				vramAddr.nametable_x = ~vramAddr.nametable_x;
@@ -245,7 +245,7 @@ void RicohRP2C02::run()
 
 	auto TransferAddressY = [&]()
 	{
-		if (maskRegister.render_background || maskRegister.render_sprites)
+		if (maskRegister.render_bg || maskRegister.render_sprites)
 		{
 			vramAddr.fine_y      = tramAddr.fine_y;
 			vramAddr.nametable_y = tramAddr.nametable_y;
@@ -296,10 +296,10 @@ void RicohRP2C02::run()
 			case 0:
 				LoadBackgroundShifters();
 
-				bg_next_tile_id = ppuRead(0x2000 | (vramAddr.reg & 0x0FFF));
+				bg_next_tile_id = localRead(0x2000 | (vramAddr.raw & 0x0FFF));
 				break;
 			case 2:
-				bg_next_tile_attrib = ppuRead(0x23C0 | (vramAddr.nametable_y << 11) 
+				bg_next_tile_attrib = localRead(0x23C0 | (vramAddr.nametable_y << 11) 
 					                                 | (vramAddr.nametable_x << 10) 
 					                                 | ((vramAddr.coarse_y >> 2) << 3) 
 					                                 | (vramAddr.coarse_x >> 2));
@@ -310,7 +310,7 @@ void RicohRP2C02::run()
 				break;
 
 			case 4: 
-				bg_next_tile_lsb = localRead((controlRegister.pattern_background << 12) 
+				bg_next_tile_lsb = localRead((controlRegister.pattern_bg << 12) 
 					                       + ((uint16_t)bg_next_tile_id << 4) 
 					                       + (vramAddr.fine_y) + 0);
 
@@ -325,7 +325,40 @@ void RicohRP2C02::run()
 				break;
 			}
 		}
-    }
+
+		if (cycle == 256)
+		{
+			IncrementScrollY();
+		}
+
+		if (cycle == 257)
+		{
+			LoadBackgroundShifters();
+			TransferAddressX();
+		}
+
+		if (cycle == 338 || cycle == 340)
+		{
+			bg_next_tile_id = localRead(0x2000 | (vramAddr.raw & 0x0FFF));
+		}
+
+		if (scanline == -1 && cycle >= 280 && cycle < 305)
+		{
+			TransferAddressY();
+		}
+	}
+
+	if (scanline >= 241 && scanline < 261)
+	{
+		if (scanline == 241 && cycle == 1)
+		{
+			statusRegister.vertical_blank = 1;
+
+			if (controlRegister.enable_nmi) 
+				requestCpuNmi = true;
+		}
+	}
+
     ++cycle;
 
     if (cycle >= 341)
@@ -344,7 +377,7 @@ void RicohRP2C02::run()
 
 void RicohRP2C02::reset()
 {
-	fineX = 0x00;
+	fine_x = 0x00;
 	addrLatch = 0x00;
 	dataBuffer = 0x00;
 	scanline = 0;
@@ -357,9 +390,9 @@ void RicohRP2C02::reset()
 	bg_shifter_pattern_hi = 0x0000;
 	bg_shifter_attrib_lo = 0x0000;
 	bg_shifter_attrib_hi = 0x0000;
-	statusRegister.reg = 0x00;
-	maskRegister.reg = 0x00;
-	controlRegister.reg = 0x00;
-	vramAddr.reg = 0x0000;
-	tramAddr.reg = 0x0000;
+	statusRegister.raw = 0x00;
+	maskRegister.raw = 0x00;
+	controlRegister.raw = 0x00;
+	vramAddr.raw = 0x0000;
+	tramAddr.raw = 0x0000;
 }
