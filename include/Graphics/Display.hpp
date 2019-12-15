@@ -8,10 +8,6 @@
 
 class Display
 {
-    bool frameDrawn;
-    uint16_t scanline;
-    uint16_t cycle;
-
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Texture *texture;

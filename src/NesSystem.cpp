@@ -14,21 +14,21 @@ NesSystem::NesSystem()
 
 void NesSystem::tick()
 {
-    ppu->run();
+    // ppu->run();
 
-    if (systemClock % 3 == 0)
-    {
-        cpu->fetch();
-    }
+    // if (systemClock % 3 == 0)
+    // {
+    //     cpu->fetch();
+    // }
 
-    if (ppu->requestCpuNmi)
-    {
-        cpu->nmi();
-        ppu->requestCpuNmi = false;
-    }
+    // if (ppu->requestCpuNmi)
+    // {
+    //     cpu->nmi();
+    //     ppu->requestCpuNmi = false;
+    // }
 
-    ++systemClock;
-    
+    // ++systemClock;
+
     screen->blit();
 }
 

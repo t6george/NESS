@@ -1,8 +1,7 @@
 #include <Display.hpp>
-
+#include <iostream>
 Display::Display(const uint16_t width, const uint16_t height, const uint32_t *fb)
-    : frameDrawn{false}, scanline{0}, cycle{0},
-      window{SDL_CreateWindow(
+    : window{SDL_CreateWindow(
           "NES", SDL_WINDOWPOS_UNDEFINED,
           SDL_WINDOWPOS_UNDEFINED,
           width * DISPLAY::PixelDim,
@@ -18,12 +17,7 @@ Display::Display(const uint16_t width, const uint16_t height, const uint32_t *fb
           width,
           height)},
       canvas{.x = 0, .y = 0, .w = width * DISPLAY::PixelDim, .h = height * DISPLAY::PixelDim},
-      frameBuffer{fb}
-{
-    (void)frameDrawn;
-    (void)scanline;
-    (void)cycle;
-}
+      frameBuffer{fb} {}
 
 Display::~Display() noexcept
 {
@@ -35,6 +29,7 @@ Display::~Display() noexcept
 
 void Display::blit()
 {
+    // std::cerr << "moss\n";
     SDL_UpdateTexture(texture, nullptr, frameBuffer, DISPLAY::Width * sizeof(uint32_t));
 
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);

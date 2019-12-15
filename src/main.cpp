@@ -1,5 +1,6 @@
 #include <memory>
 #include <cstdint>
+#include <string>
 
 // #include <Ricoh2A03.hpp>
 // #include <RicohRP2C02.hpp>
@@ -12,6 +13,8 @@ int main(int argc, char *argv[])
     bool quit = false;
     SDL_Event e;
     std::unique_ptr<NesSystem> nes;
+
+    // nes->insertCartridge("nestest.nes");
 
     SDL_Init(SDL_INIT_VIDEO);
     while (!quit)
