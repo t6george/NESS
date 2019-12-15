@@ -97,7 +97,18 @@ void RicohRP2C02::setByte(uint16_t addr, uint8_t data)
     case 0x0004:
         break;
     case 0x0005:
-        break;
+    	if (addrLatch == 0x1)
+		{
+			fine_x = data & 0x07;
+			tramAddr.coarse_x = data >> 0x3;
+		}
+		else
+		{
+			tram_addr.fine_y = data & 0x07;
+			tram_addr.coarse_y = data >> 3;
+		}
+        addrLatch ^= 0x1;
+		break;
     case 0x0006:
         tramAddr.raw = (tramAddr.raw & ~(static_cast<uint16_t>(0xFF) << (addrLatch * 0x8))) 
             | (static_cast<uint16_t>(data) << (addrLatch * 0x8));
@@ -241,7 +252,28 @@ void RicohRP2C02::run()
 			vramAddr.coarse_y    = tramAddr.coarse_y;
 		}
 	};
-    
+
+    auto LoadBackgroundShifters = [&]()
+	{	
+		bg_shifter_pattern_lo = (bg_shifter_pattern_lo & 0xFF00) | bg_next_tile_lsb;
+		bg_shifter_pattern_hi = (bg_shifter_pattern_hi & 0xFF00) | bg_next_tile_msb;
+
+		bg_shifter_attrib_lo  = (bg_shifter_attrib_lo & 0xFF00) | ((bg_next_tile_attrib & 0b01) ? 0xFF : 0x00);
+		bg_shifter_attrib_hi  = (bg_shifter_attrib_hi & 0xFF00) | ((bg_next_tile_attrib & 0b10) ? 0xFF : 0x00);
+	};
+
+    auto UpdateShifters = [&]()
+	{
+		if (maskRegister.render_bg)
+		{
+			bg_shifter_pattern_lo <<= 1;
+			bg_shifter_pattern_hi <<= 1;
+
+			bg_shifter_attrib_lo <<= 1;
+			bg_shifter_attrib_hi <<= 1;
+		}
+	};
+
     ++cycles;
 
     if (cycles >= 341)
