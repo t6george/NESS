@@ -7,7 +7,10 @@
 
 NesSystem::NesSystem()
     : systemClock{0}, ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu}},
-      screen{new Display{DISPLAY::Height, DISPLAY::Width, ppu->getFrameBuffData()}} {}
+      screen{new Display{DISPLAY::Height, DISPLAY::Width, ppu->getFrameBuffData()}} 
+{
+    
+}
 
 void NesSystem::tick()
 {
@@ -25,11 +28,14 @@ void NesSystem::tick()
     }
 
     ++systemClock;
+    
+    screen->blit();
 }
 
 void NesSystem::reset()
 {
     cpu->reset();
+    ppu->reset();
     systemClock = 0;
 }
 

@@ -2,10 +2,10 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <Display.hpp>
+#include <Ricoh2A03.hpp>
 
-class Ricoh2A03;
 class RicohRP2C02;
-class Display;
 
 class NesSystem
 {

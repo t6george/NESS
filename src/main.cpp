@@ -1,15 +1,30 @@
 #include <memory>
 #include <cstdint>
 
-#include <Ricoh2A03.hpp>
-#include <RicohRP2C02.hpp>
-#include <Display.hpp>
+// #include <Ricoh2A03.hpp>
+// #include <RicohRP2C02.hpp>
+// #include <Display.hpp>
+#include <SDL2/SDL.h>
+#include <NesSystem.hpp>
 
 int main(int argc, char *argv[])
 {
+    bool quit = false;
+    SDL_Event e;
+    std::unique_ptr<NesSystem> nes;
+
     SDL_Init(SDL_INIT_VIDEO);
-    Display d(256, 240, nullptr);
-    d.blit();
+    while (!quit)
+    {
+        while (SDL_PollEvent(&e))
+        {
+            if (e.type == SDL_QUIT)
+            {
+                quit = true;
+            }
+            nes->tick();
+        }
+    }
 
     return 0;
 }

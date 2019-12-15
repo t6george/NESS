@@ -359,6 +359,26 @@ void RicohRP2C02::run()
 		}
 	}
 
+	uint8_t bg_pixel = 0x00;
+	uint8_t bg_palette = 0x00;
+
+	if (maskRegister.render_bg)
+	{
+		uint16_t bit_mux = 0x8000 >> fine_x;
+
+		uint8_t p0_pixel = (bg_shifter_pattern_lo & bit_mux) > 0;
+		uint8_t p1_pixel = (bg_shifter_pattern_hi & bit_mux) > 0;
+
+		bg_pixel = (p1_pixel << 1) | p0_pixel;
+
+		uint8_t bg_pal0 = (bg_shifter_attrib_lo & bit_mux) > 0;
+		uint8_t bg_pal1 = (bg_shifter_attrib_hi & bit_mux) > 0;
+		bg_palette = (bg_pal1 << 1) | bg_pal0;
+	}
+
+
+    frameBuffer[scanline * 256 + cycle - 1] = getRgb(bg_palette, bg_pixel);
+
     ++cycle;
 
     if (cycle >= 341)
@@ -378,7 +398,7 @@ void RicohRP2C02::run()
 void RicohRP2C02::reset()
 {
 	fine_x = 0x00;
-	addrLatch = 0x00;
+	addrLatch = 0x01;
 	dataBuffer = 0x00;
 	scanline = 0;
 	cycle = 0;

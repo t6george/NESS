@@ -42,17 +42,4 @@ void Display::blit()
 
     SDL_RenderCopy(renderer, texture, nullptr, &canvas);
     SDL_RenderPresent(renderer);
-
-    bool quit = false;
-    SDL_Event e;
-    while (!quit)
-    {
-        while (SDL_PollEvent(&e))
-        {
-            if (e.type == SDL_QUIT)
-            {
-                quit = true;
-            }
-        }
-    }
 }
