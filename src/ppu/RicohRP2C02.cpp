@@ -7,7 +7,7 @@
 #include <HwConstants.hpp>
 #include <GamePak.hpp>
 
-RicohRP2C02::RicohRP2C02() : cycles{0}, addrLatch{0x1}, dataBuffer{0x00}, 
+RicohRP2C02::RicohRP2C02() : cycle{0}, addrLatch{0x1}, dataBuffer{0x00}, 
       scanline{0}, requestCpuNmi{false}, fine_x{0x00}, bus{new Bus{}},
       colors{0x666666, 0x002A88, 0x1412A7, 0x3B00A4,
              0x5C007E, 0x6E0040, 0x6C0600, 0x561D00,
@@ -274,11 +274,63 @@ void RicohRP2C02::run()
 		}
 	};
 
-    ++cycles;
+    if (scanline >= -1 && scanline < 240)
+	{		
+		if (scanline == 0 && cycle == 0)
+		{
+			cycle = 1;
+		}
 
-    if (cycles >= 341)
+		if (scanline == -1 && cycle == 1)
+		{
+			statusRegister.vertical_blank = 0;
+		}
+
+
+		if ((cycle >= 2 && cycle < 258) || (cycle >= 321 && cycle < 338))
+		{
+			UpdateShifters();
+			
+			switch ((cycle - 1) % 8)
+			{
+			case 0:
+				LoadBackgroundShifters();
+
+				bg_next_tile_id = ppuRead(0x2000 | (vramAddr.reg & 0x0FFF));
+				break;
+			case 2:
+				bg_next_tile_attrib = ppuRead(0x23C0 | (vramAddr.nametable_y << 11) 
+					                                 | (vramAddr.nametable_x << 10) 
+					                                 | ((vramAddr.coarse_y >> 2) << 3) 
+					                                 | (vramAddr.coarse_x >> 2));
+								
+				if (vramAddr.coarse_y & 0x02) bg_next_tile_attrib >>= 4;
+				if (vramAddr.coarse_x & 0x02) bg_next_tile_attrib >>= 2;
+				bg_next_tile_attrib &= 0x03;
+				break;
+
+			case 4: 
+				bg_next_tile_lsb = localRead((controlRegister.pattern_background << 12) 
+					                       + ((uint16_t)bg_next_tile_id << 4) 
+					                       + (vramAddr.fine_y) + 0);
+
+				break;
+			case 6:
+				bg_next_tile_msb = localRead((controlRegister.pattern_bg << 12)
+					                       + ((uint16_t)bg_next_tile_id << 4)
+					                       + (vramAddr.fine_y) + 8);
+				break;
+			case 7:
+				IncrementScrollX();
+				break;
+			}
+		}
+    }
+    ++cycle;
+
+    if (cycle >= 341)
     {
-        cycles = 0;
+        cycle = 0;
         ++scanline;
 
         if (scanline >= 261)
@@ -296,7 +348,7 @@ void RicohRP2C02::reset()
 	addrLatch = 0x00;
 	dataBuffer = 0x00;
 	scanline = 0;
-	cycles = 0;
+	cycle = 0;
 	bg_next_tile_id = 0x00;
 	bg_next_tile_attrib = 0x00;
 	bg_next_tile_lsb = 0x00;

@@ -12,7 +12,7 @@ class NesSystem;
 
 class RicohRP2C02 : public AddressableDevice
 {
-    uint16_t cycles;
+    uint16_t cycle;
     uint16_t addrLatch;
     uint8_t dataBuffer;
     int16_t scanline;
