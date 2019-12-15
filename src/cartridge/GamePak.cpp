@@ -32,8 +32,8 @@ void GamePak::parseFile(const std::string &fname)
             prg.resize(CARTRIDGE::PrgBankSize * header.prgBanks);
             chr.resize(CARTRIDGE::ChrBankSize * header.chrBanks);
 
-            in.read((char *)&prg, prg.size());
-            in.read((char *)&chr, chr.size());
+            in.read((char *)prg.data(), prg.size());
+            in.read((char *)chr.data(), chr.size());
         }
 
         switch (mapperNum)
@@ -48,6 +48,10 @@ void GamePak::parseFile(const std::string &fname)
         }
 
         in.close();
+    }
+    else
+    {
+        assert(false);
     }
 }
 

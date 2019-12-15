@@ -28,6 +28,6 @@ int main(int argc, char *argv[])
 
         nes->tick();
     }
-    
+
     return 0;
 }
