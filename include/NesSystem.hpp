@@ -11,7 +11,7 @@ class NesSystem
 {
     uint32_t systemClock;
     std::shared_ptr<RicohRP2C02> ppu;
-    std::unique_ptr<Ricoh2A03> cpu;
+    std::shared_ptr<Ricoh2A03> cpu;
     std::unique_ptr<Display> screen;
 
 public:
@@ -21,5 +21,4 @@ public:
     void tick();
     void reset();
     void insertCartridge(const std::string &romName);
-    void updateDisplay();
 };

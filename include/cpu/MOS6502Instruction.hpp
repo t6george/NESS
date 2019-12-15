@@ -19,7 +19,7 @@ class Ricoh2A03;
 class MOS6502Instruction
 {
 protected:
-    std::shared_ptr<Ricoh2A03> cpu;
+    Ricoh2A03* cpu;
 
     /* 
      * The additional data the instruction would read
@@ -42,7 +42,8 @@ protected:
     */
     uint8_t numCycles;
 
-    MOS6502Instruction(Ricoh2A03 *cpu, uint8_t numCycles);
+    MOS6502Instruction(Ricoh2A03 *cpu, uint8_t numCycles)
+     : cpu{cpu}, auxData{0x0000}, numCycles{numCycles} {}
 
     // Fetches any data from RAM that the instruction will execute on
     virtual uint8_t fetchAuxData() = 0;

@@ -10,13 +10,12 @@
 
 int main(int argc, char *argv[])
 {
+    std::unique_ptr<NesSystem> nes(new NesSystem());
+
+    nes->insertCartridge("nestest.nes");
+    
     bool quit = false;
     SDL_Event e;
-    std::unique_ptr<NesSystem> nes;
-
-    // nes->insertCartridge("nestest.nes");
-
-    SDL_Init(SDL_INIT_VIDEO);
     while (!quit)
     {
         while (SDL_PollEvent(&e))
@@ -25,9 +24,10 @@ int main(int argc, char *argv[])
             {
                 quit = true;
             }
-            nes->tick();
         }
-    }
 
+        nes->tick();
+    }
+    
     return 0;
 }

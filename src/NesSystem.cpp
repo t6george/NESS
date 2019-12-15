@@ -7,10 +7,7 @@
 
 NesSystem::NesSystem()
     : systemClock{0}, ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu}},
-      screen{new Display{DISPLAY::Height, DISPLAY::Width, ppu->getFrameBuffData()}} 
-{
-    
-}
+      screen{new Display{DISPLAY::Width, DISPLAY::Height, ppu->getFrameBuffData()}} {}
 
 void NesSystem::tick()
 {
@@ -44,8 +41,4 @@ void NesSystem::insertCartridge(const std::string &romName)
     std::shared_ptr<AddressableDevice> cart(new GamePak(romName));
     cpu->addCartridge(cart);
     ppu->addCartridge(cart);
-}
-
-void NesSystem::updateDisplay()
-{
 }

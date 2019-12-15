@@ -8,6 +8,7 @@
 
 class Display
 {
+public:
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Texture *texture;
@@ -16,7 +17,6 @@ class Display
 
     const uint32_t *frameBuffer;
 
-public:
     Display(const uint16_t width, const uint16_t height, const uint32_t *fb);
     ~Display() noexcept;
     void blit();

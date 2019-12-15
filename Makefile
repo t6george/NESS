@@ -6,7 +6,7 @@ OBJECTS := $(addsuffix .o,$(basename $(SOURCES)))
 INCLUDES := $(shell find include -type d | sed s/^/-I/)
 
 CPPC := g++
-CPPFLAGS := -std=c++17 -Wall -Werror $(INCLUDES)
+CPPFLAGS := -std=c++17 -g -Wall -Werror $(INCLUDES)
 
 nes: $(OBJECTS)
 	$(CPPC) -o $@ $^ -L lib -l SDL2-2.0.0 -lstdc++ $(CPPFLAGS)
