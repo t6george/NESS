@@ -169,8 +169,9 @@ void RicohRP2C02::updateFrameBuffer(const uint8_t tblIndex)
 
 uint32_t RicohRP2C02::getRgb(const uint8_t tblIndex, const uint16_t pixelVal) const
 {
-    return colors[(localRead(PPU::PALETTE::Base + (tblIndex << 0x2) + pixelVal)) 
-        & maskRegister.grayscale ? 0x30 : 0x3F];
+    int i = (localRead(PPU::PALETTE::Base + (tblIndex << 0x2) + pixelVal)) 
+        & maskRegister.grayscale ? 0x30 : 0x3F;
+    return colors[i] | DISPLAY::PixelOpacity;
 }
 
 const uint32_t *RicohRP2C02::getFrameBuffData() const
@@ -376,8 +377,8 @@ void RicohRP2C02::run()
 		bg_palette = (bg_pal1 << 1) | bg_pal0;
 	}
 
-
-    frameBuffer[scanline * 256 + cycle - 1] = getRgb(bg_palette, bg_pixel);
+    if (scanline >= 0 && scanline < 240 && cycle <= 256)
+        frameBuffer[scanline * 256 + cycle - 1] = getRgb(bg_palette, bg_pixel);
 
     ++cycle;
 

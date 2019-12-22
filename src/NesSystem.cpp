@@ -24,9 +24,14 @@ void NesSystem::tick()
         ppu->requestCpuNmi = false;
     }
 
+    if (systemClock % (256 * 240) == 0)
+    {
+        screen->blit();
+    }
+
     ++systemClock;
 
-    screen->blit();
+    
 }
 
 void NesSystem::reset()

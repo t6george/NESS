@@ -6,8 +6,8 @@ template <Ricoh2A03::AddressingType T>
 class AddressingMode : public MOS6502Instruction
 {
 protected:
-    AddressingMode(Ricoh2A03 *cpu, uint8_t numCycles)
-     : MOS6502Instruction(cpu, numCycles){};
+    AddressingMode(std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+     : MOS6502Instruction(mnemonic, cpu, numCycles){};
 
     uint8_t fetchAuxData() override final;
 

@@ -17,18 +17,18 @@ void GamePak::parseFile(const std::string &fname)
     if (in.is_open())
     {
         in.read((char *)&header, sizeof(GameHeader));
-        in.seekg(5, std::ios_base::cur);
 
         if (header.mapper1 & 0x04)
             in.seekg(0x200, std::ios_base::cur);
 
-        uint8_t mapperNum = (header.mapper2 & 0xFFF0) | (header.mapper2 >> 0x4);
+        uint8_t mapperNum = (header.mapper2 & 0xFFF0) | (header.mapper1 >> 0x4);
         mMode = (header.mapper1 & 0x01) ? VERTICAL : HORIZONTAL;
 
         uint8_t ftype = 1;
 
         if (ftype == 1)
         {
+            header.chrBanks = header.chrBanks == 0 ? 0x1: header.chrBanks;
             prg.resize(CARTRIDGE::PrgBankSize * header.prgBanks);
             chr.resize(CARTRIDGE::ChrBankSize * header.chrBanks);
 
