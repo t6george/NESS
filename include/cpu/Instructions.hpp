@@ -26,6 +26,7 @@ public:
         this->cpu->PC = this->cpu->readDoubleWord(0xFFFE);
         this->cpu->setFlag(Ricoh2A03::B, false);
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -44,6 +45,8 @@ public:
         this->cpu->setFlag(Ricoh2A03::B, false);
 
         this->cpu->PC = this->cpu->popDoubleWord();
+
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -61,6 +64,8 @@ public:
         this->fetchAuxData();
         this->cpu->pushDoubleWord(this->cpu->PC - 1);
         this->cpu->PC = this->absoluteAddress;
+
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -76,6 +81,8 @@ public:
     {
         this->cpu->PC = this->cpu->popDoubleWord();
         ++this->cpu->PC;
+
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -93,6 +100,7 @@ public:
         this->cpu->A = this->cpu->popWord();
         SET_ZN(this->cpu->A)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -107,6 +115,8 @@ public:
     uint8_t exec() override final
     {
         this->cpu->pushWord(this->cpu->A);
+
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -122,7 +132,8 @@ public:
     {
         this->cpu->S = this->cpu->popWord();
         this->cpu->setFlag(Ricoh2A03::U, true);
-
+        
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -144,6 +155,7 @@ public:
         this->cpu->setFlag(Ricoh2A03::U, false);
         this->cpu->setFlag(Ricoh2A03::B, false);
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -162,6 +174,7 @@ public:
         this->cpu->A = this->auxData;
         SET_ZN(this->cpu->A)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -179,6 +192,7 @@ public:
         this->cpu->X = this->auxData;
         SET_ZN(this->cpu->X)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -196,6 +210,7 @@ public:
         this->cpu->Y = this->auxData;
         SET_ZN(this->cpu->Y)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -213,6 +228,8 @@ public:
         this->fetchAuxData();
         this->auxData = this->cpu->A;
         this->writeBack();
+
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -229,6 +246,8 @@ public:
         this->fetchAuxData();
         this->auxData = this->cpu->X;
         this->writeBack();
+
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -245,6 +264,8 @@ public:
         this->fetchAuxData();
         this->auxData = this->cpu->Y;
         this->writeBack();
+
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -262,6 +283,7 @@ public:
         this->cpu->X = this->cpu->A;
         SET_ZN(this->cpu->X)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -278,6 +300,7 @@ public:
         this->cpu->A = this->cpu->X;
         SET_ZN(this->cpu->A)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -294,6 +317,7 @@ public:
         this->cpu->X = this->cpu->SP;
         SET_ZN(this->cpu->X)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -308,6 +332,8 @@ public:
     uint8_t exec() override final
     {
         this->cpu->SP = this->cpu->X;
+
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -324,6 +350,7 @@ public:
         this->cpu->Y = this->cpu->A;
         SET_ZN(this->cpu->Y)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -340,6 +367,7 @@ public:
         this->cpu->A = this->cpu->Y;
         SET_ZN(this->cpu->A)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -357,7 +385,8 @@ public:
         this->fetchAuxData();
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              this->cpu->getFlag(Ricoh2A03::Z));
-
+        
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -375,6 +404,7 @@ public:
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              !this->cpu->getFlag(Ricoh2A03::Z));
 
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -392,6 +422,7 @@ public:
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              this->cpu->getFlag(Ricoh2A03::C));
 
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -409,6 +440,7 @@ public:
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              !this->cpu->getFlag(Ricoh2A03::C));
 
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -426,6 +458,7 @@ public:
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              this->cpu->getFlag(Ricoh2A03::V));
 
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -443,6 +476,7 @@ public:
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              !this->cpu->getFlag(Ricoh2A03::V));
 
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -460,6 +494,7 @@ public:
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              this->cpu->getFlag(Ricoh2A03::N));
 
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -477,6 +512,7 @@ public:
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              !this->cpu->getFlag(Ricoh2A03::N));
 
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -497,6 +533,7 @@ public:
         this->writeBack();
         SET_ZN(this->auxData)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -516,6 +553,7 @@ public:
         this->writeBack();
         SET_ZN(this->auxData)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -532,6 +570,7 @@ public:
         ++this->cpu->X;
         SET_ZN(this->cpu->X)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -548,6 +587,7 @@ public:
         --this->cpu->X;
         SET_ZN(this->cpu->X)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -564,6 +604,7 @@ public:
         ++this->cpu->Y;
         SET_ZN(this->cpu->Y)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -580,6 +621,7 @@ public:
         --this->cpu->Y;
         SET_ZN(this->cpu->Y)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -600,6 +642,7 @@ public:
         SET_ZN(result)
         this->cpu->setFlag(Ricoh2A03::C, this->cpu->A >= this->auxData);
 
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -619,6 +662,7 @@ public:
         SET_ZN(result)
         this->cpu->setFlag(Ricoh2A03::C, this->cpu->X >= this->auxData);
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -638,6 +682,7 @@ public:
         SET_ZN(result)
         this->cpu->setFlag(Ricoh2A03::C, this->cpu->Y >= this->auxData);
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -659,6 +704,7 @@ public:
         this->auxData &= this->cpu->A;
         this->cpu->setFlag(Ricoh2A03::Z, this->auxData == 0x00);
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -674,6 +720,8 @@ public:
     uint8_t exec() override final
     {
         this->cpu->setFlag(Ricoh2A03::C, true);
+
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -688,6 +736,8 @@ public:
     uint8_t exec() override final
     {
         this->cpu->setFlag(Ricoh2A03::C, false);
+
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -702,6 +752,8 @@ public:
     uint8_t exec() override final
     {
         this->cpu->setFlag(Ricoh2A03::D, true);
+
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -716,6 +768,8 @@ public:
     uint8_t exec() override final
     {
         this->cpu->setFlag(Ricoh2A03::D, false);
+
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -730,6 +784,8 @@ public:
     uint8_t exec() override final
     {
         this->cpu->setFlag(Ricoh2A03::I, true);
+
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -744,6 +800,8 @@ public:
     uint8_t exec() override final
     {
         this->cpu->setFlag(Ricoh2A03::I, false);
+
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -758,6 +816,8 @@ public:
     uint8_t exec() override final
     {
         this->cpu->setFlag(Ricoh2A03::V, false);
+
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -776,6 +836,7 @@ public:
         this->cpu->A &= this->auxData;
         SET_ZN(this->cpu->A)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -793,6 +854,7 @@ public:
         this->cpu->A |= this->auxData;
         SET_ZN(this->cpu->A)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -810,6 +872,7 @@ public:
         this->cpu->A ^= this->auxData;
         SET_ZN(this->cpu->A)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -831,6 +894,7 @@ public:
         this->writeBack();
         SET_ZN(this->auxData)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -851,6 +915,7 @@ public:
         this->writeBack();
         SET_ZN(this->auxData)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -872,6 +937,7 @@ public:
         this->writeBack();
         SET_ZN(this->auxData)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -893,6 +959,7 @@ public:
         this->writeBack();
         SET_ZN(this->auxData)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -920,6 +987,7 @@ public:
         this->cpu->A = overflowCheck & 0xFF;
         SET_ZN(this->cpu->A)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -948,6 +1016,7 @@ public:
         this->cpu->A = overflowCheck & 0xFF;
         SET_ZN(this->cpu->A)
 
+        AddressingMode<T>::disassemble();
         return this->numCycles + cyclePenalty;
     }
 };
@@ -964,6 +1033,8 @@ public:
     {
         this->fetchAuxData();
         this->cpu->PC = this->absoluteAddress;
+
+        AddressingMode<T>::disassemble();
         return this->numCycles;
     }
 };
@@ -977,6 +1048,8 @@ public:
 
     uint8_t exec() override final
     {
+        AddressingMode<T>::disassemble();
+        
         return this->numCycles;
     }
 };

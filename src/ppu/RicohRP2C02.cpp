@@ -160,7 +160,7 @@ void RicohRP2C02::updateFrameBuffer(const uint8_t tblIndex)
                 pixel = ((lsBits & 0x80) >> 0x7) | ((msBits & 0x80) >> 0x6);
                 lsBits <<= 0x1;
                 msBits <<= 0x1;
-                frameBuffer[offset + row * DISPLAY::Width + col] |= 
+                frameBuffer[offset + row * DISPLAY::Width + col] = 
                     getRgb(tblIndex, pixel);
             }
         }

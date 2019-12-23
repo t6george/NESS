@@ -73,15 +73,17 @@ void Ricoh2A03::fetch()
     --cycles;
 }
 
+#include <SDL2/SDL.h>
+
 void Ricoh2A03::reset()
 {
-    A = X = Y = 0;
+    A = X = Y = 0x00;
     SP = 0xFD;
     S = U;
 
     PC = readDoubleWord(0xFFFC);
 
-    cycles = 8;
+    cycles = 0x8;
 }
 
 void Ricoh2A03::nmi(uint16_t interruptAddr)

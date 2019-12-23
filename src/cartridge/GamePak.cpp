@@ -3,6 +3,7 @@
 
 #include <GamePak.hpp>
 #include <Mapper000.hpp>
+#include <SDL2/SDL.h>
 
 GamePak::GamePak(const std::string &fname) : mem{PRG} 
 {
@@ -34,6 +35,18 @@ void GamePak::parseFile(const std::string &fname)
 
             in.read((char *)prg.data(), prg.size());
             in.read((char *)chr.data(), chr.size());
+
+            // SDL_Log("PRG Dump\n");
+            // for (int i = 0; i < prg.size(); ++i)
+            // {
+            //     SDL_Log("prg %X: %X ", i, prg[i]);
+            // }
+
+            // SDL_Log("\n\nCHR Dump\n");
+            // for (int i = 0; i < chr.size(); ++i)
+            // {
+            //     SDL_Log("chr %X: %X ", i, chr[i]);
+            // }
         }
 
         switch (mapperNum)

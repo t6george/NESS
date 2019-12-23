@@ -11,9 +11,8 @@
 
 class Ram : public AddressableDevice
 {
-    std::vector<uint8_t> contents;
-
 protected:
+    std::vector<uint8_t> contents;
     void setByte(uint16_t addr, uint8_t data) override;
     uint8_t getByte(uint16_t addr, bool readOnly) override;
 

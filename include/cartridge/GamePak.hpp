@@ -36,7 +36,7 @@ private:
         uint8_t prgRamSize;
         uint8_t tv1;
         uint8_t tv2;
-        uint8_t unused[4];
+        uint8_t unused[5];
     } GameHeader;
 
     std::unique_ptr<Mapper> mapper;

@@ -19,8 +19,14 @@ class Ricoh2A03;
 class MOS6502Instruction
 {
 protected:
-    std::string mnemonic;
+    /*
+     * Instruction mnemonic used for debugging and disassembly
+    */
+    const std::string mnemonic;
 
+    /*
+     * MOS6502 reference used to change cpu state
+    */
     Ricoh2A03* cpu;
 
     /* 
@@ -44,7 +50,7 @@ protected:
     */
     uint8_t numCycles;
 
-    MOS6502Instruction(std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+    MOS6502Instruction(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
      : mnemonic{mnemonic}, cpu{cpu}, auxData{0x0000}, numCycles{numCycles} {}
 
     // Fetches any data from RAM that the instruction will execute on
