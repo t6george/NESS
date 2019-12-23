@@ -25,4 +25,7 @@ protected:
         SDL_Log("PC: 0x%04X | OP: %s | AddrMode: %s | Addr: 0x%04X | Fetched Data: 0x%02X\n", 
             oldPC, mnemonic.c_str(), addrModeStr.c_str(), absoluteAddress, auxData);
     }
+
+public:
+    std::string disassemble(uint16_t &pc) override;
 };

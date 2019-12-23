@@ -1,3 +1,6 @@
+#include <iostream>
+#include <fstream>
+
 #include <NesSystem.hpp>
 #include <Ricoh2A03.hpp>
 #include <RicohRP2C02.hpp>
@@ -39,10 +42,28 @@ void NesSystem::reset()
     systemClock = 0;
 }
 
+#define DISASSEMBLE
 void NesSystem::insertCartridge(const std::string &romName)
 {
     std::shared_ptr<AddressableDevice> cart(new GamePak(romName));
     cpu->addCartridge(cart);
     ppu->addCartridge(cart);
     reset();
+    #ifdef DISASSEMBLE
+    uint16_t PC = CPU::CARTRIDGE::Base;
+    uint8_t opcode;
+    
+    std::ofstream asmFile ("disassembly.asm");
+    if (asmFile.is_open())
+    {    
+        while (PC >= CPU::CARTRIDGE::Base && PC <= CPU::CARTRIDGE::Limit)
+        {
+            asmFile << std::hex << PC << " : ";
+            opcode = cpu->read(PC++);
+            asmFile << cpu->instructions[opcode]->disassemble(PC) << std::endl;
+        }
+
+        asmFile.close();
+    }
+    #endif
 }

@@ -7,23 +7,13 @@
 // #include <Display.hpp>
 #include <SDL2/SDL.h>
 #include <NesSystem.hpp>
-#include <iostream>
-#include <fstream>
 
 int main(int argc, char *argv[])
 {
     std::unique_ptr<NesSystem> nes(new NesSystem());
 
-    nes->insertCartridge("DonkeyKong.nes");
+    nes->insertCartridge("nestest.nes");
 
-    std::ofstream myfile ("example.txt");
-    if (myfile.is_open())
-    {
-        myfile << "This is a line.\n";
-        myfile << "This is another line.\n";
-        myfile.close();
-    }
-    
     bool quit = false;
     SDL_Event e;
     while (!quit)

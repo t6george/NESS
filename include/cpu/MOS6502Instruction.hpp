@@ -69,4 +69,5 @@ public:
 
     // The instruction's actual functionality
     virtual uint8_t exec() = 0;
+    virtual std::string disassemble(uint16_t &pc) = 0;
 };
