@@ -25,6 +25,11 @@ protected:
     const std::string mnemonic;
 
     /*
+     * The PC before it is incremented by the instruction - for disassembly
+    */
+    uint16_t oldPC;
+
+    /*
      * MOS6502 reference used to change cpu state
     */
     Ricoh2A03* cpu;

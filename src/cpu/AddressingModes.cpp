@@ -6,8 +6,14 @@
  * does not need data from RAM
  */
 template <>
+AddressingMode<Ricoh2A03::AddressingType::IMP>::AddressingMode
+    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"IMP"} {}
+
+template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::IMP>::fetchAuxData()
 {
+    oldPC = cpu->PC - 0x1;
     auxData = cpu->A;
     return 0;
 }
@@ -17,8 +23,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IMP>::fetchAuxData()
  * so no need to access RAM either
  */
 template <>
+AddressingMode<Ricoh2A03::AddressingType::IMM>::AddressingMode
+    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"IMM"} {}
+
+template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::IMM>::fetchAuxData()
 {
+    oldPC = cpu->PC - 0x1;
     absoluteAddress = cpu->PC++;
     auxData = cpu->read(absoluteAddress);
     return 0;
@@ -30,8 +42,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IMM>::fetchAuxData()
  * it accesses the RAM's Page 0
  */
 template <>
+AddressingMode<Ricoh2A03::AddressingType::ZP>::AddressingMode
+    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ZPI"} {}
+
+template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ZP>::fetchAuxData()
 {
+    oldPC = cpu->PC - 0x1;
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++));
     auxData = cpu->readZ(absoluteAddress);
     return 0;
@@ -42,8 +60,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ZP>::fetchAuxData()
  * equal to CPU REG X
  */
 template <>
+AddressingMode<Ricoh2A03::AddressingType::ZPX>::AddressingMode
+    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ZPX"} {}
+
+template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPX>::fetchAuxData()
 {
+    oldPC = cpu->PC - 0x1;
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->X);
     auxData = cpu->readZ(absoluteAddress);
     return 0;
@@ -54,8 +78,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPX>::fetchAuxData()
  * equal to CPU REG Y
  */
 template <>
+AddressingMode<Ricoh2A03::AddressingType::ZPY>::AddressingMode
+    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ZPY"} {}
+
+template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPY>::fetchAuxData()
 {
+    oldPC = cpu->PC - 0x1;
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->Y);
     auxData = cpu->readZ(absoluteAddress);
     return 0;
@@ -66,8 +96,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPY>::fetchAuxData()
  * Offset is only 8-bit, so must be sign-extended
  */
 template <>
+AddressingMode<Ricoh2A03::AddressingType::REL>::AddressingMode
+    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"REL"} {}
+
+template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::REL>::fetchAuxData()
 {
+    oldPC = cpu->PC - 0x1;
     absoluteAddress = cpu->PC++;
     absoluteAddress = cpu->read(absoluteAddress);
     absoluteAddress |= ((static_cast<uint8_t>(0x80 & auxData) != 0x0000) * 0xFF00);
@@ -80,8 +116,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::REL>::fetchAuxData()
  * to retrieve the contents of
  */
 template <>
+AddressingMode<Ricoh2A03::AddressingType::AB>::AddressingMode
+    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ABS"} {}
+
+template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::AB>::fetchAuxData()
 {
+    oldPC = cpu->PC - 0x1;
     absoluteAddress = cpu->readDoubleWord(cpu->PC);
     cpu->PC += 0x2;
 
@@ -94,8 +136,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::AB>::fetchAuxData()
  * Page cross => 1 cycle penalty
  */
 template <>
+AddressingMode<Ricoh2A03::AddressingType::ABX>::AddressingMode
+    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ABX"} {}
+
+template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ABX>::fetchAuxData()
 {
+    oldPC = cpu->PC - 0x1;
     absoluteAddress = cpu->readDoubleWord(cpu->PC) + cpu->X;
     cpu->PC += 0x2;
 
@@ -108,8 +156,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ABX>::fetchAuxData()
  * Page cross => 1 cycle penalty
  */
 template <>
+AddressingMode<Ricoh2A03::AddressingType::ABY>::AddressingMode
+    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ABY"} {}
+
+template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ABY>::fetchAuxData()
 {
+    oldPC = cpu->PC - 0x1;
     absoluteAddress = cpu->readDoubleWord(cpu->PC) + cpu->Y;
     cpu->PC += 0x2;
 
@@ -123,8 +177,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ABY>::fetchAuxData()
  * addressing modes).
  */
 template <>
+AddressingMode<Ricoh2A03::AddressingType::IN>::AddressingMode
+    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"IND"} {}
+
+template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::IN>::fetchAuxData()
 {
+    oldPC = cpu->PC - 0x1;
     absoluteAddress = cpu->readDoubleWord(cpu->PC);
     cpu->PC += 0x2;
 
@@ -149,8 +209,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IN>::fetchAuxData()
  * is offset by CPU REG X
  */
 template <>
+AddressingMode<Ricoh2A03::AddressingType::IX>::AddressingMode
+    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"INX"} {}
+
+template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::IX>::fetchAuxData()
 {
+    oldPC = cpu->PC - 0x1;
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++)) + static_cast<uint16_t>(cpu->X);
     absoluteAddress = cpu->readZDoubleWord(absoluteAddress);
 
@@ -166,8 +232,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IX>::fetchAuxData()
  * Page cross => 1 cycle penalty
  */
 template <>
+AddressingMode<Ricoh2A03::AddressingType::IY>::AddressingMode
+    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"INY"} {}
+
+template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::IY>::fetchAuxData()
 {
+    oldPC = cpu->PC - 0x1;
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++));
     absoluteAddress = cpu->readZDoubleWord(absoluteAddress) + cpu->Y;
 

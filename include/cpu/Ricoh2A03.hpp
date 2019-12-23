@@ -7,7 +7,8 @@
 #include <MOS6502Instruction.hpp>
 
 #define STACK_BASE 0x0100
-#define NUM_POSSIBLE_OPCODES 0x100
+#define NUM_OPCODES 0x100
+#define DUMP
 
 class GamePak;
 class AddressableDevice;
@@ -18,7 +19,7 @@ class Ricoh2A03
     std::unique_ptr<Bus> bus;
 
     std::shared_ptr<GamePak> cartridge;
-    std::array<std::unique_ptr<MOS6502Instruction>, NUM_POSSIBLE_OPCODES> instructions;
+    std::array<std::unique_ptr<MOS6502Instruction>, NUM_OPCODES> instructions;
 
     uint8_t cycles;
 
