@@ -46,14 +46,21 @@ void NesSystem::reset()
 void NesSystem::insertCartridge(const std::string &romName)
 {
     std::shared_ptr<AddressableDevice> cart(new GamePak(romName));
+
     cpu->addCartridge(cart);
     ppu->addCartridge(cart);
     reset();
     #ifdef DISASSEMBLE
     uint16_t PC = CPU::CARTRIDGE::Base;
+    int8_t nameEnd = romName.size() - 1;
     uint8_t opcode;
+
+    while (nameEnd >= 0 && romName[nameEnd--] != '.');
+    ++nameEnd;
+    if (nameEnd == 0)
+        nameEnd = romName.size() - 1;
     
-    std::ofstream asmFile ("disassembly.asm");
+    std::ofstream asmFile (romName.substr(0, nameEnd) + ".asm");
     if (asmFile.is_open())
     {    
         while (PC >= CPU::CARTRIDGE::Base && PC <= CPU::CARTRIDGE::Limit)

@@ -17,6 +17,7 @@ template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::IMP>::disassemble(uint16_t &pc)
 {
     (void) pc;
+
     return mnemonic;
 }
 
@@ -41,7 +42,9 @@ template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::IMM>::disassemble(uint16_t &pc)
 {
     std::ostringstream stream;
-    stream << mnemonic << " $" << std::hex << cpu->read(pc++);
+    stream << mnemonic << " $" << std::hex << 
+        std::uppercase << static_cast<int>(cpu->read(pc++));
+
     return stream.str();
 }
 
@@ -70,7 +73,8 @@ std::string AddressingMode<Ricoh2A03::AddressingType::ZP>::disassemble(uint16_t 
 {
     std::ostringstream stream;
     stream << mnemonic << " $" << std::internal << std::setfill('0') << 
-        std::setw(2) << std::hex << cpu->read(pc++);
+        std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->read(pc++));
+
     return stream.str();
 }
 
@@ -97,7 +101,8 @@ std::string AddressingMode<Ricoh2A03::AddressingType::ZPX>::disassemble(uint16_t
 {
     std::ostringstream stream;
     stream << mnemonic << " $" << std::internal << std::setfill('0') << 
-        std::setw(2) << std::hex << cpu->read(pc++) << ", X";
+        std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->read(pc++)) << ", X";
+
     return stream.str();
 }
 
@@ -124,7 +129,8 @@ std::string AddressingMode<Ricoh2A03::AddressingType::ZPY>::disassemble(uint16_t
 {
     std::ostringstream stream;
     stream << mnemonic << " $" << std::internal << std::setfill('0') << 
-        std::setw(2) << std::hex << cpu->read(pc++) << ", Y";
+        std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->read(pc++)) << ", Y";
+
     return stream.str();
 }
 
@@ -149,16 +155,18 @@ AddressingMode<Ricoh2A03::AddressingType::REL>::AddressingMode
 template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::REL>::disassemble(uint16_t &pc)
 {
-    (void) pc;
-    return mnemonic;
+    std::ostringstream stream;
+    stream << mnemonic << " $" << std::internal << std::setfill('0') << 
+        std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->read(pc++));
+
+    return stream.str();
 }
 
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::REL>::fetchAuxData()
 {
     oldPC = cpu->PC - 0x1;
-    absoluteAddress = cpu->PC++;
-    absoluteAddress = cpu->read(absoluteAddress);
+    absoluteAddress = cpu->read(cpu->PC++);
     absoluteAddress |= ((static_cast<uint8_t>(0x80 & auxData) != 0x0000) * 0xFF00);
 
     return 0;
@@ -178,10 +186,10 @@ std::string AddressingMode<Ricoh2A03::AddressingType::AB>::disassemble(uint16_t 
 {
     std::ostringstream stream;
     stream << mnemonic << " $" << std::internal << std::setfill('0') << 
-        std::setw(4) << std::hex << cpu->readDoubleWord(pc);
+        std::setw(4) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc));
     pc += 0x2;
     
-    return mnemonic;
+    return stream.str();
 }
 
 template <>
@@ -209,9 +217,10 @@ std::string AddressingMode<Ricoh2A03::AddressingType::ABX>::disassemble(uint16_t
 {
     std::ostringstream stream;
     stream << mnemonic << " $" << std::internal << std::setfill('0') << 
-        std::setw(4) << std::hex << cpu->readDoubleWord(pc) << ", X";
+        std::setw(4) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc)) << ", X";
     pc += 0x2;
-    return mnemonic;
+    
+    return stream.str();
 }
 
 template <>
@@ -239,9 +248,10 @@ std::string AddressingMode<Ricoh2A03::AddressingType::ABY>::disassemble(uint16_t
 {
     std::ostringstream stream;
     stream << mnemonic << " $" << std::internal << std::setfill('0') << 
-        std::setw(4) << std::hex << cpu->readDoubleWord(pc) << ", Y";
+        std::setw(4) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc)) << ", Y";
     pc += 0x2;
-    return mnemonic;
+
+    return stream.str();
 }
 
 template <>
@@ -270,8 +280,9 @@ std::string AddressingMode<Ricoh2A03::AddressingType::IN>::disassemble(uint16_t 
 {
     std::ostringstream stream;
     stream << mnemonic << " ($" << std::internal << std::setfill('0') << 
-        std::setw(4) << std::hex << cpu->readDoubleWord(pc) << ")";
+        std::setw(4) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc)) << ")";
     pc += 0x2;
+
     return stream.str();
 }
 
@@ -312,8 +323,9 @@ std::string AddressingMode<Ricoh2A03::AddressingType::IX>::disassemble(uint16_t 
 {
     std::ostringstream stream;
     stream << mnemonic << " ($" << std::internal << std::setfill('0') << 
-        std::setw(2) << std::hex << cpu->readDoubleWord(pc) << ", X)";
+        std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc)) << ", X)";
     pc += 0x2;
+
     return stream.str();
 }
 
@@ -345,7 +357,7 @@ std::string AddressingMode<Ricoh2A03::AddressingType::IY>::disassemble(uint16_t 
 {
     std::ostringstream stream;
     stream << mnemonic << " ($" << std::internal << std::setfill('0') << 
-        std::setw(2) << std::hex << cpu->readDoubleWord(pc) << "), Y";
+        std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc)) << "), Y";
     pc += 0x2;
     return stream.str();
 }
