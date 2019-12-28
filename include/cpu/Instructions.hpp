@@ -12,7 +12,7 @@ class BRK : public AddressingMode<T>
 {
 public:
     BRK(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("BRK", cpu, numCycles) {}
+        : AddressingMode<T>("BRK", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -26,10 +26,10 @@ public:
         this->cpu->PC = this->cpu->readDoubleWord(0xFFFE);
         this->cpu->setFlag(Ricoh2A03::B, false);
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -39,7 +39,7 @@ class RTI : public AddressingMode<T>
 {
 public:
     RTI(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("RTI", cpu, numCycles) {}
+        : AddressingMode<T>("RTI", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -49,10 +49,10 @@ public:
 
         this->cpu->PC = this->cpu->popDoubleWord();
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -63,7 +63,7 @@ class JSR : public AddressingMode<T>
 {
 public:
     JSR(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("JSR", cpu, numCycles) {}
+        : AddressingMode<T>("JSR", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -71,9 +71,9 @@ public:
         this->cpu->pushDoubleWord(this->cpu->PC - 1);
         this->cpu->PC = this->absoluteAddress;
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -83,17 +83,17 @@ class RTS : public AddressingMode<T>
 {
 public:
     RTS(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("RTS", cpu, numCycles) {}
+        : AddressingMode<T>("RTS", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->PC = this->cpu->popDoubleWord();
         ++this->cpu->PC;
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -104,17 +104,17 @@ class PLA : public AddressingMode<T>
 {
 public:
     PLA(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("PLA", cpu, numCycles) {}
+        : AddressingMode<T>("PLA", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->A = this->cpu->popWord();
         SET_ZN(this->cpu->A)
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -124,16 +124,16 @@ class PHA : public AddressingMode<T>
 {
 public:
     PHA(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("PHA", cpu, numCycles) {}
+        : AddressingMode<T>("PHA", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->pushWord(this->cpu->A);
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -143,17 +143,17 @@ class PLP : public AddressingMode<T>
 {
 public:
     PLP(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("PLP", cpu, numCycles) {}
+        : AddressingMode<T>("PLP", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->S = this->cpu->popWord();
         this->cpu->setFlag(Ricoh2A03::U, true);
-        
-        #ifdef DUMP
+
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -163,7 +163,7 @@ class PHP : public AddressingMode<T>
 {
 public:
     PHP(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("PHP", cpu, numCycles) {}
+        : AddressingMode<T>("PHP", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -175,10 +175,10 @@ public:
         this->cpu->setFlag(Ricoh2A03::U, false);
         this->cpu->setFlag(Ricoh2A03::B, false);
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -189,7 +189,7 @@ class LDA : public AddressingMode<T>
 {
 public:
     LDA(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("LDA", cpu, numCycles) {}
+        : AddressingMode<T>("LDA", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -197,9 +197,9 @@ public:
         this->cpu->A = this->auxData;
         SET_ZN(this->cpu->A)
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -209,7 +209,7 @@ class LDX : public AddressingMode<T>
 {
 public:
     LDX(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("LDX", cpu, numCycles) {}
+        : AddressingMode<T>("LDX", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -217,9 +217,9 @@ public:
         this->cpu->X = this->auxData;
         SET_ZN(this->cpu->X)
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -229,7 +229,7 @@ class LDY : public AddressingMode<T>
 {
 public:
     LDY(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("LDY", cpu, numCycles) {}
+        : AddressingMode<T>("LDY", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -237,9 +237,9 @@ public:
         this->cpu->Y = this->auxData;
         SET_ZN(this->cpu->Y)
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -250,7 +250,7 @@ class STA : public AddressingMode<T>
 {
 public:
     STA(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("STA", cpu, numCycles) {}
+        : AddressingMode<T>("STA", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -258,9 +258,9 @@ public:
         this->auxData = this->cpu->A;
         this->writeBack();
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -270,7 +270,7 @@ class STX : public AddressingMode<T>
 {
 public:
     STX(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("STX", cpu, numCycles) {}
+        : AddressingMode<T>("STX", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -278,9 +278,9 @@ public:
         this->auxData = this->cpu->X;
         this->writeBack();
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -290,7 +290,7 @@ class STY : public AddressingMode<T>
 {
 public:
     STY(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("STY", cpu, numCycles) {}
+        : AddressingMode<T>("STY", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -298,9 +298,9 @@ public:
         this->auxData = this->cpu->Y;
         this->writeBack();
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -311,17 +311,17 @@ class TAX : public AddressingMode<T>
 {
 public:
     TAX(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("TAX", cpu, numCycles) {}
+        : AddressingMode<T>("TAX", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->X = this->cpu->A;
         SET_ZN(this->cpu->X)
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -331,17 +331,17 @@ class TXA : public AddressingMode<T>
 {
 public:
     TXA(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("TXA", cpu, numCycles) {}
+        : AddressingMode<T>("TXA", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->A = this->cpu->X;
         SET_ZN(this->cpu->A)
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -351,17 +351,17 @@ class TSX : public AddressingMode<T>
 {
 public:
     TSX(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("TSX", cpu, numCycles) {}
+        : AddressingMode<T>("TSX", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->X = this->cpu->SP;
         SET_ZN(this->cpu->X)
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -371,16 +371,16 @@ class TXS : public AddressingMode<T>
 {
 public:
     TXS(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("TXS", cpu, numCycles) {}
+        : AddressingMode<T>("TXS", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->SP = this->cpu->X;
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -390,17 +390,17 @@ class TAY : public AddressingMode<T>
 {
 public:
     TAY(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("TAY", cpu, numCycles) {}
+        : AddressingMode<T>("TAY", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->Y = this->cpu->A;
         SET_ZN(this->cpu->Y)
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -410,17 +410,17 @@ class TYA : public AddressingMode<T>
 {
 public:
     TYA(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("TYA", cpu, numCycles) {}
+        : AddressingMode<T>("TYA", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->A = this->cpu->Y;
         SET_ZN(this->cpu->A)
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -431,17 +431,17 @@ class BEQ : public AddressingMode<T>
 {
 public:
     BEQ(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("BEQ", cpu, numCycles) {}
+        : AddressingMode<T>("BEQ", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->fetchAuxData();
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              this->cpu->getFlag(Ricoh2A03::Z));
-        
-        #ifdef DUMP
+
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -451,7 +451,7 @@ class BNE : public AddressingMode<T>
 {
 public:
     BNE(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("BNE", cpu, numCycles) {}
+        : AddressingMode<T>("BNE", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -459,9 +459,9 @@ public:
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              !this->cpu->getFlag(Ricoh2A03::Z));
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -471,7 +471,7 @@ class BCS : public AddressingMode<T>
 {
 public:
     BCS(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("BCS", cpu, numCycles) {}
+        : AddressingMode<T>("BCS", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -479,9 +479,9 @@ public:
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              this->cpu->getFlag(Ricoh2A03::C));
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -491,7 +491,7 @@ class BCC : public AddressingMode<T>
 {
 public:
     BCC(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("BCC", cpu, numCycles) {}
+        : AddressingMode<T>("BCC", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -499,9 +499,9 @@ public:
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              !this->cpu->getFlag(Ricoh2A03::C));
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -511,7 +511,7 @@ class BVS : public AddressingMode<T>
 {
 public:
     BVS(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("BVS", cpu, numCycles) {}
+        : AddressingMode<T>("BVS", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -519,9 +519,9 @@ public:
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              this->cpu->getFlag(Ricoh2A03::V));
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -531,7 +531,7 @@ class BVC : public AddressingMode<T>
 {
 public:
     BVC(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("BVS", cpu, numCycles) {}
+        : AddressingMode<T>("BVS", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -539,9 +539,9 @@ public:
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              !this->cpu->getFlag(Ricoh2A03::V));
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -551,7 +551,7 @@ class BMI : public AddressingMode<T>
 {
 public:
     BMI(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("BMI", cpu, numCycles) {}
+        : AddressingMode<T>("BMI", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -559,9 +559,9 @@ public:
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              this->cpu->getFlag(Ricoh2A03::N));
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -571,7 +571,7 @@ class BPL : public AddressingMode<T>
 {
 public:
     BPL(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("BPL", cpu, numCycles) {}
+        : AddressingMode<T>("BPL", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -579,9 +579,9 @@ public:
         int cyclePenalty = this->cpu->branch(this->absoluteAddress,
                                              !this->cpu->getFlag(Ricoh2A03::N));
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -592,7 +592,7 @@ class INC : public AddressingMode<T>
 {
 public:
     INC(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("INC", cpu, numCycles) {}
+        : AddressingMode<T>("INC", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -602,9 +602,9 @@ public:
         this->writeBack();
         SET_ZN(this->auxData)
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -614,7 +614,7 @@ class DEC : public AddressingMode<T>
 {
 public:
     DEC(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("DEC", cpu, numCycles) {}
+        : AddressingMode<T>("DEC", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -624,9 +624,9 @@ public:
         this->writeBack();
         SET_ZN(this->auxData)
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -636,17 +636,17 @@ class INX : public AddressingMode<T>
 {
 public:
     INX(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("INX", cpu, numCycles) {}
+        : AddressingMode<T>("INX", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         ++this->cpu->X;
         SET_ZN(this->cpu->X)
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -656,17 +656,17 @@ class DEX : public AddressingMode<T>
 {
 public:
     DEX(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("DEX", cpu, numCycles) {}
+        : AddressingMode<T>("DEX", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         --this->cpu->X;
         SET_ZN(this->cpu->X)
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -676,17 +676,17 @@ class INY : public AddressingMode<T>
 {
 public:
     INY(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("INY", cpu, numCycles) {}
+        : AddressingMode<T>("INY", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         ++this->cpu->Y;
         SET_ZN(this->cpu->Y)
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -696,17 +696,17 @@ class DEY : public AddressingMode<T>
 {
 public:
     DEY(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("DEY", cpu, numCycles) {}
+        : AddressingMode<T>("DEY", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         --this->cpu->Y;
         SET_ZN(this->cpu->Y)
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -717,7 +717,7 @@ class CMP : public AddressingMode<T>
 {
 public:
     CMP(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("CMP", cpu, numCycles) {}
+        : AddressingMode<T>("CMP", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -727,9 +727,9 @@ public:
         SET_ZN(result)
         this->cpu->setFlag(Ricoh2A03::C, this->cpu->A >= this->auxData);
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -739,7 +739,7 @@ class CPX : public AddressingMode<T>
 {
 public:
     CPX(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("CPX", cpu, numCycles) {}
+        : AddressingMode<T>("CPX", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -749,9 +749,9 @@ public:
         SET_ZN(result)
         this->cpu->setFlag(Ricoh2A03::C, this->cpu->X >= this->auxData);
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -761,7 +761,7 @@ class CPY : public AddressingMode<T>
 {
 public:
     CPY(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("CPY", cpu, numCycles) {}
+        : AddressingMode<T>("CPY", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -771,9 +771,9 @@ public:
         SET_ZN(result)
         this->cpu->setFlag(Ricoh2A03::C, this->cpu->Y >= this->auxData);
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -783,7 +783,7 @@ class BIT : public AddressingMode<T>
 {
 public:
     BIT(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("BIT", cpu, numCycles) {}
+        : AddressingMode<T>("BIT", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -795,9 +795,9 @@ public:
         this->auxData &= this->cpu->A;
         this->cpu->setFlag(Ricoh2A03::Z, this->auxData == 0x00);
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -808,16 +808,16 @@ class SEC : public AddressingMode<T>
 {
 public:
     SEC(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("SEC", cpu, numCycles) {}
+        : AddressingMode<T>("SEC", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->setFlag(Ricoh2A03::C, true);
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -827,16 +827,16 @@ class CLC : public AddressingMode<T>
 {
 public:
     CLC(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("CLC", cpu, numCycles) {}
+        : AddressingMode<T>("CLC", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->setFlag(Ricoh2A03::C, false);
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -846,16 +846,16 @@ class SED : public AddressingMode<T>
 {
 public:
     SED(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("SED", cpu, numCycles) {}
+        : AddressingMode<T>("SED", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->setFlag(Ricoh2A03::D, true);
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -865,16 +865,16 @@ class CLD : public AddressingMode<T>
 {
 public:
     CLD(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("CLD", cpu, numCycles) {}
+        : AddressingMode<T>("CLD", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->setFlag(Ricoh2A03::D, false);
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -884,16 +884,16 @@ class SEI : public AddressingMode<T>
 {
 public:
     SEI(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("SEI", cpu, numCycles) {}
+        : AddressingMode<T>("SEI", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->setFlag(Ricoh2A03::I, true);
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -903,16 +903,16 @@ class CLI : public AddressingMode<T>
 {
 public:
     CLI(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("CLI", cpu, numCycles) {}
+        : AddressingMode<T>("CLI", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->setFlag(Ricoh2A03::I, false);
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -922,16 +922,16 @@ class CLV : public AddressingMode<T>
 {
 public:
     CLV(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("CLV", cpu, numCycles) {}
+        : AddressingMode<T>("CLV", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->cpu->setFlag(Ricoh2A03::V, false);
 
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -942,7 +942,7 @@ class AND : public AddressingMode<T>
 {
 public:
     AND(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("AND", cpu, numCycles) {}
+        : AddressingMode<T>("AND", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -950,9 +950,9 @@ public:
         this->cpu->A &= this->auxData;
         SET_ZN(this->cpu->A)
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -962,7 +962,7 @@ class ORA : public AddressingMode<T>
 {
 public:
     ORA(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("ORA", cpu, numCycles) {}
+        : AddressingMode<T>("ORA", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -970,9 +970,9 @@ public:
         this->cpu->A |= this->auxData;
         SET_ZN(this->cpu->A)
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -982,7 +982,7 @@ class EOR : public AddressingMode<T>
 {
 public:
     EOR(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("EOR", cpu, numCycles) {}
+        : AddressingMode<T>("EOR", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -990,9 +990,9 @@ public:
         this->cpu->A ^= this->auxData;
         SET_ZN(this->cpu->A)
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -1002,7 +1002,7 @@ class LSR : public AddressingMode<T>
 {
 public:
     LSR(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("LSR", cpu, numCycles) {}
+        : AddressingMode<T>("LSR", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -1014,9 +1014,9 @@ public:
         this->writeBack();
         SET_ZN(this->auxData)
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -1026,7 +1026,7 @@ class ASL : public AddressingMode<T>
 {
 public:
     ASL(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("ASL", cpu, numCycles) {}
+        : AddressingMode<T>("ASL", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -1037,9 +1037,9 @@ public:
         this->writeBack();
         SET_ZN(this->auxData)
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -1049,7 +1049,7 @@ class ROR : public AddressingMode<T>
 {
 public:
     ROR(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("ROR", cpu, numCycles) {}
+        : AddressingMode<T>("ROR", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -1061,9 +1061,9 @@ public:
         this->writeBack();
         SET_ZN(this->auxData)
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -1073,7 +1073,7 @@ class ROL : public AddressingMode<T>
 {
 public:
     ROL(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("ROL", cpu, numCycles) {}
+        : AddressingMode<T>("ROL", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -1085,9 +1085,9 @@ public:
         this->writeBack();
         SET_ZN(this->auxData)
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -1098,7 +1098,7 @@ class ADC : public AddressingMode<T>
 {
 public:
     ADC(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("ADC", cpu, numCycles) {}
+        : AddressingMode<T>("ADC", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -1115,9 +1115,9 @@ public:
         this->cpu->A = overflowCheck & 0xFF;
         SET_ZN(this->cpu->A)
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -1127,7 +1127,7 @@ class SBC : public AddressingMode<T>
 {
 public:
     SBC(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("SDC", cpu, numCycles) {}
+        : AddressingMode<T>("SDC", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
@@ -1146,9 +1146,9 @@ public:
         this->cpu->A = overflowCheck & 0xFF;
         SET_ZN(this->cpu->A)
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles + cyclePenalty;
     }
 };
@@ -1159,16 +1159,16 @@ class JMP : public AddressingMode<T>
 {
 public:
     JMP(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("JMP", cpu, numCycles) {}
+        : AddressingMode<T>("JMP", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->fetchAuxData();
         this->cpu->PC = this->absoluteAddress;
 
-        #ifdef DUMP
+#ifdef DUMP
         AddressingMode<T>::instrDump();
-        #endif
+#endif
         return this->numCycles;
     }
 };
@@ -1178,14 +1178,14 @@ class NOP : public AddressingMode<T>
 {
 public:
     NOP(Ricoh2A03 *cpu, uint8_t numCycles)
-     : AddressingMode<T>("NOP", cpu, numCycles) {}
+        : AddressingMode<T>("NOP", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
-        #ifdef DUMP
+#ifdef DUMP
         this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
-        #endif
+#endif
 
         return this->numCycles;
     }

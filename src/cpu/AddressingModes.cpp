@@ -9,14 +9,13 @@
  * does not need data from RAM
  */
 template <>
-AddressingMode<Ricoh2A03::AddressingType::IMP>::AddressingMode
-    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
-     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"IMP"} {}
+AddressingMode<Ricoh2A03::AddressingType::IMP>::AddressingMode(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+    : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"IMP"} {}
 
 template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::IMP>::disassemble(uint16_t &pc)
 {
-    (void) pc;
+    (void)pc;
 
     return mnemonic;
 }
@@ -34,20 +33,17 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IMP>::fetchAuxData()
  * so no need to access RAM either
  */
 template <>
-AddressingMode<Ricoh2A03::AddressingType::IMM>::AddressingMode
-    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
-     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"IMM"} {}
+AddressingMode<Ricoh2A03::AddressingType::IMM>::AddressingMode(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+    : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"IMM"} {}
 
 template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::IMM>::disassemble(uint16_t &pc)
 {
     std::ostringstream stream;
-    stream << mnemonic << " $" << std::hex << 
-        std::uppercase << static_cast<int>(cpu->read(pc++));
+    stream << mnemonic << " $" << std::hex << std::uppercase << static_cast<int>(cpu->read(pc++));
 
     return stream.str();
 }
-
 
 template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::IMM>::fetchAuxData()
@@ -64,16 +60,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IMM>::fetchAuxData()
  * it accesses the RAM's Page 0
  */
 template <>
-AddressingMode<Ricoh2A03::AddressingType::ZP>::AddressingMode
-    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
-     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ZPI"} {}
+AddressingMode<Ricoh2A03::AddressingType::ZP>::AddressingMode(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+    : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ZPI"} {}
 
 template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::ZP>::disassemble(uint16_t &pc)
 {
     std::ostringstream stream;
-    stream << mnemonic << " $" << std::internal << std::setfill('0') << 
-        std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->read(pc++));
+    stream << mnemonic << " $" << std::internal << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->read(pc++));
 
     return stream.str();
 }
@@ -92,16 +86,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ZP>::fetchAuxData()
  * equal to CPU REG X
  */
 template <>
-AddressingMode<Ricoh2A03::AddressingType::ZPX>::AddressingMode
-    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
-     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ZPX"} {}
+AddressingMode<Ricoh2A03::AddressingType::ZPX>::AddressingMode(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+    : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ZPX"} {}
 
 template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::ZPX>::disassemble(uint16_t &pc)
 {
     std::ostringstream stream;
-    stream << mnemonic << " $" << std::internal << std::setfill('0') << 
-        std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->read(pc++)) << ", X";
+    stream << mnemonic << " $" << std::internal << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->read(pc++)) << ", X";
 
     return stream.str();
 }
@@ -120,16 +112,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPX>::fetchAuxData()
  * equal to CPU REG Y
  */
 template <>
-AddressingMode<Ricoh2A03::AddressingType::ZPY>::AddressingMode
-    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
-     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ZPY"} {}
+AddressingMode<Ricoh2A03::AddressingType::ZPY>::AddressingMode(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+    : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ZPY"} {}
 
 template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::ZPY>::disassemble(uint16_t &pc)
 {
     std::ostringstream stream;
-    stream << mnemonic << " $" << std::internal << std::setfill('0') << 
-        std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->read(pc++)) << ", Y";
+    stream << mnemonic << " $" << std::internal << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->read(pc++)) << ", Y";
 
     return stream.str();
 }
@@ -148,16 +138,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPY>::fetchAuxData()
  * Offset is only 8-bit, so must be sign-extended
  */
 template <>
-AddressingMode<Ricoh2A03::AddressingType::REL>::AddressingMode
-    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
-     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"REL"} {}
+AddressingMode<Ricoh2A03::AddressingType::REL>::AddressingMode(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+    : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"REL"} {}
 
 template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::REL>::disassemble(uint16_t &pc)
 {
     std::ostringstream stream;
-    stream << mnemonic << " $" << std::internal << std::setfill('0') << 
-        std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->read(pc++));
+    stream << mnemonic << " $" << std::internal << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->read(pc++));
 
     return stream.str();
 }
@@ -167,7 +155,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::REL>::fetchAuxData()
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = cpu->read(cpu->PC++);
-    absoluteAddress |= ((static_cast<uint8_t>(0x80 & auxData) != 0x0000) * 0xFF00);
+    absoluteAddress |= ((static_cast<uint8_t>(0x80 & absoluteAddress) != 0x0000) * 0xFF00);
 
     return 0;
 }
@@ -177,18 +165,16 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::REL>::fetchAuxData()
  * to retrieve the contents of
  */
 template <>
-AddressingMode<Ricoh2A03::AddressingType::AB>::AddressingMode
-    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
-     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ABS"} {}
+AddressingMode<Ricoh2A03::AddressingType::AB>::AddressingMode(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+    : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ABS"} {}
 
 template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::AB>::disassemble(uint16_t &pc)
 {
     std::ostringstream stream;
-    stream << mnemonic << " $" << std::internal << std::setfill('0') << 
-        std::setw(4) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc));
+    stream << mnemonic << " $" << std::internal << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc));
     pc += 0x2;
-    
+
     return stream.str();
 }
 
@@ -208,18 +194,16 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::AB>::fetchAuxData()
  * Page cross => 1 cycle penalty
  */
 template <>
-AddressingMode<Ricoh2A03::AddressingType::ABX>::AddressingMode
-    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
-     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ABX"} {}
+AddressingMode<Ricoh2A03::AddressingType::ABX>::AddressingMode(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+    : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ABX"} {}
 
 template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::ABX>::disassemble(uint16_t &pc)
 {
     std::ostringstream stream;
-    stream << mnemonic << " $" << std::internal << std::setfill('0') << 
-        std::setw(4) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc)) << ", X";
+    stream << mnemonic << " $" << std::internal << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc)) << ", X";
     pc += 0x2;
-    
+
     return stream.str();
 }
 
@@ -239,16 +223,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ABX>::fetchAuxData()
  * Page cross => 1 cycle penalty
  */
 template <>
-AddressingMode<Ricoh2A03::AddressingType::ABY>::AddressingMode
-    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
-     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ABY"} {}
+AddressingMode<Ricoh2A03::AddressingType::ABY>::AddressingMode(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+    : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"ABY"} {}
 
 template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::ABY>::disassemble(uint16_t &pc)
 {
     std::ostringstream stream;
-    stream << mnemonic << " $" << std::internal << std::setfill('0') << 
-        std::setw(4) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc)) << ", Y";
+    stream << mnemonic << " $" << std::internal << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc)) << ", Y";
     pc += 0x2;
 
     return stream.str();
@@ -271,16 +253,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ABY>::fetchAuxData()
  * addressing modes).
  */
 template <>
-AddressingMode<Ricoh2A03::AddressingType::IN>::AddressingMode
-    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
-     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"IND"} {}
+AddressingMode<Ricoh2A03::AddressingType::IN>::AddressingMode(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+    : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"IND"} {}
 
 template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::IN>::disassemble(uint16_t &pc)
 {
     std::ostringstream stream;
-    stream << mnemonic << " ($" << std::internal << std::setfill('0') << 
-        std::setw(4) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc)) << ")";
+    stream << mnemonic << " ($" << std::internal << std::setfill('0') << std::setw(4) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc)) << ")";
     pc += 0x2;
 
     return stream.str();
@@ -314,16 +294,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IN>::fetchAuxData()
  * is offset by CPU REG X
  */
 template <>
-AddressingMode<Ricoh2A03::AddressingType::IX>::AddressingMode
-    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
-     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"INX"} {}
+AddressingMode<Ricoh2A03::AddressingType::IX>::AddressingMode(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+    : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"INX"} {}
 
 template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::IX>::disassemble(uint16_t &pc)
 {
     std::ostringstream stream;
-    stream << mnemonic << " ($" << std::internal << std::setfill('0') << 
-        std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc)) << ", X)";
+    stream << mnemonic << " ($" << std::internal << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc)) << ", X)";
     pc += 0x2;
 
     return stream.str();
@@ -348,16 +326,14 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IX>::fetchAuxData()
  * Page cross => 1 cycle penalty
  */
 template <>
-AddressingMode<Ricoh2A03::AddressingType::IY>::AddressingMode
-    (const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
-     : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"INY"} {}
+AddressingMode<Ricoh2A03::AddressingType::IY>::AddressingMode(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
+    : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"INY"} {}
 
 template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::IY>::disassemble(uint16_t &pc)
 {
     std::ostringstream stream;
-    stream << mnemonic << " ($" << std::internal << std::setfill('0') << 
-        std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc)) << "), Y";
+    stream << mnemonic << " ($" << std::internal << std::setfill('0') << std::setw(2) << std::hex << std::uppercase << static_cast<int>(cpu->readDoubleWord(pc)) << "), Y";
     pc += 0x2;
     return stream.str();
 }

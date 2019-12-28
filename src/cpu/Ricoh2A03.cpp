@@ -61,12 +61,13 @@ uint16_t Ricoh2A03::popDoubleWord()
     uint16_t hi = read(STACK_BASE + ++SP);
     return (hi << 8) | lo;
 }
-
+#include <SDL2/SDL.h>
 // Fetch-Execute Cycle
 void Ricoh2A03::fetch()
 {
     if (cycles == 0)
     {
+        SDL_Log("%x", S);
         uint8_t opcode = read(PC++);
         cycles = instructions[opcode]->exec();
     }
@@ -139,7 +140,7 @@ uint8_t Ricoh2A03::branch(uint16_t absoluteAddress, bool cond)
 
 void Ricoh2A03::addCartridge(std::shared_ptr<AddressableDevice> cart)
 {
-    assert(dynamic_cast<GamePak*>(cart.get()));
+    assert(dynamic_cast<GamePak *>(cart.get()));
 
     bus->attachDevice(CPU::CARTRIDGE::Base,
                       CPU::CARTRIDGE::Limit,
