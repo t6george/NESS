@@ -8,7 +8,7 @@
 
 #define STACK_BASE 0x0100
 #define NUM_OPCODES 0x100
-#define DUMP
+// #define DUMP
 
 class GamePak;
 class AddressableDevice;
@@ -62,8 +62,8 @@ public:
     Ricoh2A03(std::shared_ptr<AddressableDevice> ppu);
     ~Ricoh2A03() = default;
 
-    uint8_t read(uint16_t addr);
-    uint16_t readDoubleWord(uint16_t addr);
+    uint8_t read(uint16_t addr, bool zpageMode = false);
+    uint16_t readDoubleWord(uint16_t addr, bool zpageMode = false);
 
     uint8_t readZ(uint16_t &addr);
     uint16_t readZDoubleWord(uint16_t &addr);

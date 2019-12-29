@@ -77,7 +77,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ZP>::fetchAuxData()
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++));
-    auxData = cpu->readZ(absoluteAddress);
+    auxData = cpu->read(absoluteAddress, true);
     return 0;
 }
 
@@ -103,7 +103,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPX>::fetchAuxData()
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->X);
-    auxData = cpu->readZ(absoluteAddress);
+    auxData = cpu->read(absoluteAddress, true);
     return 0;
 }
 
@@ -129,7 +129,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPY>::fetchAuxData()
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->Y);
-    auxData = cpu->readZ(absoluteAddress);
+    auxData = cpu->read(absoluteAddress, true);
     return 0;
 }
 
@@ -155,7 +155,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::REL>::fetchAuxData()
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = cpu->read(cpu->PC++);
-    absoluteAddress |= ((static_cast<uint8_t>(0x80 & absoluteAddress) != 0x0000) * 0xFF00);
+    absoluteAddress |= ((static_cast<uint8_t>(0x80 & auxData) != 0x0000) * 0xFF00);
 
     return 0;
 }
@@ -312,7 +312,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IX>::fetchAuxData()
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++)) + static_cast<uint16_t>(cpu->X);
-    absoluteAddress = cpu->readZDoubleWord(absoluteAddress);
+    absoluteAddress = cpu->readDoubleWord(absoluteAddress, true);
 
     auxData = cpu->read(absoluteAddress);
 
@@ -343,7 +343,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IY>::fetchAuxData()
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++));
-    absoluteAddress = cpu->readZDoubleWord(absoluteAddress) + cpu->Y;
+    absoluteAddress = cpu->readDoubleWord(absoluteAddress, true) + cpu->Y;
 
     auxData = cpu->read(absoluteAddress);
 

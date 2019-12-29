@@ -6,31 +6,30 @@
 #include <Instructions.hpp>
 #include <HwConstants.hpp>
 #include <GamePak.hpp>
+#include <SDL2/SDL.h>
 
 // Nested template syntax can be damaging to the eye - I only want to write it out once :)
 #define GEN_INSTR(name, type, cycles) std::unique_ptr<MOS6502Instruction>(new name<Ricoh2A03::AddressingType::type>(this, cycles))
 
-uint8_t Ricoh2A03::read(uint16_t addr)
+uint8_t Ricoh2A03::read(uint16_t addr, bool zpageMode)
 {
-    return bus->read(addr);
+    uint16_t mask = 0xFFFF;
+
+    if (zpageMode)
+        mask = 0x00FF;
+
+    return bus->read(addr & mask);
 }
 
-uint16_t Ricoh2A03::readDoubleWord(uint16_t addr)
+uint16_t Ricoh2A03::readDoubleWord(uint16_t addr, bool zpageMode)
 {
-    return (static_cast<uint16_t>(bus->read(addr + 0x1)) << 8) |
-           (static_cast<uint16_t>(bus->read(addr)));
-}
+    uint16_t mask = 0xFFFF;
 
-uint8_t Ricoh2A03::readZ(uint16_t &addr)
-{
-    addr &= 0x00FF;
-    return bus->read(addr);
-}
+    if (zpageMode)
+        mask = 0x00FF;
 
-uint16_t Ricoh2A03::readZDoubleWord(uint16_t &addr)
-{
-    addr &= 0x00FF;
-    return (static_cast<uint16_t>(bus->read((addr + 0x1) & 0x00FF)) << 8) |
+    addr &= mask;
+    return (static_cast<uint16_t>(bus->read(addr + 0x1) & mask) << 8) |
            (static_cast<uint16_t>(bus->read(addr)));
 }
 
@@ -61,20 +60,17 @@ uint16_t Ricoh2A03::popDoubleWord()
     uint16_t hi = read(STACK_BASE + ++SP);
     return (hi << 8) | lo;
 }
-#include <SDL2/SDL.h>
+
 // Fetch-Execute Cycle
 void Ricoh2A03::fetch()
 {
     if (cycles == 0)
     {
-        SDL_Log("%x", S);
         uint8_t opcode = read(PC++);
         cycles = instructions[opcode]->exec();
     }
     --cycles;
 }
-
-#include <SDL2/SDL.h>
 
 void Ricoh2A03::reset()
 {

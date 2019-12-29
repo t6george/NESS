@@ -6,6 +6,10 @@
     this->cpu->setFlag(Ricoh2A03::Z, (val) == 0x00); \
     this->cpu->setFlag(Ricoh2A03::N, (val)&0x80);
 
+#define IS_ZP_MODE (T == Ricoh2A03::AddressingType::ZP ||  \
+                    T == Ricoh2A03::AddressingType::ZPX || \
+                    T == Ricoh2A03::AddressingType::ZPY)
+
 // Interrupt Instructions ------------------------------------------------------
 template <Ricoh2A03::AddressingType T>
 class BRK : public AddressingMode<T>
@@ -68,6 +72,7 @@ public:
     uint8_t exec() override final
     {
         this->fetchAuxData();
+        this->auxData = this->cpu->read(this->absoluteAddress, IS_ZP_MODE);
         this->cpu->pushDoubleWord(this->cpu->PC - 1);
         this->cpu->PC = this->absoluteAddress;
 
