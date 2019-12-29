@@ -32,7 +32,7 @@ protected:
     /*
      * MOS6502 reference used to change cpu state
     */
-    Ricoh2A03* cpu;
+    Ricoh2A03 *cpu;
 
     /* 
      * The additional data the instruction would read
@@ -56,10 +56,10 @@ protected:
     uint8_t numCycles;
 
     MOS6502Instruction(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
-     : mnemonic{mnemonic}, cpu{cpu}, auxData{0x0000}, numCycles{numCycles} {}
+        : mnemonic{mnemonic}, cpu{cpu}, auxData{0x0000}, numCycles{numCycles} {}
 
     // Fetches any data from RAM that the instruction will execute on
-    virtual uint8_t fetchAuxData() = 0;
+    virtual uint8_t fetchAuxData(bool loadData = true) = 0;
 
     // Writes back to location where auxiliary data was read from
     virtual void writeBack() = 0;

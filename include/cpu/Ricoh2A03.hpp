@@ -65,9 +65,6 @@ public:
     uint8_t read(uint16_t addr, bool zpageMode = false);
     uint16_t readDoubleWord(uint16_t addr, bool zpageMode = false);
 
-    uint8_t readZ(uint16_t &addr);
-    uint16_t readZDoubleWord(uint16_t &addr);
-
     void write(uint16_t addr, uint8_t data);
 
     void fetch();

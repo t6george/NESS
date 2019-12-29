@@ -52,11 +52,8 @@ uint8_t RicohRP2C02::getByte(uint16_t addr, bool readOnly)
     case 0x0002:
         statusRegister.scratch = dataBuffer & 0x1F;
         data = statusRegister.raw;
-        if (!readOnly)
-        {
-            statusRegister.vertical_blank = 0x0;
-            addrLatch = 0x0;
-        }
+        statusRegister.vertical_blank = 0x0;
+        addrLatch = 0x0;
         break;
     case 0x0003:
         break;
@@ -74,13 +71,8 @@ uint8_t RicohRP2C02::getByte(uint16_t addr, bool readOnly)
         {
             data = dataBuffer;
         }
-        if ((vramAddr.raw & 0x3FFF) >= 0x3F00)
-        {
-            SDL_Log("READ %x: %x", vramAddr.raw, data);
-        }
-        if (!readOnly)
-            vramAddr.raw += (controlRegister.inc_mode ? 0x20 : 0x1);
 
+        vramAddr.raw += (controlRegister.inc_mode ? 0x20 : 0x1);
         break;
     default:
         break;
@@ -134,11 +126,6 @@ void RicohRP2C02::setByte(uint16_t addr, uint8_t data)
         addrLatch ^= 0x01;
         break;
     case 0x0007:
-        if ((vramAddr.raw & 0x3FFF) >= 0x3F00)
-        {
-            SDL_Log("WRITE %x: %x", vramAddr.raw, data);
-            // assert(false);
-        }
         localWrite(vramAddr.raw, data);
         vramAddr.raw += (controlRegister.inc_mode ? 0x20 : 0x1);
         break;
@@ -202,15 +189,6 @@ const uint32_t *RicohRP2C02::getFrameBuffData() const
 
 uint8_t RicohRP2C02::localRead(uint16_t addr) const
 {
-    // if ((addr & 0x3FFF) >= 0x3F00)
-    // {
-    //     --addr;
-    //     addr &= 0x3FFF;
-    //     addr &= 0x1F;
-    //     if ((addr & 0x13) == 0x10)
-    //         addr &= ~0x10;
-    //     SDL_Log("READ %x: %x", addr, bus->read(addr & 0x3FFF));
-    // }
     return bus->read(addr & 0x3FFF);
 }
 

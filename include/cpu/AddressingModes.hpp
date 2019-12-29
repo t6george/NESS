@@ -7,10 +7,11 @@ template <Ricoh2A03::AddressingType T>
 class AddressingMode : public MOS6502Instruction
 {
     const std::string addrModeStr;
+
 protected:
     AddressingMode(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles);
 
-    uint8_t fetchAuxData() override final;
+    uint8_t fetchAuxData(bool loadData = true) override final;
 
     void writeBack() override final
     {
@@ -22,8 +23,8 @@ protected:
 
     inline void instrDump()
     {
-        SDL_Log("PC: 0x%04X | OP: %s | AddrMode: %s | Addr: 0x%04X | Fetched Data: 0x%02X\n", 
-            oldPC, mnemonic.c_str(), addrModeStr.c_str(), absoluteAddress, auxData);
+        SDL_Log("PC: 0x%04X | OP: %s | AddrMode: %s | Addr: 0x%04X | Fetched Data: 0x%02X\n",
+                oldPC, mnemonic.c_str(), addrModeStr.c_str(), absoluteAddress, auxData);
     }
 
 public:

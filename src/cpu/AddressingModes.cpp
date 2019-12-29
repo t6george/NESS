@@ -21,10 +21,13 @@ std::string AddressingMode<Ricoh2A03::AddressingType::IMP>::disassemble(uint16_t
 }
 
 template <>
-uint8_t AddressingMode<Ricoh2A03::AddressingType::IMP>::fetchAuxData()
+uint8_t AddressingMode<Ricoh2A03::AddressingType::IMP>::fetchAuxData(bool loadData)
 {
     oldPC = cpu->PC - 0x1;
-    auxData = cpu->A;
+
+    if (loadData)
+        auxData = cpu->A;
+
     return 0;
 }
 
@@ -46,11 +49,14 @@ std::string AddressingMode<Ricoh2A03::AddressingType::IMM>::disassemble(uint16_t
 }
 
 template <>
-uint8_t AddressingMode<Ricoh2A03::AddressingType::IMM>::fetchAuxData()
+uint8_t AddressingMode<Ricoh2A03::AddressingType::IMM>::fetchAuxData(bool loadData)
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = cpu->PC++;
-    auxData = cpu->read(absoluteAddress);
+
+    if (loadData)
+        auxData = cpu->read(absoluteAddress);
+
     return 0;
 }
 
@@ -73,11 +79,14 @@ std::string AddressingMode<Ricoh2A03::AddressingType::ZP>::disassemble(uint16_t 
 }
 
 template <>
-uint8_t AddressingMode<Ricoh2A03::AddressingType::ZP>::fetchAuxData()
+uint8_t AddressingMode<Ricoh2A03::AddressingType::ZP>::fetchAuxData(bool loadData)
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++));
-    auxData = cpu->read(absoluteAddress, true);
+
+    if (loadData)
+        auxData = cpu->read(absoluteAddress, true);
+
     return 0;
 }
 
@@ -99,11 +108,14 @@ std::string AddressingMode<Ricoh2A03::AddressingType::ZPX>::disassemble(uint16_t
 }
 
 template <>
-uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPX>::fetchAuxData()
+uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPX>::fetchAuxData(bool loadData)
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->X);
-    auxData = cpu->read(absoluteAddress, true);
+
+    if (loadData)
+        auxData = cpu->read(absoluteAddress, true);
+
     return 0;
 }
 
@@ -125,11 +137,14 @@ std::string AddressingMode<Ricoh2A03::AddressingType::ZPY>::disassemble(uint16_t
 }
 
 template <>
-uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPY>::fetchAuxData()
+uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPY>::fetchAuxData(bool loadData)
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->Y);
-    auxData = cpu->read(absoluteAddress, true);
+
+    if (loadData)
+        auxData = cpu->read(absoluteAddress, true);
+
     return 0;
 }
 
@@ -151,11 +166,11 @@ std::string AddressingMode<Ricoh2A03::AddressingType::REL>::disassemble(uint16_t
 }
 
 template <>
-uint8_t AddressingMode<Ricoh2A03::AddressingType::REL>::fetchAuxData()
+uint8_t AddressingMode<Ricoh2A03::AddressingType::REL>::fetchAuxData(bool loadData)
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = cpu->read(cpu->PC++);
-    absoluteAddress |= ((static_cast<uint8_t>(0x80 & auxData) != 0x0000) * 0xFF00);
+    absoluteAddress |= ((static_cast<uint8_t>(0x80 & absoluteAddress) != 0x0000) * 0xFF00);
 
     return 0;
 }
@@ -179,13 +194,15 @@ std::string AddressingMode<Ricoh2A03::AddressingType::AB>::disassemble(uint16_t 
 }
 
 template <>
-uint8_t AddressingMode<Ricoh2A03::AddressingType::AB>::fetchAuxData()
+uint8_t AddressingMode<Ricoh2A03::AddressingType::AB>::fetchAuxData(bool loadData)
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = cpu->readDoubleWord(cpu->PC);
     cpu->PC += 0x2;
 
-    auxData = cpu->read(absoluteAddress);
+    if (loadData)
+        auxData = cpu->read(absoluteAddress);
+
     return 0;
 }
 
@@ -208,13 +225,15 @@ std::string AddressingMode<Ricoh2A03::AddressingType::ABX>::disassemble(uint16_t
 }
 
 template <>
-uint8_t AddressingMode<Ricoh2A03::AddressingType::ABX>::fetchAuxData()
+uint8_t AddressingMode<Ricoh2A03::AddressingType::ABX>::fetchAuxData(bool loadData)
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = cpu->readDoubleWord(cpu->PC) + cpu->X;
     cpu->PC += 0x2;
 
-    auxData = cpu->read(absoluteAddress);
+    if (loadData)
+        auxData = cpu->read(absoluteAddress);
+
     return (absoluteAddress & 0xFF00) != ((absoluteAddress - cpu->X) & 0xFF00);
 }
 
@@ -237,13 +256,15 @@ std::string AddressingMode<Ricoh2A03::AddressingType::ABY>::disassemble(uint16_t
 }
 
 template <>
-uint8_t AddressingMode<Ricoh2A03::AddressingType::ABY>::fetchAuxData()
+uint8_t AddressingMode<Ricoh2A03::AddressingType::ABY>::fetchAuxData(bool loadData)
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = cpu->readDoubleWord(cpu->PC) + cpu->Y;
     cpu->PC += 0x2;
 
-    auxData = cpu->read(absoluteAddress);
+    if (loadData)
+        auxData = cpu->read(absoluteAddress);
+
     return (absoluteAddress & 0xFF00) != ((absoluteAddress - cpu->Y) & 0xFF00);
 }
 
@@ -267,7 +288,7 @@ std::string AddressingMode<Ricoh2A03::AddressingType::IN>::disassemble(uint16_t 
 }
 
 template <>
-uint8_t AddressingMode<Ricoh2A03::AddressingType::IN>::fetchAuxData()
+uint8_t AddressingMode<Ricoh2A03::AddressingType::IN>::fetchAuxData(bool loadData)
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = cpu->readDoubleWord(cpu->PC);
@@ -284,7 +305,8 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IN>::fetchAuxData()
         absoluteAddress = cpu->readDoubleWord(absoluteAddress);
     }
 
-    auxData = cpu->read(absoluteAddress);
+    if (loadData)
+        auxData = cpu->read(absoluteAddress);
 
     return 0;
 }
@@ -308,13 +330,14 @@ std::string AddressingMode<Ricoh2A03::AddressingType::IX>::disassemble(uint16_t 
 }
 
 template <>
-uint8_t AddressingMode<Ricoh2A03::AddressingType::IX>::fetchAuxData()
+uint8_t AddressingMode<Ricoh2A03::AddressingType::IX>::fetchAuxData(bool loadData)
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++)) + static_cast<uint16_t>(cpu->X);
     absoluteAddress = cpu->readDoubleWord(absoluteAddress, true);
 
-    auxData = cpu->read(absoluteAddress);
+    if (loadData)
+        auxData = cpu->read(absoluteAddress);
 
     return 0;
 }
@@ -339,13 +362,14 @@ std::string AddressingMode<Ricoh2A03::AddressingType::IY>::disassemble(uint16_t 
 }
 
 template <>
-uint8_t AddressingMode<Ricoh2A03::AddressingType::IY>::fetchAuxData()
+uint8_t AddressingMode<Ricoh2A03::AddressingType::IY>::fetchAuxData(bool loadData)
 {
     oldPC = cpu->PC - 0x1;
     absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++));
     absoluteAddress = cpu->readDoubleWord(absoluteAddress, true) + cpu->Y;
 
-    auxData = cpu->read(absoluteAddress);
+    if (loadData)
+        auxData = cpu->read(absoluteAddress);
 
     return (absoluteAddress & 0xFF00) != ((absoluteAddress - cpu->Y) & 0xFF00);
 }
