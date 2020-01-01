@@ -18,7 +18,12 @@ uint8_t Ricoh2A03::read(uint16_t addr, bool zpageMode)
     if (zpageMode)
         mask = 0x00FF;
 
-    return bus->read(addr & mask);
+    uint8_t tmp = bus->read(addr & mask);
+
+    // if (addr <= 0x1FFF && addr >= 0x0000)
+    //     std::cout << "RAM READ from " << std::hex << static_cast<int>(addr % 0x800) << " with data " << static_cast<int>(tmp) << std::endl;
+
+    return tmp;
 }
 
 uint16_t Ricoh2A03::readDoubleWord(uint16_t addr, bool zpageMode)
@@ -29,12 +34,15 @@ uint16_t Ricoh2A03::readDoubleWord(uint16_t addr, bool zpageMode)
         mask = 0x00FF;
 
     addr &= mask;
-    return (static_cast<uint16_t>(bus->read(addr + 0x1) & mask) << 8) |
-           (static_cast<uint16_t>(bus->read(addr)));
+    return (static_cast<uint16_t>(read(addr, zpageMode))) |
+           (static_cast<uint16_t>(read(addr + 0x1, zpageMode)) << 8);
 }
 
 void Ricoh2A03::write(uint16_t addr, uint8_t data)
 {
+    // if (addr <= 0x1FFF && addr >= 0x0000)
+    //     std::cout << "RAM WRITE to " << std::hex << static_cast<int>(addr) << " with data " << static_cast<int>(data) << std::endl;
+
     bus->write(addr, data);
 }
 
@@ -51,13 +59,13 @@ void Ricoh2A03::pushDoubleWord(uint16_t dWord)
 
 uint8_t Ricoh2A03::popWord()
 {
-    return read(STACK_BASE + ++SP);
+    return read(STACK_BASE + (++SP));
 }
 
 uint16_t Ricoh2A03::popDoubleWord()
 {
-    uint16_t lo = read(STACK_BASE + ++SP);
-    uint16_t hi = read(STACK_BASE + ++SP);
+    uint16_t lo = read(STACK_BASE + (++SP));
+    uint16_t hi = read(STACK_BASE + (++SP));
     return (hi << 8) | lo;
 }
 
@@ -85,6 +93,7 @@ void Ricoh2A03::reset()
 
 void Ricoh2A03::nmi(uint16_t interruptAddr)
 {
+    // std::cout << "NMI CALLED" << std::endl;
     setFlag(U, true);
     setFlag(I, true);
     setFlag(B, false);

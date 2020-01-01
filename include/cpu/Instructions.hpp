@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <AddressingModes.hpp>
+#include <iostream>
 
 #define SET_ZN(val)                                  \
     this->cpu->setFlag(Ricoh2A03::Z, (val) == 0x00); \
@@ -44,8 +45,8 @@ public:
     uint8_t exec() override final
     {
         this->cpu->S = this->cpu->popWord();
-        this->cpu->setFlag(Ricoh2A03::U, false);
-        this->cpu->setFlag(Ricoh2A03::B, false);
+        // this->cpu->setFlag(Ricoh2A03::U, false);
+        // this->cpu->setFlag(Ricoh2A03::B, false);
 
         this->cpu->PC = this->cpu->popDoubleWord();
 
@@ -69,7 +70,9 @@ public:
     {
         this->fetchAuxData(false);
         this->cpu->pushDoubleWord(this->cpu->PC - 1);
+        // std::cout << "saved to stack " << static_cast<int>(this->cpu->PC - 1) << std::endl;
         this->cpu->PC = this->absoluteAddress;
+        // std::cout << "new pc is " << static_cast<int>(this->cpu->PC) << std::endl;
 
 #ifdef DUMP
         AddressingMode<T>::instrDump();
@@ -87,11 +90,10 @@ public:
 
     uint8_t exec() override final
     {
-        this->cpu->PC = this->cpu->popDoubleWord();
-        ++this->cpu->PC;
-
+        this->cpu->PC = this->cpu->popDoubleWord() + 1;
+        // std::cout << "new pc " << std::hex << static_cast<int>(this->cpu->PC) << std::endl;
 #ifdef DUMP
-        this->oldPC = this->cpu->PC - 0x1;
+        this->fetchAuxData();
         AddressingMode<T>::instrDump();
 #endif
         return this->numCycles;
@@ -195,6 +197,7 @@ public:
     {
         uint8_t cyclePenalty = this->fetchAuxData();
         this->cpu->A = this->auxData;
+        // std::cout << "lda from " << std::hex << static_cast<int>(this->absoluteAddress) << std::endl;
         SET_ZN(this->cpu->A)
 
 #ifdef DUMP
@@ -436,8 +439,8 @@ public:
     uint8_t exec() override final
     {
         this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
-                                             this->cpu->getFlag(Ricoh2A03::Z));
+        uint8_t cyclePenalty = this->cpu->branch(this->absoluteAddress,
+                                                 this->cpu->getFlag(Ricoh2A03::Z));
 
 #ifdef DUMP
         AddressingMode<T>::instrDump();
@@ -456,8 +459,8 @@ public:
     uint8_t exec() override final
     {
         this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
-                                             !this->cpu->getFlag(Ricoh2A03::Z));
+        uint8_t cyclePenalty = this->cpu->branch(this->absoluteAddress,
+                                                 !this->cpu->getFlag(Ricoh2A03::Z));
 
 #ifdef DUMP
         AddressingMode<T>::instrDump();
@@ -476,8 +479,8 @@ public:
     uint8_t exec() override final
     {
         this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
-                                             this->cpu->getFlag(Ricoh2A03::C));
+        uint8_t cyclePenalty = this->cpu->branch(this->absoluteAddress,
+                                                 this->cpu->getFlag(Ricoh2A03::C));
 
 #ifdef DUMP
         AddressingMode<T>::instrDump();
@@ -496,8 +499,8 @@ public:
     uint8_t exec() override final
     {
         this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
-                                             !this->cpu->getFlag(Ricoh2A03::C));
+        uint8_t cyclePenalty = this->cpu->branch(this->absoluteAddress,
+                                                 !this->cpu->getFlag(Ricoh2A03::C));
 
 #ifdef DUMP
         AddressingMode<T>::instrDump();
@@ -516,8 +519,8 @@ public:
     uint8_t exec() override final
     {
         this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
-                                             this->cpu->getFlag(Ricoh2A03::V));
+        uint8_t cyclePenalty = this->cpu->branch(this->absoluteAddress,
+                                                 this->cpu->getFlag(Ricoh2A03::V));
 
 #ifdef DUMP
         AddressingMode<T>::instrDump();
@@ -531,13 +534,13 @@ class BVC : public AddressingMode<T>
 {
 public:
     BVC(Ricoh2A03 *cpu, uint8_t numCycles)
-        : AddressingMode<T>("BVS", cpu, numCycles) {}
+        : AddressingMode<T>("BVC", cpu, numCycles) {}
 
     uint8_t exec() override final
     {
         this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
-                                             !this->cpu->getFlag(Ricoh2A03::V));
+        uint8_t cyclePenalty = this->cpu->branch(this->absoluteAddress,
+                                                 !this->cpu->getFlag(Ricoh2A03::V));
 
 #ifdef DUMP
         AddressingMode<T>::instrDump();
@@ -556,8 +559,8 @@ public:
     uint8_t exec() override final
     {
         this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
-                                             this->cpu->getFlag(Ricoh2A03::N));
+        uint8_t cyclePenalty = this->cpu->branch(this->absoluteAddress,
+                                                 this->cpu->getFlag(Ricoh2A03::N));
 
 #ifdef DUMP
         AddressingMode<T>::instrDump();
@@ -576,8 +579,8 @@ public:
     uint8_t exec() override final
     {
         this->fetchAuxData();
-        int cyclePenalty = this->cpu->branch(this->absoluteAddress,
-                                             !this->cpu->getFlag(Ricoh2A03::N));
+        uint8_t cyclePenalty = this->cpu->branch(this->absoluteAddress,
+                                                 !this->cpu->getFlag(Ricoh2A03::N));
 
 #ifdef DUMP
         AddressingMode<T>::instrDump();
@@ -1139,7 +1142,7 @@ public:
 
         this->cpu->setFlag(Ricoh2A03::C, overflowCheck & 0xFF00);
         this->cpu->setFlag(Ricoh2A03::V,
-                           (this->auxData ^ static_cast<uint8_t>(overflowCheck)) &
+                           ~(this->cpu->A ^ this->auxData) &
                                (this->cpu->A ^ static_cast<uint8_t>(overflowCheck)) &
                                0x80);
 

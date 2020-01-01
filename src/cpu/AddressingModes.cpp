@@ -317,7 +317,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IN>::fetchAuxData(bool loadDat
  */
 template <>
 AddressingMode<Ricoh2A03::AddressingType::IX>::AddressingMode(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
-    : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"INX"} {}
+    : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"IZX"} {}
 
 template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::IX>::disassemble(uint16_t &pc)
@@ -350,7 +350,7 @@ uint8_t AddressingMode<Ricoh2A03::AddressingType::IX>::fetchAuxData(bool loadDat
  */
 template <>
 AddressingMode<Ricoh2A03::AddressingType::IY>::AddressingMode(const std::string mnemonic, Ricoh2A03 *cpu, uint8_t numCycles)
-    : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"INY"} {}
+    : MOS6502Instruction(mnemonic, cpu, numCycles), addrModeStr{"IZY"} {}
 
 template <>
 std::string AddressingMode<Ricoh2A03::AddressingType::IY>::disassemble(uint16_t &pc)
