@@ -14,10 +14,8 @@ NesSystem::NesSystem()
 
 void NesSystem::tick()
 {
-    // std::cout << "pc 1 " << std::hex << static_cast<int>(cpu->PC) << std::endl;
-
     ppu->run();
-    // std::cout << "pc 2 " << std::hex << static_cast<int>(cpu->PC) << std::endl;
+
     if (systemClock % 3 == 0)
     {
         cpu->fetch();
@@ -29,23 +27,17 @@ void NesSystem::tick()
         ppu->requestCpuNmi = false;
     }
 
-    // std::cout << "pc 3 " << std::hex << static_cast<int>(cpu->PC) << std::endl;
-    if (ppu->updateScreen)
+    if (systemClock % (256 * 240) == 0)
     {
         screen->blit();
-        ppu->updateScreen = false;
     }
-    // std::cout << "pc 4 " << std::hex << static_cast<int>(cpu->PC) << std::endl;
+
     ++systemClock;
 }
 
 void NesSystem::reset()
 {
     cpu->reset();
-
-    for (uint8_t i = 0; i < 0x15; ++i)
-        ppu->run();
-
     ppu->reset();
     systemClock = 0;
 }
@@ -58,21 +50,19 @@ void NesSystem::insertCartridge(const std::string &romName)
     cpu->addCartridge(cart);
     ppu->addCartridge(cart);
     reset();
-
-#ifdef DISASSEMBLE
+    #ifdef DISASSEMBLE
     uint16_t PC = CPU::CARTRIDGE::Base;
     int8_t nameEnd = romName.size() - 1;
     uint8_t opcode;
 
-    while (nameEnd >= 0 && romName[nameEnd--] != '.')
-        ;
+    while (nameEnd >= 0 && romName[nameEnd--] != '.');
     ++nameEnd;
     if (nameEnd == 0)
         nameEnd = romName.size() - 1;
-
-    std::ofstream asmFile(romName.substr(0, nameEnd) + ".asm");
+    
+    std::ofstream asmFile (romName.substr(0, nameEnd) + ".asm");
     if (asmFile.is_open())
-    {
+    {    
         while (PC >= CPU::CARTRIDGE::Base && PC <= CPU::CARTRIDGE::Limit)
         {
             asmFile << std::hex << PC << " : ";
@@ -82,5 +72,5 @@ void NesSystem::insertCartridge(const std::string &romName)
 
         asmFile.close();
     }
-#endif
+    #endif
 }

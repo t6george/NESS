@@ -30,6 +30,7 @@ RicohRP2C02::RicohRP2C02() : cycle{0}, addrLatch{0x00}, dataBuffer{0x00},
                                  DISPLAY::Width * DISPLAY::Height,
                                  DISPLAY::PixelOpacity)}
 {
+    reset();
     bus->attachDevice(PPU::PALETTE::Base,
                       PPU::PALETTE::Limit,
                       PPU::PALETTE::Mirror,
@@ -86,7 +87,8 @@ void RicohRP2C02::setByte(uint16_t addr, uint8_t data)
     {
     case 0x0000:
         controlRegister.raw = data;
-        tramAddr.nametable = controlRegister.nametable;
+        tramAddr.nametable_x = controlRegister.nametable_x;
+        tramAddr.nametable_y = controlRegister.nametable_y;
         break;
     case 0x0001:
         maskRegister.raw = data;
@@ -175,9 +177,8 @@ void RicohRP2C02::updateFrameBuffer(const uint8_t tblIndex)
 
 uint32_t RicohRP2C02::getRgb(const uint8_t tblIndex, const uint16_t pixelVal) const
 {
-    // int palette = PPU::PALETTE::Base + (tblIndex << 0x2) + pixelVal;
-    // if (palette != PPU::PALETTE::Base)
-    // colors[(localRead(PPU::PALETTE::Base + (tblIndex << 0x2) + pixelVal)) & maskRegister.grayscale ? 0x30 : 0x3F] | DISPLAY::PixelOpacity);
+    // SDL_Log("Read coming from %x", );
+    // int i = colors[(localRead(PPU::PALETTE::Base + (tblIndex << 0x2) + pixelVal)) & maskRegister.grayscale ? 0x30 : 0x3F];
     return colors[(localRead(PPU::PALETTE::Base + (tblIndex << 0x2) + pixelVal)) & maskRegister.grayscale ? 0x30 : 0x3F] | DISPLAY::PixelOpacity;
 }
 
@@ -195,142 +196,200 @@ void RicohRP2C02::localWrite(uint16_t addr, uint8_t data)
 {
     bus->write(addr & 0x3FFF, data);
 }
-void RicohRP2C02::updatePixel(bool framePrep)
-{
-    static uint16_t addr;
-    // SDL_Log("status %x", statusRegister.raw);
-    // SDL_Log("mask %x", maskRegister.raw);
-    // SDL_Log("control %x", controlRegister.raw);
-    // SDL_Log("vram %x", vramAddr.raw);
-    // SDL_Log("tram %x", tramAddr.raw);
-    // SDL_Log("-------");
-    switch (dot)
-    {
-    case 2 ... 255:
-    case 322 ... 337:
-        pixel();
-        switch (dot % 8)
-        {
-        // Nametable:
-        case 1:
-            addr = nt_addr();
-            reload_shift();
-            break;
-        case 2:
-            nt = localRead(addr);
-            break;
-        // Attribute:
-        case 3:
-            addr = at_addr();
-            break;
-        case 4:
-            at = localRead(addr);
-            if (vramAddr.coarse_y & 2)
-                at >>= 4;
-            if (vramAddr.coarse_x & 2)
-                at >>= 2;
-            break;
-        // Background (low bits):
-        case 5:
-            addr = bg_addr();
-            break;
-        case 6:
-            bgL = localRead(addr);
-            break;
-        // Background (high bits):
-        case 7:
-            addr += 8;
-            break;
-        case 0:
-            bgH = localRead(addr);
-            h_scroll();
-            break;
-        }
-        break;
-    case 256:
-        pixel();
-        bgH = localRead(addr);
-        v_scroll();
-        break; // Vertical bump.
-    case 257:
-        pixel();
-        reload_shift();
-        h_update();
-        break; // Update horizontal position.
-    case 280 ... 304:
-        if (framePrep)
-            v_update();
-        break; // Update vertical position.
 
-    // No shift reloading:
-    case 1:
-        addr = nt_addr();
-        if (framePrep)
-            statusRegister.vertical_blank = 0x0;
-        break;
-    case 321:
-    case 339:
-        addr = nt_addr();
-        break;
-    // Nametable fetch instead of attribute:
-    case 338:
-        nt = localRead(addr);
-        break;
-    case 340:
-        nt = localRead(addr);
-        if (framePrep && rendering() && oddFrame)
-            ++dot;
-    }
-}
-// static uint32_t cnt = 0;
-// #define NTH_BIT(x, n) (((x) >> (n)) & 1)
-#include <iostream>
 void RicohRP2C02::run()
 {
-    // std::cout << "moss " << std::hex << " dot is " << static_cast<int>(dot) << "    " << static_cast<int>(cnt) << std::endl;
-    // ++cnt;
-    switch (scanline)
-    {
-    case 0 ... 239:
-        updatePixel();
-        break;
-    case 240:
-        if (dot == 0)
+    auto IncrementScrollX = [&]() {
+        if (maskRegister.render_bg || maskRegister.render_sprites)
         {
-            updateScreen = true;
-        }
-        break;
-    case 241:
-        if (dot == 0x1)
-        {
-            std::cout << "NMI" << std::endl;
-            statusRegister.vertical_blank = 0x1;
-            // std::cout << "ctrl reg " << std::hex << static_cast<int>(controlRegister.raw) << std::endl;
-            if (controlRegister.enable_nmi == 0x1)
+            if (vramAddr.coarse_x == 31)
             {
-                requestCpuNmi = true;
+                vramAddr.coarse_x = 0;
+                vramAddr.nametable_x = ~vramAddr.nametable_x;
+            }
+            else
+            {
+                ++vramAddr.coarse_x;
             }
         }
-        break;
-    case 261:
-        updatePixel(true);
-        break;
+    };
+
+    auto IncrementScrollY = [&]() {
+        if (maskRegister.render_bg || maskRegister.render_sprites)
+        {
+            if (vramAddr.fine_y < 7)
+            {
+                ++vramAddr.fine_y;
+            }
+            else
+            {
+                vramAddr.fine_y = 0;
+
+                if (vramAddr.coarse_y == 29)
+                {
+                    vramAddr.coarse_y = 0;
+                    vramAddr.nametable_y = ~vramAddr.nametable_y;
+                }
+                else
+                {
+                    ++vramAddr.coarse_y;
+                }
+            }
+        }
+    };
+
+    auto TransferAddressX = [&]() {
+        if (maskRegister.render_bg || maskRegister.render_sprites)
+        {
+            vramAddr.nametable_x = tramAddr.nametable_x;
+            vramAddr.coarse_x = tramAddr.coarse_x;
+        }
+    };
+
+    auto TransferAddressY = [&]() {
+        if (maskRegister.render_bg || maskRegister.render_sprites)
+        {
+            vramAddr.fine_y = tramAddr.fine_y;
+            vramAddr.nametable_y = tramAddr.nametable_y;
+            vramAddr.coarse_y = tramAddr.coarse_y;
+        }
+    };
+
+    auto LoadBackgroundShifters = [&]() {
+        bg_shifter_pattern_lo = (bg_shifter_pattern_lo & 0xFF00) | bg_next_tile_lsb;
+        bg_shifter_pattern_hi = (bg_shifter_pattern_hi & 0xFF00) | bg_next_tile_msb;
+
+        bg_shifter_attrib_lo = (bg_shifter_attrib_lo & 0xFF00) | ((bg_next_tile_attrib & 0b01) ? 0xFF : 0x00);
+        bg_shifter_attrib_hi = (bg_shifter_attrib_hi & 0xFF00) | ((bg_next_tile_attrib & 0b10) ? 0xFF : 0x00);
+    };
+
+    auto UpdateShifters = [&]() {
+        if (maskRegister.render_bg)
+        {
+            bg_shifter_pattern_lo <<= 1;
+            bg_shifter_pattern_hi <<= 1;
+
+            bg_shifter_attrib_lo <<= 1;
+            bg_shifter_attrib_hi <<= 1;
+        }
+    };
+
+    if (scanline >= -1 && scanline < 240)
+    {
+        if (scanline == 0 && cycle == 0)
+        {
+            cycle = 1;
+        }
+
+        if (scanline == -1 && cycle == 1)
+        {
+            statusRegister.vertical_blank = 0;
+        }
+
+        if ((cycle >= 2 && cycle < 258) || (cycle >= 321 && cycle < 338))
+        {
+            UpdateShifters();
+
+            switch ((cycle - 1) % 8)
+            {
+            case 0:
+                LoadBackgroundShifters();
+
+                bg_next_tile_id = localRead(0x2000 | (vramAddr.raw & 0x0FFF));
+                break;
+            case 2:
+                bg_next_tile_attrib = localRead(0x23C0 | (vramAddr.nametable_y << 11) | (vramAddr.nametable_x << 10) | ((vramAddr.coarse_y >> 2) << 3) | (vramAddr.coarse_x >> 2));
+
+                if (vramAddr.coarse_y & 0x02)
+                    bg_next_tile_attrib >>= 4;
+                if (vramAddr.coarse_x & 0x02)
+                    bg_next_tile_attrib >>= 2;
+                bg_next_tile_attrib &= 0x03;
+                break;
+
+            case 4:
+                bg_next_tile_lsb = localRead((controlRegister.pattern_bg << 12) + ((uint16_t)bg_next_tile_id << 4) + (vramAddr.fine_y) + 0);
+
+                break;
+            case 6:
+                bg_next_tile_msb = localRead((controlRegister.pattern_bg << 12) + ((uint16_t)bg_next_tile_id << 4) + (vramAddr.fine_y) + 8);
+                break;
+            case 7:
+                IncrementScrollX();
+                break;
+            }
+        }
+
+        if (cycle == 256)
+        {
+            IncrementScrollY();
+        }
+
+        if (cycle == 257)
+        {
+            LoadBackgroundShifters();
+            TransferAddressX();
+        }
+
+        if (cycle == 338 || cycle == 340)
+        {
+            bg_next_tile_id = localRead(0x2000 | (vramAddr.raw & 0x0FFF));
+        }
+
+        if (scanline == -1 && cycle >= 280 && cycle < 305)
+        {
+            TransferAddressY();
+        }
     }
 
-    if (++dot > 340)
+    if (scanline >= 241 && scanline < 261)
     {
-        dot %= 341;
-        if (++scanline > 261)
+        if (scanline == 241 && cycle == 1)
         {
-            scanline = 0;
-            oddFrame ^= true;
+            statusRegister.vertical_blank = 1;
+
+            if (controlRegister.enable_nmi)
+                requestCpuNmi = true;
+        }
+    }
+
+    uint8_t bg_pixel = 0x00;
+    uint8_t bg_palette = 0x00;
+
+    if (maskRegister.render_bg)
+    {
+        uint16_t bit_mux = 0x8000 >> fine_x;
+
+        uint8_t p0_pixel = (bg_shifter_pattern_lo & bit_mux) > 0;
+        uint8_t p1_pixel = (bg_shifter_pattern_hi & bit_mux) > 0;
+
+        bg_pixel = (p1_pixel << 1) | p0_pixel;
+
+        uint8_t bg_pal0 = (bg_shifter_attrib_lo & bit_mux) > 0;
+        uint8_t bg_pal1 = (bg_shifter_attrib_hi & bit_mux) > 0;
+        bg_palette = (bg_pal1 << 1) | bg_pal0;
+    }
+
+    if (scanline >= 0 && scanline < 240 && cycle <= 256)
+        frameBuffer[scanline * 256 + cycle - 1] = getRgb(bg_palette, bg_pixel);
+
+    ++cycle;
+
+    if (cycle >= 341)
+    {
+        cycle = 0;
+        ++scanline;
+
+        if (scanline >= 261)
+        {
+            scanline = -1;
+            // frameDrawn = true;
         }
     }
 }
 
 void RicohRP2C02::reset()
 {
-    std::cout << "RESET" << std::endl;
     fine_x = 0x00;
     addrLatch = 0x00;
     dataBuffer = 0x00;
@@ -349,5 +408,4 @@ void RicohRP2C02::reset()
     controlRegister.raw = 0x00;
     vramAddr.raw = 0x0000;
     tramAddr.raw = 0x0000;
-    dot = 0;
 }

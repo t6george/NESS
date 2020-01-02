@@ -7,8 +7,8 @@
 #include <MOS6502Instruction.hpp>
 
 #define STACK_BASE 0x0100
-#define NUM_OPCODES 0x0100
-#define DUMP
+#define NUM_OPCODES 0x100
+// #define DUMP
 
 class GamePak;
 class AddressableDevice;
