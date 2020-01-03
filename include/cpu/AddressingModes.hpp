@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <MOS6502Instruction.hpp>
 #include <Ricoh2A03.hpp>
+#include <stdio.h>
 
 template <Ricoh2A03::AddressingType T>
 class AddressingMode : public MOS6502Instruction
@@ -23,8 +24,11 @@ protected:
 
     inline void instrDump()
     {
-        SDL_Log("PC: 0x%04X | OP: %s | AddrMode: %s | Addr: 0x%04X | Fetched Data: 0x%02X\n",
-                oldPC, mnemonic.c_str(), addrModeStr.c_str(), absoluteAddress, auxData);
+        printf("PC: 0x%04X / OP: %s / Addr: %s / Addr: 0x%04X / Data: 0x%02X\n",
+               oldPC, mnemonic.c_str(), addrModeStr.c_str(), absoluteAddress, auxData);
+        absoluteAddress = auxData = 0;
+        printf("A: 0x%02X / X: 0x%02X / Y: 0x%02X / SP: 0x%02X / S: 0x%02X\n-----\n",
+               cpu->A, cpu->X, cpu->Y, cpu->SP, cpu->S);
     }
 
 public:

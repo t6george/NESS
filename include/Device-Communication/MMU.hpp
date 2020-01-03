@@ -16,12 +16,14 @@ typedef struct
 class MMU
 {
     std::vector<AddressingInfo> virtToPhys;
+    // uint8_t controller_state[2];
+    // uint8_t controller[2];
 
 public:
     MMU() = default;
     ~MMU() = default;
 
     void addEntry(const AddressingInfo entry);
-    uint8_t read(uint16_t addr) const;
-    void write(uint16_t addr, uint8_t data) const;
+    uint8_t read(uint16_t addr);
+    void write(uint16_t addr, uint8_t data);
 };

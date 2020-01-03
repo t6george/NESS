@@ -111,7 +111,7 @@ template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPX>::fetchAuxData(bool loadData)
 {
     oldPC = cpu->PC - 0x1;
-    absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->X);
+    absoluteAddress = 0x00FF & static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->X);
 
     if (loadData)
         auxData = cpu->read(absoluteAddress, true);
@@ -140,7 +140,7 @@ template <>
 uint8_t AddressingMode<Ricoh2A03::AddressingType::ZPY>::fetchAuxData(bool loadData)
 {
     oldPC = cpu->PC - 0x1;
-    absoluteAddress = static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->Y);
+    absoluteAddress = 0x00FF & static_cast<uint16_t>(cpu->read(cpu->PC++) + cpu->Y);
 
     if (loadData)
         auxData = cpu->read(absoluteAddress, true);

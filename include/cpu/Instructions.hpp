@@ -16,6 +16,9 @@ public:
 
     uint8_t exec() override final
     {
+#ifdef DUMP
+        this->oldPC = this->cpu->PC - 0x1;
+#endif
         ++this->cpu->PC;
         this->cpu->setFlag(Ricoh2A03::I, true);
         this->cpu->setFlag(Ricoh2A03::B, true);
@@ -27,7 +30,6 @@ public:
         this->cpu->setFlag(Ricoh2A03::B, false);
 
 #ifdef DUMP
-        this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
 #endif
         return this->numCycles;
@@ -43,6 +45,10 @@ public:
 
     uint8_t exec() override final
     {
+#ifdef DUMP
+        this->oldPC = this->cpu->PC - 0x1;
+#endif
+
         this->cpu->S = this->cpu->popWord();
         this->cpu->setFlag(Ricoh2A03::U, false);
         this->cpu->setFlag(Ricoh2A03::B, false);
@@ -50,7 +56,6 @@ public:
         this->cpu->PC = this->cpu->popDoubleWord();
 
 #ifdef DUMP
-        this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
 #endif
         return this->numCycles;
@@ -67,6 +72,9 @@ public:
 
     uint8_t exec() override final
     {
+#ifdef DUMP
+        this->oldPC = this->cpu->PC - 0x1;
+#endif
         this->fetchAuxData(false);
         this->cpu->pushDoubleWord(this->cpu->PC - 1);
         this->cpu->PC = this->absoluteAddress;
@@ -87,11 +95,13 @@ public:
 
     uint8_t exec() override final
     {
+#ifdef DUMP
+        this->oldPC = this->cpu->PC - 0x1;
+#endif
         this->cpu->PC = this->cpu->popDoubleWord();
         ++this->cpu->PC;
 
 #ifdef DUMP
-        this->oldPC = this->cpu->PC - 0x1;
         AddressingMode<T>::instrDump();
 #endif
         return this->numCycles;

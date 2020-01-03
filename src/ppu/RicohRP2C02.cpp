@@ -1,81 +1,167 @@
 #include <cassert>
+#include <iostream>
 
 #include <RicohRP2C02.hpp>
-#include <Bus.hpp>
-#include <Vram.hpp>
-#include <PaletteRam.hpp>
-#include <HwConstants.hpp>
-#include <GamePak.hpp>
-#include <SDL2/SDL.h>
 
-RicohRP2C02::RicohRP2C02() : cycle{0}, addrLatch{0x00}, dataBuffer{0x00},
-                             scanline{0}, requestCpuNmi{false}, fine_x{0x00}, bus{new Bus{}},
-                             colors{0x666666, 0x002A88, 0x1412A7, 0x3B00A4,
-                                    0x5C007E, 0x6E0040, 0x6C0600, 0x561D00,
-                                    0x333500, 0x0B4800, 0x005200, 0x004F08,
-                                    0x00404D, 0x000000, 0x000000, 0x000000,
-                                    0xADADAD, 0x155FD9, 0x4240FF, 0x7527FE,
-                                    0xA01ACC, 0xB71E7B, 0xB53120, 0x994E00,
-                                    0x6B6D00, 0x388700, 0x0C9300, 0x008F32,
-                                    0x007C8D, 0x000000, 0x000000, 0x000000,
-                                    0xFFFEFF, 0x64B0FF, 0x9290FF, 0xC676FF,
-                                    0xF36AFF, 0xFE6ECC, 0xFE8170, 0xEA9E22,
-                                    0xBCBE00, 0x88D800, 0x5CE430, 0x45E082,
-                                    0x48CDDE, 0x4F4F4F, 0x000000, 0x000000,
-                                    0xFFFEFF, 0xC0DFFF, 0xD3D2FF, 0xE8C8FF,
-                                    0xFBC2FF, 0xFEC4EA, 0xFECCC5, 0xF7D8A5,
-                                    0xE4E594, 0xCFEF96, 0xBDF4AB, 0xB3F3CC,
-                                    0xB5EBF2, 0xB8B8B8, 0x000000, 0x000000},
-                             frameBuffer{std::vector<uint32_t>(
-                                 DISPLAY::Width * DISPLAY::Height,
-                                 DISPLAY::PixelOpacity)}
+uint32_t genColor(uint8_t r, uint8_t g, uint8_t b)
 {
-    reset();
-    bus->attachDevice(PPU::PALETTE::Base,
-                      PPU::PALETTE::Limit,
-                      PPU::PALETTE::Mirror,
-                      std::shared_ptr<AddressableDevice>(
-                          new PaletteRam(PPU::PALETTE::Size)));
+    uint32_t color = 0xFF000000;
+    color |= (r << 4);
+    color |= (g << 2);
+    color |= (b << 0);
+    return color;
 }
-#include <cassert>
+
+RicohRP2C02::RicohRP2C02()
+{
+    sprScreen.resize(240 * 256);
+    for (int i = 0; i < 256 * 240; ++i)
+        sprScreen[i] = 0;
+
+    palScreen[0x00] = genColor(84, 84, 84);
+    palScreen[0x01] = genColor(0, 30, 116);
+    palScreen[0x02] = genColor(8, 16, 144);
+    palScreen[0x03] = genColor(48, 0, 136);
+    palScreen[0x04] = genColor(68, 0, 100);
+    palScreen[0x05] = genColor(92, 0, 48);
+    palScreen[0x06] = genColor(84, 4, 0);
+    palScreen[0x07] = genColor(60, 24, 0);
+    palScreen[0x08] = genColor(32, 42, 0);
+    palScreen[0x09] = genColor(8, 58, 0);
+    palScreen[0x0A] = genColor(0, 64, 0);
+    palScreen[0x0B] = genColor(0, 60, 0);
+    palScreen[0x0C] = genColor(0, 50, 60);
+    palScreen[0x0D] = genColor(0, 0, 0);
+    palScreen[0x0E] = genColor(0, 0, 0);
+    palScreen[0x0F] = genColor(0, 0, 0);
+
+    palScreen[0x10] = genColor(152, 150, 152);
+    palScreen[0x11] = genColor(8, 76, 196);
+    palScreen[0x12] = genColor(48, 50, 236);
+    palScreen[0x13] = genColor(92, 30, 228);
+    palScreen[0x14] = genColor(136, 20, 176);
+    palScreen[0x15] = genColor(160, 20, 100);
+    palScreen[0x16] = genColor(152, 34, 32);
+    palScreen[0x17] = genColor(120, 60, 0);
+    palScreen[0x18] = genColor(84, 90, 0);
+    palScreen[0x19] = genColor(40, 114, 0);
+    palScreen[0x1A] = genColor(8, 124, 0);
+    palScreen[0x1B] = genColor(0, 118, 40);
+    palScreen[0x1C] = genColor(0, 102, 120);
+    palScreen[0x1D] = genColor(0, 0, 0);
+    palScreen[0x1E] = genColor(0, 0, 0);
+    palScreen[0x1F] = genColor(0, 0, 0);
+
+    palScreen[0x20] = genColor(236, 238, 236);
+    palScreen[0x21] = genColor(76, 154, 236);
+    palScreen[0x22] = genColor(120, 124, 236);
+    palScreen[0x23] = genColor(176, 98, 236);
+    palScreen[0x24] = genColor(228, 84, 236);
+    palScreen[0x25] = genColor(236, 88, 180);
+    palScreen[0x26] = genColor(236, 106, 100);
+    palScreen[0x27] = genColor(212, 136, 32);
+    palScreen[0x28] = genColor(160, 170, 0);
+    palScreen[0x29] = genColor(116, 196, 0);
+    palScreen[0x2A] = genColor(76, 208, 32);
+    palScreen[0x2B] = genColor(56, 204, 108);
+    palScreen[0x2C] = genColor(56, 180, 204);
+    palScreen[0x2D] = genColor(60, 60, 60);
+    palScreen[0x2E] = genColor(0, 0, 0);
+    palScreen[0x2F] = genColor(0, 0, 0);
+
+    palScreen[0x30] = genColor(236, 238, 236);
+    palScreen[0x31] = genColor(168, 204, 236);
+    palScreen[0x32] = genColor(188, 188, 236);
+    palScreen[0x33] = genColor(212, 178, 236);
+    palScreen[0x34] = genColor(236, 174, 236);
+    palScreen[0x35] = genColor(236, 174, 212);
+    palScreen[0x36] = genColor(236, 180, 176);
+    palScreen[0x37] = genColor(228, 196, 144);
+    palScreen[0x38] = genColor(204, 210, 120);
+    palScreen[0x39] = genColor(180, 222, 120);
+    palScreen[0x3A] = genColor(168, 226, 144);
+    palScreen[0x3B] = genColor(152, 226, 180);
+    palScreen[0x3C] = genColor(160, 214, 228);
+    palScreen[0x3D] = genColor(160, 162, 160);
+    palScreen[0x3E] = genColor(0, 0, 0);
+    palScreen[0x3F] = genColor(0, 0, 0);
+}
+
+RicohRP2C02::~RicohRP2C02()
+{
+}
+
+uint32_t *RicohRP2C02::getFrameBuffData()
+{
+    // Simply returns the current sprite holding the rendered screen
+    return sprScreen.data();
+}
+
+uint32_t RicohRP2C02::GetColourFromPaletteRam(uint8_t palette, uint8_t pixel)
+{
+    return palScreen[localRead(0x3F00 + (palette << 2) + pixel) & 0x3F];
+}
 
 uint8_t RicohRP2C02::getByte(uint16_t addr, bool readOnly)
 {
     uint8_t data = 0x00;
 
-    switch (addr)
+    if (readOnly)
     {
-    case 0x0000:
-        break;
-    case 0x0001:
-        break;
-    case 0x0002:
-        statusRegister.scratch = dataBuffer & 0x1F;
-        data = statusRegister.raw;
-        statusRegister.vertical_blank = 0x0;
-        addrLatch = 0x0;
-        break;
-    case 0x0003:
-        break;
-    case 0x0004:
-        break;
-    case 0x0005:
-        break;
-    case 0x0006:
-        break;
-    case 0x0007:
-        data = dataBuffer;
-        dataBuffer = localRead(vramAddr.raw);
-
-        if (vramAddr.raw >= PPU::PALETTE::Base && vramAddr.raw <= PPU::PALETTE::Limit)
+        switch (addr)
         {
-            data = dataBuffer;
+        case 0x0000:
+            data = control.reg;
+            break;
+        case 0x0001:
+            data = mask.reg;
+            break;
+        case 0x0002:
+            data = status.reg;
+            break;
+        case 0x0003:
+            break;
+        case 0x0004:
+            break;
+        case 0x0005:
+            break;
+        case 0x0006:
+            break;
+        case 0x0007:
+            break;
         }
+    }
+    else
+    {
+        switch (addr)
+        {
+        case 0x0000:
+            break;
 
-        vramAddr.raw += (controlRegister.inc_mode ? 0x20 : 0x1);
-        break;
-    default:
-        break;
+        case 0x0001:
+            break;
+
+        case 0x0002:
+            data = (status.reg & 0xE0) | (ppu_data_buffer & 0x1F);
+            status.vertical_blank = 0;
+            address_latch = 0;
+            break;
+        case 0x0003:
+            break;
+        case 0x0004:
+            break;
+        case 0x0005:
+            break;
+        case 0x0006:
+            break;
+        case 0x0007:
+            data = ppu_data_buffer;
+            ppu_data_buffer = localRead(vram_addr.reg);
+            if (vram_addr.reg >= 0x3F00)
+                data = ppu_data_buffer;
+            vram_addr.reg += (control.increment_mode ? 32 : 1);
+            break;
+        }
     }
 
     return data;
@@ -86,12 +172,12 @@ void RicohRP2C02::setByte(uint16_t addr, uint8_t data)
     switch (addr)
     {
     case 0x0000:
-        controlRegister.raw = data;
-        tramAddr.nametable_x = controlRegister.nametable_x;
-        tramAddr.nametable_y = controlRegister.nametable_y;
+        control.reg = data;
+        tram_addr.nametable_x = control.nametable_x;
+        tram_addr.nametable_y = control.nametable_y;
         break;
     case 0x0001:
-        maskRegister.raw = data;
+        mask.reg = data;
         break;
     case 0x0002:
         break;
@@ -100,158 +186,229 @@ void RicohRP2C02::setByte(uint16_t addr, uint8_t data)
     case 0x0004:
         break;
     case 0x0005:
-        if (addrLatch == 0x0)
+        if (address_latch == 0)
         {
             fine_x = data & 0x07;
-            tramAddr.coarse_x = data >> 0x3;
+            tram_addr.coarse_x = data >> 3;
+            address_latch = 1;
         }
         else
         {
-            tramAddr.fine_y = data & 0x07;
-            tramAddr.coarse_y = data >> 3;
+            tram_addr.fine_y = data & 0x07;
+            tram_addr.coarse_y = data >> 3;
+            address_latch = 0;
         }
-        addrLatch ^= 0x1;
         break;
     case 0x0006:
-        if (addrLatch == 0x00)
+        if (address_latch == 0)
         {
-            tramAddr.raw = static_cast<uint16_t>((data & 0x3F) << 0x8) | (tramAddr.raw & 0x00FF);
+            tram_addr.reg = (uint16_t)((data & 0x3F) << 8) | (tram_addr.reg & 0x00FF);
+            address_latch = 1;
         }
         else
         {
-            tramAddr.raw = (tramAddr.raw & 0xFF00) | static_cast<uint16_t>(data);
-            vramAddr = tramAddr;
+            tram_addr.reg = (tram_addr.reg & 0xFF00) | data;
+            vram_addr = tram_addr;
+            address_latch = 0;
         }
-
-        addrLatch ^= 0x01;
         break;
     case 0x0007:
-        localWrite(vramAddr.raw, data);
-        vramAddr.raw += (controlRegister.inc_mode ? 0x20 : 0x1);
-        break;
-    default:
+        localWrite(vram_addr.reg, data);
+        vram_addr.reg += (control.increment_mode ? 32 : 1);
         break;
     }
 }
 
-void RicohRP2C02::addCartridge(std::shared_ptr<AddressableDevice> cart)
+uint8_t RicohRP2C02::localRead(uint16_t addr, bool rdonly)
 {
-    GamePak *game = nullptr;
-    assert(game = dynamic_cast<GamePak *>(cart.get()));
+    uint8_t data = 0x00;
+    addr &= 0x3FFF;
 
-    bus->attachDevice(PPU::CARTRIDGE::Base,
-                      PPU::CARTRIDGE::Limit,
-                      PPU::CARTRIDGE::Mirror,
-                      cart);
-
-    bus->attachDevice(PPU::VRAM::Base,
-                      PPU::VRAM::Limit,
-                      PPU::VRAM::Mirror,
-                      std::shared_ptr<AddressableDevice>(
-                          new VRam(PPU::VRAM::Size, game->getMirrorMode())));
-}
-
-void RicohRP2C02::updateFrameBuffer(const uint8_t tblIndex)
-{
-    uint16_t chrBase = tblIndex * PPU::CARTRIDGE::CHR::PartitionSize, pixel;
-    uint8_t lsBits, msBits;
-
-    for (uint16_t offset = 0; offset < PPU::CARTRIDGE::CHR::NumTiles; offset += 2)
+    if (addr >= 0x0000 && addr <= 0x1FFF)
     {
-        for (uint16_t row = 0; row < 0x8; ++row)
-        {
-            lsBits = localRead(chrBase + row);
-            msBits = localRead(chrBase + row + 0x8);
+        data = cart->read(addr, 0x2000);
+    }
+    else if (addr >= 0x2000 && addr <= 0x3EFF)
+    {
+        addr &= 0x0FFF;
 
-            for (uint16_t col = 0; col < 0x8; ++col)
-            {
-                pixel = ((lsBits & 0x80) >> 0x7) | ((msBits & 0x80) >> 0x6);
-                lsBits <<= 0x1;
-                msBits <<= 0x1;
-                frameBuffer[offset + row * DISPLAY::Width + col] =
-                    getRgb(tblIndex, pixel);
-            }
+        if (cart->getMirrorMode() == GamePak::MirrorMode::VERTICAL)
+        {
+            if (addr >= 0x0000 && addr <= 0x03FF)
+                data = tblName[0][addr & 0x03FF];
+            if (addr >= 0x0400 && addr <= 0x07FF)
+                data = tblName[1][addr & 0x03FF];
+            if (addr >= 0x0800 && addr <= 0x0BFF)
+                data = tblName[0][addr & 0x03FF];
+            if (addr >= 0x0C00 && addr <= 0x0FFF)
+                data = tblName[1][addr & 0x03FF];
+        }
+        else if (cart->getMirrorMode() == GamePak::MirrorMode::HORIZONTAL)
+        {
+            if (addr >= 0x0000 && addr <= 0x03FF)
+                data = tblName[0][addr & 0x03FF];
+            if (addr >= 0x0400 && addr <= 0x07FF)
+                data = tblName[0][addr & 0x03FF];
+            if (addr >= 0x0800 && addr <= 0x0BFF)
+                data = tblName[1][addr & 0x03FF];
+            if (addr >= 0x0C00 && addr <= 0x0FFF)
+                data = tblName[1][addr & 0x03FF];
         }
     }
-}
+    else if (addr >= 0x3F00 && addr <= 0x3FFF)
+    {
+        addr &= 0x001F;
+        if (addr == 0x0010)
+            addr = 0x0000;
+        if (addr == 0x0014)
+            addr = 0x0004;
+        if (addr == 0x0018)
+            addr = 0x0008;
+        if (addr == 0x001C)
+            addr = 0x000C;
+        data = tblPalette[addr] & (mask.grayscale ? 0x30 : 0x3F);
+    }
 
-uint32_t RicohRP2C02::getRgb(const uint8_t tblIndex, const uint16_t pixelVal) const
-{
-    // SDL_Log("Read coming from %x", );
-    // int i = colors[(localRead(PPU::PALETTE::Base + (tblIndex << 0x2) + pixelVal)) & maskRegister.grayscale ? 0x30 : 0x3F];
-    return colors[(localRead(PPU::PALETTE::Base + (tblIndex << 0x2) + pixelVal)) & maskRegister.grayscale ? 0x30 : 0x3F] | DISPLAY::PixelOpacity;
-}
-
-const uint32_t *RicohRP2C02::getFrameBuffData() const
-{
-    return frameBuffer.data();
-}
-
-uint8_t RicohRP2C02::localRead(uint16_t addr) const
-{
-    return bus->read(addr & 0x3FFF);
+    return data;
 }
 
 void RicohRP2C02::localWrite(uint16_t addr, uint8_t data)
 {
-    bus->write(addr & 0x3FFF, data);
+    addr &= 0x3FFF;
+
+    if (addr >= 0x0000 && addr <= 0x1FFF)
+    {
+        cart->write(addr, 0x1FFF, data);
+    }
+    else if (addr >= 0x2000 && addr <= 0x3EFF)
+    {
+        addr &= 0x0FFF;
+        if (cart->getMirrorMode() == GamePak::MirrorMode::VERTICAL)
+        {
+            if (addr >= 0x0000 && addr <= 0x03FF)
+                tblName[0][addr & 0x03FF] = data;
+            if (addr >= 0x0400 && addr <= 0x07FF)
+                tblName[1][addr & 0x03FF] = data;
+            if (addr >= 0x0800 && addr <= 0x0BFF)
+                tblName[0][addr & 0x03FF] = data;
+            if (addr >= 0x0C00 && addr <= 0x0FFF)
+                tblName[1][addr & 0x03FF] = data;
+        }
+        else if (cart->getMirrorMode() == GamePak::MirrorMode::HORIZONTAL)
+        {
+            // std::cout << "write " << std::hex << static_cast<int>(data) << " to " << static_cast<int>(addr) << std::endl;
+
+            if (addr >= 0x0000 && addr <= 0x03FF)
+                tblName[0][addr & 0x03FF] = data;
+            if (addr >= 0x0400 && addr <= 0x07FF)
+                tblName[0][addr & 0x03FF] = data;
+            if (addr >= 0x0800 && addr <= 0x0BFF)
+                tblName[1][addr & 0x03FF] = data;
+            if (addr >= 0x0C00 && addr <= 0x0FFF)
+                tblName[1][addr & 0x03FF] = data;
+        }
+    }
+    else if (addr >= 0x3F00 && addr <= 0x3FFF)
+    {
+        addr &= 0x001F;
+        if (addr == 0x0010)
+            addr = 0x0000;
+        if (addr == 0x0014)
+            addr = 0x0004;
+        if (addr == 0x0018)
+            addr = 0x0008;
+        if (addr == 0x001C)
+            addr = 0x000C;
+        tblPalette[addr] = data;
+    }
+}
+
+void RicohRP2C02::addCartridge(const std::shared_ptr<AddressableDevice> cartridge)
+{
+    assert(this->cart = dynamic_cast<GamePak *>(cartridge.get()));
+}
+
+void RicohRP2C02::reset()
+{
+    fine_x = 0x00;
+    address_latch = 0x00;
+    ppu_data_buffer = 0x00;
+    scanline = 0;
+    cycle = 0;
+    bg_next_tile_id = 0x00;
+    bg_next_tile_attrib = 0x00;
+    bg_next_tile_lsb = 0x00;
+    bg_next_tile_msb = 0x00;
+    bg_shifter_pattern_lo = 0x0000;
+    bg_shifter_pattern_hi = 0x0000;
+    bg_shifter_attrib_lo = 0x0000;
+    bg_shifter_attrib_hi = 0x0000;
+    status.reg = 0x00;
+    mask.reg = 0x00;
+    control.reg = 0x00;
+    vram_addr.reg = 0x0000;
+    tram_addr.reg = 0x0000;
 }
 
 void RicohRP2C02::run()
 {
     auto IncrementScrollX = [&]() {
-        if (maskRegister.render_bg || maskRegister.render_sprites)
+        if (mask.render_background || mask.render_sprites)
         {
-            if (vramAddr.coarse_x == 31)
+            if (vram_addr.coarse_x == 31)
             {
-                vramAddr.coarse_x = 0;
-                vramAddr.nametable_x = ~vramAddr.nametable_x;
+                vram_addr.coarse_x = 0;
+                vram_addr.nametable_x = ~vram_addr.nametable_x;
             }
             else
             {
-                ++vramAddr.coarse_x;
+                vram_addr.coarse_x++;
             }
         }
     };
 
     auto IncrementScrollY = [&]() {
-        if (maskRegister.render_bg || maskRegister.render_sprites)
+        if (mask.render_background || mask.render_sprites)
         {
-            if (vramAddr.fine_y < 7)
+            if (vram_addr.fine_y < 7)
             {
-                ++vramAddr.fine_y;
+                vram_addr.fine_y++;
             }
             else
             {
-                vramAddr.fine_y = 0;
+                vram_addr.fine_y = 0;
 
-                if (vramAddr.coarse_y == 29)
+                if (vram_addr.coarse_y == 29)
                 {
-                    vramAddr.coarse_y = 0;
-                    vramAddr.nametable_y = ~vramAddr.nametable_y;
+                    vram_addr.coarse_y = 0;
+                    vram_addr.nametable_y = ~vram_addr.nametable_y;
+                }
+                else if (vram_addr.coarse_y == 31)
+                {
+                    vram_addr.coarse_y = 0;
                 }
                 else
                 {
-                    ++vramAddr.coarse_y;
+                    vram_addr.coarse_y++;
                 }
             }
         }
     };
 
     auto TransferAddressX = [&]() {
-        if (maskRegister.render_bg || maskRegister.render_sprites)
+        if (mask.render_background || mask.render_sprites)
         {
-            vramAddr.nametable_x = tramAddr.nametable_x;
-            vramAddr.coarse_x = tramAddr.coarse_x;
+            vram_addr.nametable_x = tram_addr.nametable_x;
+            vram_addr.coarse_x = tram_addr.coarse_x;
         }
     };
 
     auto TransferAddressY = [&]() {
-        if (maskRegister.render_bg || maskRegister.render_sprites)
+        if (mask.render_background || mask.render_sprites)
         {
-            vramAddr.fine_y = tramAddr.fine_y;
-            vramAddr.nametable_y = tramAddr.nametable_y;
-            vramAddr.coarse_y = tramAddr.coarse_y;
+            vram_addr.fine_y = tram_addr.fine_y;
+            vram_addr.nametable_y = tram_addr.nametable_y;
+            vram_addr.coarse_y = tram_addr.coarse_y;
         }
     };
 
@@ -264,7 +421,7 @@ void RicohRP2C02::run()
     };
 
     auto UpdateShifters = [&]() {
-        if (maskRegister.render_bg)
+        if (mask.render_background)
         {
             bg_shifter_pattern_lo <<= 1;
             bg_shifter_pattern_hi <<= 1;
@@ -283,7 +440,7 @@ void RicohRP2C02::run()
 
         if (scanline == -1 && cycle == 1)
         {
-            statusRegister.vertical_blank = 0;
+            status.vertical_blank = 0;
         }
 
         if ((cycle >= 2 && cycle < 258) || (cycle >= 321 && cycle < 338))
@@ -295,24 +452,25 @@ void RicohRP2C02::run()
             case 0:
                 LoadBackgroundShifters();
 
-                bg_next_tile_id = localRead(0x2000 | (vramAddr.raw & 0x0FFF));
+                bg_next_tile_id = localRead(0x2000 | (vram_addr.reg & 0x0FFF));
+
+                // std::cout << "1 bg_next_tile_id " << std::hex << static_cast<int>(bg_next_tile_id) << std::endl;
+                // std::cout << "vram addr " << std::hex << static_cast<int>(vram_addr.reg & 0x0FFF) << std::endl;
                 break;
             case 2:
-                bg_next_tile_attrib = localRead(0x23C0 | (vramAddr.nametable_y << 11) | (vramAddr.nametable_x << 10) | ((vramAddr.coarse_y >> 2) << 3) | (vramAddr.coarse_x >> 2));
-
-                if (vramAddr.coarse_y & 0x02)
+                bg_next_tile_attrib = localRead(0x23C0 | (vram_addr.nametable_y << 11) | (vram_addr.nametable_x << 10) | ((vram_addr.coarse_y >> 2) << 3) | (vram_addr.coarse_x >> 2));
+                if (vram_addr.coarse_y & 0x02)
                     bg_next_tile_attrib >>= 4;
-                if (vramAddr.coarse_x & 0x02)
+                if (vram_addr.coarse_x & 0x02)
                     bg_next_tile_attrib >>= 2;
                 bg_next_tile_attrib &= 0x03;
                 break;
 
             case 4:
-                bg_next_tile_lsb = localRead((controlRegister.pattern_bg << 12) + ((uint16_t)bg_next_tile_id << 4) + (vramAddr.fine_y) + 0);
-
+                bg_next_tile_lsb = localRead((control.pattern_background << 12) + ((uint16_t)bg_next_tile_id << 4) + (vram_addr.fine_y) + 0);
                 break;
             case 6:
-                bg_next_tile_msb = localRead((controlRegister.pattern_bg << 12) + ((uint16_t)bg_next_tile_id << 4) + (vramAddr.fine_y) + 8);
+                bg_next_tile_msb = localRead((control.pattern_background << 12) + ((uint16_t)bg_next_tile_id << 4) + (vram_addr.fine_y) + 8);
                 break;
             case 7:
                 IncrementScrollX();
@@ -333,7 +491,9 @@ void RicohRP2C02::run()
 
         if (cycle == 338 || cycle == 340)
         {
-            bg_next_tile_id = localRead(0x2000 | (vramAddr.raw & 0x0FFF));
+            bg_next_tile_id = localRead(0x2000 | (vram_addr.reg & 0x0FFF));
+            // std::cout << "2 bg_next_tile_id " << static_cast<int>(bg_next_tile_id) << std::endl;
+            // std::cout << "vram addr " << static_cast<int>(vram_addr.reg & 0x0FFF) << std::endl;
         }
 
         if (scanline == -1 && cycle >= 280 && cycle < 305)
@@ -346,17 +506,20 @@ void RicohRP2C02::run()
     {
         if (scanline == 241 && cycle == 1)
         {
-            statusRegister.vertical_blank = 1;
+            status.vertical_blank = 1;
 
-            if (controlRegister.enable_nmi)
+            if (control.enable_nmi)
+            {
+                // std::cout << "NMI GETS SET" << std::endl;
                 requestCpuNmi = true;
+            }
         }
     }
 
     uint8_t bg_pixel = 0x00;
     uint8_t bg_palette = 0x00;
 
-    if (maskRegister.render_bg)
+    if (mask.render_background)
     {
         uint16_t bit_mux = 0x8000 >> fine_x;
 
@@ -370,42 +533,20 @@ void RicohRP2C02::run()
         bg_palette = (bg_pal1 << 1) | bg_pal0;
     }
 
-    if (scanline >= 0 && scanline < 240 && cycle <= 256)
-        frameBuffer[scanline * 256 + cycle - 1] = getRgb(bg_palette, bg_pixel);
+    if (scanline < 240 and cycle > 0 and cycle <= 256)
+    {
+        sprScreen[cycle - 1 + scanline * 256] = GetColourFromPaletteRam(bg_palette, bg_pixel);
+    }
 
-    ++cycle;
-
+    cycle++;
     if (cycle >= 341)
     {
         cycle = 0;
-        ++scanline;
-
+        scanline++;
         if (scanline >= 261)
         {
             scanline = -1;
-            // frameDrawn = true;
+            frame_complete = true;
         }
     }
-}
-
-void RicohRP2C02::reset()
-{
-    fine_x = 0x00;
-    addrLatch = 0x00;
-    dataBuffer = 0x00;
-    scanline = 0;
-    cycle = 0;
-    bg_next_tile_id = 0x00;
-    bg_next_tile_attrib = 0x00;
-    bg_next_tile_lsb = 0x00;
-    bg_next_tile_msb = 0x00;
-    bg_shifter_pattern_lo = 0x0000;
-    bg_shifter_pattern_hi = 0x0000;
-    bg_shifter_attrib_lo = 0x0000;
-    bg_shifter_attrib_hi = 0x0000;
-    statusRegister.raw = 0x00;
-    maskRegister.raw = 0x00;
-    controlRegister.raw = 0x00;
-    vramAddr.raw = 0x0000;
-    tramAddr.raw = 0x0000;
 }

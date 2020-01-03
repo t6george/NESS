@@ -5,7 +5,7 @@
 #include <Mapper000.hpp>
 #include <SDL2/SDL.h>
 
-GamePak::GamePak(const std::string &fname) : mem{PRG} 
+GamePak::GamePak(const std::string &fname) : mem{PRG}
 {
     parseFile(fname);
 }
@@ -29,7 +29,7 @@ void GamePak::parseFile(const std::string &fname)
 
         if (ftype == 1)
         {
-            header.chrBanks = header.chrBanks == 0 ? 0x1: header.chrBanks;
+            header.chrBanks = header.chrBanks == 0 ? 0x1 : header.chrBanks;
             prg.resize(CARTRIDGE::PrgBankSize * header.prgBanks);
             chr.resize(CARTRIDGE::ChrBankSize * header.chrBanks);
 
@@ -67,18 +67,24 @@ void GamePak::parseFile(const std::string &fname)
         assert(false);
     }
 }
-
+#include <iostream>
 uint8_t GamePak::getByte(uint16_t addr, bool readOnly)
 {
     uint8_t data = 0x00;
+    // if (mem == PRG)
+    //     std::cout << "PRG Mode" << std::endl;
+    // else if (mem == CHR)
+    //     std::cout << "CHR Mode" << std::endl;
 
     if (mem == PRG && mapper->translatePrgAddress(addr))
     {
         data = prg[addr];
+        // std::cout << "rd prg " << std::hex << static_cast<int>(addr) << " " << static_cast<int>(data) << std::endl;
     }
     else if (mem == CHR && mapper->translateChrAddress(addr))
     {
         data = chr[addr];
+        // std::cout << "rd chr " << std::hex << static_cast<int>(addr) << " " << static_cast<int>(data) << std::endl;
     }
 
     return data;
@@ -86,12 +92,18 @@ uint8_t GamePak::getByte(uint16_t addr, bool readOnly)
 
 void GamePak::setByte(uint16_t addr, uint8_t data)
 {
+    // if (mem == PRG)
+    //     std::cout << "PRG Mode" << std::endl;
+    // else if (mem == CHR)
+    //     std::cout << "CHR Mode" << std::endl;
     if (mem == PRG && mapper->translatePrgAddress(addr))
     {
+        // std::cout << "wr prg " << std::hex << static_cast<int>(addr) << " " << static_cast<int>(data) << std::endl;
         prg[addr] = data;
     }
     else if (mem == CHR && mapper->translateChrAddress(addr))
     {
+        // std::cout << "wr chr " << std::hex << static_cast<int>(addr) << " " << static_cast<int>(data) << std::endl;
         chr[addr] = data;
     }
 }

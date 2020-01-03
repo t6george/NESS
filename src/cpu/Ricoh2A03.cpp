@@ -8,6 +8,8 @@
 #include <GamePak.hpp>
 #include <SDL2/SDL.h>
 
+#include <iostream>
+
 // Nested template syntax can be damaging to the eye - I only want to write it out once :)
 #define GEN_INSTR(name, type, cycles) std::unique_ptr<MOS6502Instruction>(new name<Ricoh2A03::AddressingType::type>(this, cycles))
 
@@ -66,8 +68,10 @@ void Ricoh2A03::fetch()
 {
     if (cycles == 0)
     {
+        setFlag(U, true);
         uint8_t opcode = read(PC++);
         cycles = instructions[opcode]->exec();
+        setFlag(U, true);
     }
     --cycles;
 }
@@ -85,6 +89,7 @@ void Ricoh2A03::reset()
 
 void Ricoh2A03::nmi(uint16_t interruptAddr)
 {
+    // std::cout << "NMI" << std::endl;
     setFlag(U, true);
     setFlag(I, true);
     setFlag(B, false);
