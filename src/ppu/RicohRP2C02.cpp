@@ -6,9 +6,13 @@
 uint32_t genColor(uint8_t r, uint8_t g, uint8_t b)
 {
     uint32_t color = 0xFF000000;
-    color |= (r << 4);
-    color |= (g << 2);
-    color |= (b << 0);
+    color |= (static_cast<uint32_t>(r) << 16);
+    color |= (static_cast<uint32_t>(g) << 8);
+    color |= (static_cast<uint32_t>(b) << 0);
+    // std::cout << static_cast<int>(r) << std::endl;
+    // std::cout << static_cast<int>(g) << std::endl;
+    // std::cout << static_cast<int>(b) << std::endl;
+    // std::cout << std::hex << ">" << static_cast<int>(color) << std::endl;
     return color;
 }
 
@@ -535,7 +539,10 @@ void RicohRP2C02::run()
 
     if (scanline < 240 and cycle > 0 and cycle <= 256)
     {
-        sprScreen[cycle - 1 + scanline * 256] = GetColourFromPaletteRam(bg_palette, bg_pixel);
+        uint32_t col = GetColourFromPaletteRam(bg_palette, bg_pixel);
+        // if (col != 0xFF000000)
+        //     std::cout << std::hex << static_cast<int>(col) << std::endl;
+        sprScreen[cycle - 1 + scanline * 256] = col;
     }
 
     cycle++;
