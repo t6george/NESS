@@ -67,8 +67,8 @@ void GamePak::parseFile(const std::string &fname)
         assert(false);
     }
 }
-#include <iostream>
-uint8_t GamePak::getByte(uint16_t addr, bool readOnly)
+
+inline uint8_t GamePak::getByte(uint16_t addr, bool readOnly)
 {
     uint8_t data = 0x00;
     // if (mem == PRG)
@@ -90,7 +90,7 @@ uint8_t GamePak::getByte(uint16_t addr, bool readOnly)
     return data;
 }
 
-void GamePak::setByte(uint16_t addr, uint8_t data)
+inline void GamePak::setByte(uint16_t addr, uint8_t data)
 {
     // if (mem == PRG)
     //     std::cout << "PRG Mode" << std::endl;
@@ -108,7 +108,7 @@ void GamePak::setByte(uint16_t addr, uint8_t data)
     }
 }
 
-uint16_t GamePak::mirrorAddress(uint16_t addr, uint16_t mirror)
+inline uint16_t GamePak::mirrorAddress(uint16_t addr, uint16_t mirror)
 {
     if (mirror == CPU::CARTRIDGE::Mirror)
     {

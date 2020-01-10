@@ -9,6 +9,8 @@ class RicohRP2C02;
 
 class NesSystem
 {
+public:
+    uint64_t frameCount;
     uint32_t systemClock;
     std::shared_ptr<RicohRP2C02> ppu;
     std::shared_ptr<Ricoh2A03> cpu;
@@ -21,4 +23,5 @@ public:
     void tick();
     void reset();
     void insertCartridge(const std::string &romName);
+    uint64_t getFrameCount() const;
 };

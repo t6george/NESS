@@ -3,7 +3,7 @@
 VRam::VRam(const uint16_t size, GamePak::MirrorMode mMode) 
     : Ram::Ram{size}, mMode{mMode} {}
 
-uint16_t VRam::mirrorAddress(uint16_t addr, uint16_t mirror)
+inline uint16_t VRam::mirrorAddress(uint16_t addr, uint16_t mirror)
 {
     uint16_t base = 0x0000;
 

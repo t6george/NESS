@@ -2,7 +2,7 @@
 
 PaletteRam::PaletteRam(const uint16_t size) : Ram::Ram{size} {}
 
-uint16_t PaletteRam::mirrorAddress(uint16_t addr, uint16_t mirror)
+inline uint16_t PaletteRam::mirrorAddress(uint16_t addr, uint16_t mirror)
 {
     addr = AddressableDevice::mirrorAddress(addr, mirror);
 

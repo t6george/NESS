@@ -18,7 +18,9 @@ class Ricoh2A03
 {
     std::unique_ptr<Bus> bus;
 
-    std::shared_ptr<GamePak> cartridge;
+    std::shared_ptr<AddressableDevice> Ppu;
+    std::shared_ptr<AddressableDevice> ram;
+    std::shared_ptr<AddressableDevice> cartridge;
     std::array<std::unique_ptr<MOS6502Instruction>, NUM_OPCODES> instructions;
 
     uint8_t cycles;

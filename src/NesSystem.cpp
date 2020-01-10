@@ -1,4 +1,3 @@
-#include <iostream>
 #include <fstream>
 
 #include <NesSystem.hpp>
@@ -9,7 +8,7 @@
 #include <HwConstants.hpp>
 
 NesSystem::NesSystem()
-    : ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu}},
+    : frameCount{0}, systemClock{0}, ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu}},
       screen{new Display{DISPLAY::Width, DISPLAY::Height, ppu->getFrameBuffData()}} {}
 
 void NesSystem::tick()
@@ -29,10 +28,10 @@ void NesSystem::tick()
 
     if (ppu->frame_complete)
     {
-        screen->blit();
-        ppu->frame_complete = false;
+        // screen->blit();
+        // ppu->frame_complete = false;
+        ++frameCount;
     }
-
     ++systemClock;
 }
 
@@ -41,6 +40,11 @@ void NesSystem::reset()
     cpu->reset();
     ppu->reset();
     systemClock = 0;
+}
+
+uint64_t NesSystem::getFrameCount() const
+{
+    return frameCount;
 }
 
 // #define DISASSEMBLE

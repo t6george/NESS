@@ -1,5 +1,4 @@
 #include <cassert>
-#include <iostream>
 
 #include <RicohRP2C02.hpp>
 
@@ -9,10 +8,6 @@ uint32_t genColor(uint8_t r, uint8_t g, uint8_t b)
     color |= (static_cast<uint32_t>(r) << 16);
     color |= (static_cast<uint32_t>(g) << 8);
     color |= (static_cast<uint32_t>(b) << 0);
-    // std::cout << static_cast<int>(r) << std::endl;
-    // std::cout << static_cast<int>(g) << std::endl;
-    // std::cout << static_cast<int>(b) << std::endl;
-    // std::cout << std::hex << ">" << static_cast<int>(color) << std::endl;
     return color;
 }
 
@@ -330,6 +325,7 @@ void RicohRP2C02::localWrite(uint16_t addr, uint8_t data)
 void RicohRP2C02::addCartridge(const std::shared_ptr<AddressableDevice> cartridge)
 {
     assert(this->cart = dynamic_cast<GamePak *>(cartridge.get()));
+    chrData = cart->chr;
 }
 
 void RicohRP2C02::reset()
@@ -450,7 +446,6 @@ void RicohRP2C02::run()
         if ((cycle >= 2 && cycle < 258) || (cycle >= 321 && cycle < 338))
         {
             UpdateShifters();
-
             switch ((cycle - 1) % 8)
             {
             case 0:
@@ -539,17 +534,15 @@ void RicohRP2C02::run()
 
     if (scanline < 240 and cycle > 0 and cycle <= 256)
     {
-        uint32_t col = GetColourFromPaletteRam(bg_palette, bg_pixel);
-        // if (col != 0xFF000000)
-        //     std::cout << std::hex << static_cast<int>(col) << std::endl;
-        sprScreen[cycle - 1 + scanline * 256] = col;
+        sprScreen[cycle - 1 + scanline * 256] = GetColourFromPaletteRam(bg_palette, bg_pixel);
     }
 
-    cycle++;
+    ++cycle;
+
     if (cycle >= 341)
     {
         cycle = 0;
-        scanline++;
+        ++scanline;
         if (scanline >= 261)
         {
             scanline = -1;

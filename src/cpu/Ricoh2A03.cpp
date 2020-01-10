@@ -6,9 +6,6 @@
 #include <Instructions.hpp>
 #include <HwConstants.hpp>
 #include <GamePak.hpp>
-#include <SDL2/SDL.h>
-
-#include <iostream>
 
 // Nested template syntax can be damaging to the eye - I only want to write it out once :)
 #define GEN_INSTR(name, type, cycles) std::unique_ptr<MOS6502Instruction>(new name<Ricoh2A03::AddressingType::type>(this, cycles))
@@ -20,24 +17,48 @@ uint8_t Ricoh2A03::read(uint16_t addr, bool zpageMode)
     if (zpageMode)
         mask = 0x00FF;
 
-    return bus->read(addr & mask);
+    addr &= mask;
+    uint8_t data = 0;
+    if (CPU::RAM::Base <= addr && CPU::RAM::Limit >= addr)
+    {
+        data = ram->read(addr - CPU::RAM::Base, CPU::RAM::Mirror);
+    }
+    else if (CPU::PPU::Base <= addr && CPU::PPU::Limit >= addr)
+    {
+        data = Ppu->read(addr - CPU::PPU::Base, CPU::PPU::Mirror);
+    }
+    else if (CPU::CARTRIDGE::Base <= addr && CPU::CARTRIDGE::Limit >= addr)
+    {
+        data = cartridge->read(addr - CPU::CARTRIDGE::Base, CPU::CARTRIDGE::Mirror);
+    }
+
+    return data;
+
+    // return bus->read(addr & mask);
 }
 
 uint16_t Ricoh2A03::readDoubleWord(uint16_t addr, bool zpageMode)
 {
-    uint16_t mask = 0xFFFF;
-
-    if (zpageMode)
-        mask = 0x00FF;
-
-    addr &= mask;
-    return (static_cast<uint16_t>(bus->read(addr + 0x1) & mask) << 8) |
-           (static_cast<uint16_t>(bus->read(addr)));
+    return (static_cast<uint16_t>(read(addr + 0x1, zpageMode)) << 8) |
+           (static_cast<uint16_t>(read(addr, zpageMode)));
 }
 
 void Ricoh2A03::write(uint16_t addr, uint8_t data)
 {
-    bus->write(addr, data);
+    if (CPU::RAM::Base <= addr && CPU::RAM::Limit >= addr)
+    {
+        ram->write(addr - CPU::RAM::Base, CPU::RAM::Mirror, data);
+    }
+    else if (CPU::PPU::Base <= addr && CPU::PPU::Limit >= addr)
+    {
+        Ppu->write(addr - CPU::PPU::Base, CPU::PPU::Mirror, data);
+    }
+    else if (CPU::CARTRIDGE::Base <= addr && CPU::CARTRIDGE::Limit >= addr)
+    {
+        cartridge->write(addr - CPU::CARTRIDGE::Base, CPU::CARTRIDGE::Mirror, data);
+    }
+
+    // bus->write(addr, data);
 }
 
 void Ricoh2A03::pushWord(uint8_t word)
@@ -142,6 +163,8 @@ uint8_t Ricoh2A03::branch(uint16_t absoluteAddress, bool cond)
 void Ricoh2A03::addCartridge(std::shared_ptr<AddressableDevice> cart)
 {
     assert(dynamic_cast<GamePak *>(cart.get()));
+
+    cartridge = cart;
 
     bus->attachDevice(CPU::CARTRIDGE::Base,
                       CPU::CARTRIDGE::Limit,
@@ -296,11 +319,12 @@ Ricoh2A03::Ricoh2A03(std::shared_ptr<AddressableDevice> ppu)
           GEN_INSTR(NOP, IMP, 4), GEN_INSTR(SBC, ABX, 4),
           GEN_INSTR(INC, ABX, 7), GEN_INSTR(INC, IMP, 7)}
 {
+    ram.reset(new Ram(CPU::RAM::Size));
+    Ppu = ppu;
     bus->attachDevice(CPU::RAM::Base,
                       CPU::RAM::Limit,
                       CPU::RAM::Mirror,
-                      std::shared_ptr<AddressableDevice>(
-                          new Ram(CPU::RAM::Size)));
+                      ram);
 
     bus->attachDevice(CPU::PPU::Base,
                       CPU::PPU::Limit,

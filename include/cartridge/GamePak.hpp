@@ -19,7 +19,7 @@ public:
     GamePak(const std::string &fname);
     GamePak::MirrorMode getMirrorMode() const;
 
-private:
+    // private:
     enum ActiveMemory
     {
         PRG,

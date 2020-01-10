@@ -1,5 +1,4 @@
 #include <Mapper000.hpp>
-#include <iostream>
 
 Mapper000::Mapper000(const uint8_t prgBanks, const uint8_t chrBanks)
     : Mapper::Mapper(prgBanks, chrBanks) {}

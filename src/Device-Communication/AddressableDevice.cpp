@@ -1,6 +1,6 @@
 #include <AddressableDevice.hpp>
 
-uint16_t AddressableDevice::mirrorAddress(uint16_t addr, uint16_t mirror)
+inline uint16_t AddressableDevice::mirrorAddress(uint16_t addr, uint16_t mirror)
 {
     return addr & (mirror - 1);
 }

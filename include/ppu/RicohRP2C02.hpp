@@ -15,7 +15,6 @@ public:
 
 private:
     uint8_t tblName[2][1024];
-    // uint8_t tblPattern[2][4096];
     uint8_t tblPalette[32];
 
 private:
@@ -124,6 +123,7 @@ public:
 private:
     // The Cartridge or "GamePak"
     GamePak *cart;
+    std::vector<uint8_t> chrData;
 
 public:
     // Interface
