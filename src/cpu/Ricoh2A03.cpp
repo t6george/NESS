@@ -16,25 +16,13 @@ uint8_t Ricoh2A03::read(uint16_t addr, bool zpageMode)
 
     if (zpageMode)
         mask = 0x00FF;
-
     addr &= mask;
-    uint8_t data = 0;
-    if (CPU::RAM::Base <= addr && CPU::RAM::Limit >= addr)
-    {
-        data = ram->read(addr - CPU::RAM::Base, CPU::RAM::Mirror);
-    }
-    else if (CPU::PPU::Base <= addr && CPU::PPU::Limit >= addr)
-    {
-        data = Ppu->read(addr - CPU::PPU::Base, CPU::PPU::Mirror);
-    }
-    else if (CPU::CARTRIDGE::Base <= addr && CPU::CARTRIDGE::Limit >= addr)
-    {
-        data = cartridge->read(addr - CPU::CARTRIDGE::Base, CPU::CARTRIDGE::Mirror);
-    }
 
-    return data;
-
-    // return bus->read(addr & mask);
+    // if (addr >= 0x0000 && addr <= 0x1FFF)
+    // {
+    //     return cpuRam[addr & 0x07FF];
+    // }
+    return bus->read(addr);
 }
 
 uint16_t Ricoh2A03::readDoubleWord(uint16_t addr, bool zpageMode)
@@ -45,20 +33,7 @@ uint16_t Ricoh2A03::readDoubleWord(uint16_t addr, bool zpageMode)
 
 void Ricoh2A03::write(uint16_t addr, uint8_t data)
 {
-    if (CPU::RAM::Base <= addr && CPU::RAM::Limit >= addr)
-    {
-        ram->write(addr - CPU::RAM::Base, CPU::RAM::Mirror, data);
-    }
-    else if (CPU::PPU::Base <= addr && CPU::PPU::Limit >= addr)
-    {
-        Ppu->write(addr - CPU::PPU::Base, CPU::PPU::Mirror, data);
-    }
-    else if (CPU::CARTRIDGE::Base <= addr && CPU::CARTRIDGE::Limit >= addr)
-    {
-        cartridge->write(addr - CPU::CARTRIDGE::Base, CPU::CARTRIDGE::Mirror, data);
-    }
-
-    // bus->write(addr, data);
+    bus->write(addr, data);
 }
 
 void Ricoh2A03::pushWord(uint8_t word)

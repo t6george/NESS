@@ -16,6 +16,7 @@ class NesSystem;
 
 class Ricoh2A03
 {
+public:
     std::unique_ptr<Bus> bus;
 
     std::shared_ptr<AddressableDevice> Ppu;
@@ -24,6 +25,7 @@ class Ricoh2A03
     std::array<std::unique_ptr<MOS6502Instruction>, NUM_OPCODES> instructions;
 
     uint8_t cycles;
+    // uint8_t cpuRam[2048];
 
 public:
     enum Flags6502
