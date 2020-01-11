@@ -447,7 +447,7 @@ void RicohRP2C02::run()
                     sprite_shifter_pattern_lo[i] <<= 1;
                     sprite_shifter_pattern_hi[i] <<= 1;
                 }
-                        }
+            }
         }
     };
 
@@ -461,6 +461,13 @@ void RicohRP2C02::run()
         if (scanline == -1 && cycle == 1)
         {
             status.vertical_blank = 0;
+            status.sprite_overflow = 0;
+
+            for (uint8_t i = 0; i < 8; ++i)
+            {
+                sprite_shifter_pattern_lo[i] = 0;
+                sprite_shifter_pattern_hi[i] = 0;
+            }
         }
 
         if ((cycle >= 2 && cycle < 258) || (cycle >= 321 && cycle < 338))
@@ -663,9 +670,88 @@ void RicohRP2C02::run()
         bg_palette = (bg_pal1 << 1) | bg_pal0;
     }
 
+    uint8_t fg_pixel = 0x00;
+    uint8_t fg_palette = 0x00;
+    uint8_t fg_priority = 0x00;
+
+    if (mask.render_sprites)
+    {
+        for (uint8_t i = 0; i < sprite_count; ++i)
+        {
+            if (spriteScanline[i].x == 0)
+            {
+                uint8_t fg_pixel_lo = (sprite_shifter_pattern_lo[i] & 0x80) > 0;
+                uint8_t fg_pixel_hi = (sprite_shifter_pattern_hi[i] & 0x80) > 0;
+                fg_pixel = (fg_pixel_hi << 1) | fg_pixel_lo;
+
+                fg_palette = (spriteScanline[i].attribute & 0x03) + 0x04;
+                fg_priority = (spriteScanline[i].attribute & 0x20) == 0;
+
+                if (fg_pixel == 0)
+                {
+                    break;
+                }
+            }
+        }
+    }
+
+    uint8_t pixel = 0x00;
+    uint8_t palette = 0x00;
+
+    if (bg_pixel == 0 && fg_pixel == 0)
+    {
+        pixel = 0x00;
+        palette = 0x00;
+    }
+    else if (bg_pixel == 0 && fg_pixel > 0)
+    {
+        pixel = fg_pixel;
+        palette = fg_palette;
+    }
+    else if (bg_pixel > 0 && fg_pixel == 0)
+    {
+        pixel = bg_pixel;
+        palette = bg_palette;
+    }
+    else if (bg_pixel > 0 && fg_pixel > 0)
+    {
+        if (fg_priority)
+        {
+            pixel = fg_pixel;
+            palette = fg_palette;
+        }
+        else
+        {
+            pixel = bg_pixel;
+            palette = bg_palette;
+        }
+
+        // Sprite Zero Hit detection
+        // if (bSpriteZeroHitPossible && bSpriteZeroBeingRendered)
+        // {
+        //     if (mask.render_background & mask.render_sprites)
+        //     {
+        //         if (~(mask.render_background_left | mask.render_sprites_left))
+        //         {
+        //             if (cycle >= 9 && cycle < 258)
+        //             {
+        //                 status.sprite_zero_hit = 1;
+        //             }
+        //         }
+        //         else
+        //         {
+        //             if (cycle >= 1 && cycle < 258)
+        //             {
+        //                 status.sprite_zero_hit = 1;
+        //             }
+        //         }
+        //     }
+        // }
+    }
+
     if (scanline < 240 and cycle > 0 and cycle <= 256)
     {
-        sprScreen[cycle - 1 + scanline * 256] = GetColourFromPaletteRam(bg_palette, bg_pixel);
+        sprScreen[cycle - 1 + scanline * 256] = GetColourFromPaletteRam(palette, pixel);
     }
 
     ++cycle;
