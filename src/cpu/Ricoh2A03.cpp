@@ -16,13 +16,8 @@ uint8_t Ricoh2A03::read(uint16_t addr, bool zpageMode)
 
     if (zpageMode)
         mask = 0x00FF;
-    addr &= mask;
 
-    // if (addr >= 0x0000 && addr <= 0x1FFF)
-    // {
-    //     return cpuRam[addr & 0x07FF];
-    // }
-    return bus->read(addr);
+    return bus->read(addr & mask);
 }
 
 uint16_t Ricoh2A03::readDoubleWord(uint16_t addr, bool zpageMode)
@@ -33,7 +28,16 @@ uint16_t Ricoh2A03::readDoubleWord(uint16_t addr, bool zpageMode)
 
 void Ricoh2A03::write(uint16_t addr, uint8_t data)
 {
-    bus->write(addr, data);
+    if (addr == 0x4014)
+    {
+        dma_transfer = true;
+        dma_page = data;
+        dma_addr = 0x00;
+        }
+    else
+    {
+        bus->write(addr, data);
+    }
 }
 
 void Ricoh2A03::pushWord(uint8_t word)

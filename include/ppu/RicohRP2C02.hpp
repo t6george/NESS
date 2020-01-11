@@ -125,8 +125,17 @@ private:
     GamePak *cart;
     std::vector<uint8_t> chrData;
 
+    struct oamEntry
+    {
+        uint8_t y;
+        uint8_t id;
+        uint8_t attribute;
+        uint8_t x;
+    } OAM[64];
+    uint8_t oam_addr = 0x00;
+
 public:
-    // Interface
+    uint8_t *pOAM = (uint8_t *)OAM;
     void addCartridge(const std::shared_ptr<AddressableDevice> cartridge);
     void run();
     void reset();

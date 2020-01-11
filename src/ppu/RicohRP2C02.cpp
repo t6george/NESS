@@ -121,6 +121,7 @@ uint8_t RicohRP2C02::getByte(uint16_t addr, bool readOnly)
         case 0x0003:
             break;
         case 0x0004:
+            data = pOAM[oam_addr];
             break;
         case 0x0005:
             break;
@@ -148,6 +149,7 @@ uint8_t RicohRP2C02::getByte(uint16_t addr, bool readOnly)
         case 0x0003:
             break;
         case 0x0004:
+            data = pOAM[oam_addr];
             break;
         case 0x0005:
             break;
@@ -181,8 +183,10 @@ void RicohRP2C02::setByte(uint16_t addr, uint8_t data)
     case 0x0002:
         break;
     case 0x0003:
+        oam_addr = data;
         break;
     case 0x0004:
+        pOAM[oam_addr] = data;
         break;
     case 0x0005:
         if (address_latch == 0)

@@ -16,6 +16,10 @@ public:
     std::shared_ptr<Ricoh2A03> cpu;
     std::unique_ptr<Display> screen;
 
+    uint8_t dma_data = 0x00;
+
+    bool dma_dummy = true;
+
 public:
     NesSystem();
     ~NesSystem() = default;

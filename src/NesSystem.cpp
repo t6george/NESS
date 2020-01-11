@@ -17,7 +17,36 @@ void NesSystem::tick()
 
     if (systemClock % 3 == 0)
     {
-        cpu->fetch();
+        if (cpu->dma_transfer)
+        {
+            if (dma_dummy)
+            {
+                if (systemClock % 2 == 1)
+                {
+                    dma_dummy = false;
+                }
+            }
+            else
+            {
+                if (systemClock % 2 == 0)
+                {
+                    dma_data = cpu->read(cpu->dma_page << 8 | cpu->dma_addr);
+                }
+                else
+                {
+                    ppu->pOAM[cpu->dma_addr++] = dma_data;
+                    if (cpu->dma_addr == 0x00)
+                    {
+                        cpu->dma_transfer = false;
+                        dma_dummy = true;
+                    }
+                }
+            }
+        }
+        else
+        {
+            cpu->fetch();
+        }
     }
 
     if (ppu->requestCpuNmi)

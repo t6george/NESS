@@ -88,5 +88,9 @@ public:
     uint8_t branch(uint16_t absoluteAddress, bool cond);
     void addCartridge(std::shared_ptr<AddressableDevice> cart);
 
+    uint8_t dma_page = 0x00;
+    uint8_t dma_addr = 0x00;
+    bool dma_transfer = false;
+
     friend class NesSystem;
 };
