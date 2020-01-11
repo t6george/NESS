@@ -134,6 +134,11 @@ private:
     } OAM[64];
     uint8_t oam_addr = 0x00;
 
+    oamEntry spriteScanline[8];
+    uint8_t sprite_count = 0;
+    uint8_t sprite_shifter_pattern_lo[8];
+    uint8_t sprite_shifter_pattern_hi[8];
+
 public:
     uint8_t *pOAM = (uint8_t *)OAM;
     void addCartridge(const std::shared_ptr<AddressableDevice> cartridge);

@@ -433,6 +433,22 @@ void RicohRP2C02::run()
             bg_shifter_attrib_lo <<= 1;
             bg_shifter_attrib_hi <<= 1;
         }
+
+        if (mask.render_sprites && cycle >= 1 && cycle < 258)
+        {
+            for (uint8_t i = 0; i < sprite_count; ++i)
+            {
+                if (spriteScanline[i].x > 0)
+                {
+                    --spriteScanline[i].x;
+                }
+                else
+                {
+                    sprite_shifter_pattern_lo[i] <<= 1;
+                    sprite_shifter_pattern_hi[i] <<= 1;
+                }
+                        }
+        }
     };
 
     if (scanline >= -1 && scanline < 240)
@@ -492,16 +508,127 @@ void RicohRP2C02::run()
             TransferAddressX();
         }
 
-        if (cycle == 338 || cycle == 340)
-        {
-            bg_next_tile_id = localRead(0x2000 | (vram_addr.reg & 0x0FFF));
-            // std::cout << "2 bg_next_tile_id " << static_cast<int>(bg_next_tile_id) << std::endl;
-            // std::cout << "vram addr " << static_cast<int>(vram_addr.reg & 0x0FFF) << std::endl;
-        }
-
         if (scanline == -1 && cycle >= 280 && cycle < 305)
         {
             TransferAddressY();
+        }
+
+        if (cycle == 338 || cycle == 340)
+        {
+            bg_next_tile_id = localRead(0x2000 | (vram_addr.reg & 0x0FFF));
+        }
+
+        // Foreground
+
+        if (cycle == 257 && scanline >= 0)
+        {
+            std::memset(spriteScanline, 0xFF, 8 * sizeof(oamEntry));
+            sprite_count = 0;
+
+            uint8_t oamEntryI = 0;
+
+            while (oamEntryI < 64 && sprite_count < 9)
+            {
+                uint16_t diff = ((int16_t)scanline - (int16_t)OAM[0].y);
+
+                if (diff >= 0 && diff < (control.sprite_size ? 16 : 8))
+                {
+                    if (sprite_count < 8)
+                    {
+                        std::memcpy(&spriteScanline[sprite_count], &OAM[oamEntryI], sizeof(oamEntry));
+                        ++sprite_count;
+                    }
+                }
+                ++oamEntryI;
+            }
+
+            status.sprite_overflow = (sprite_count > 8);
+        }
+
+        if (cycle == 340)
+        {
+            for (uint8_t i = 0; i < sprite_count; ++i)
+            {
+                uint8_t sprite_bits_lo, sprite_bits_hi;
+                uint16_t sprite_pattern_addr_lo, sprite_pattern_addr_hi;
+
+                if (!control.sprite_size)
+                {
+                    // 8x8
+                    if (!(spriteScanline[i].attribute & 0x80))
+                    {
+                        sprite_pattern_addr_lo = (control.pattern_sprite << 12) |
+                                                 (spriteScanline[i].id << 4) |
+                                                 (scanline - spriteScanline[i].y);
+                    }
+                    else
+                    {
+                        sprite_pattern_addr_lo = (control.pattern_sprite << 12) |
+                                                 (spriteScanline[i].id << 4) |
+                                                 (7 - (scanline - spriteScanline[i].y));
+                    }
+                }
+                else
+                {
+                    // 8x16
+                    if (!(spriteScanline[i].attribute & 0x80))
+                    {
+                        if (scanline - spriteScanline[i].y < 8)
+                        {
+                            sprite_pattern_addr_lo = ((spriteScanline[i].id & 1) << 12) |
+                                                     ((spriteScanline[i].id & 0xFE) << 4) |
+                                                     ((scanline - spriteScanline[i].y) & 0x7);
+                        }
+                        else
+                        {
+                            sprite_pattern_addr_lo = ((spriteScanline[i].id & 1) << 12) |
+                                                     (((spriteScanline[i].id & 0xFE) + 1) << 4) |
+                                                     ((scanline - spriteScanline[i].y) & 0x7);
+                        }
+                    }
+                    else
+                    {
+                        // Sprite is flipped vertically, i.e. upside down
+                        if (scanline - spriteScanline[i].y < 8)
+                        {
+                            // Reading Top half Tile
+                            sprite_pattern_addr_lo =
+                                ((spriteScanline[i].id & 0x01) << 12)            // Which Pattern Table? 0KB or 4KB offset
+                                | (((spriteScanline[i].id & 0xFE) + 1) << 4)     // Which Cell? Tile ID * 16 (16 bytes per tile)
+                                | (7 - (scanline - spriteScanline[i].y) & 0x07); // Which Row in cell? (0->7)
+                        }
+                        else
+                        {
+                            // Reading Bottom Half Tile
+                            sprite_pattern_addr_lo =
+                                ((spriteScanline[i].id & 0x01) << 12)            // Which Pattern Table? 0KB or 4KB offset
+                                | ((spriteScanline[i].id & 0xFE) << 4)           // Which Cell? Tile ID * 16 (16 bytes per tile)
+                                | (7 - (scanline - spriteScanline[i].y) & 0x07); // Which Row in cell? (0->7)
+                        }
+                    }
+                }
+
+                sprite_pattern_addr_hi = sprite_pattern_addr_lo + 8;
+                sprite_bits_lo = localRead(sprite_pattern_addr_lo);
+                sprite_bits_hi = localRead(sprite_pattern_addr_hi);
+
+                if (spriteScanline[i].attribute & 0x40)
+                {
+                    auto flipbyte = [](uint8_t b) {
+                        b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+                        b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+                        b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+                        return b;
+                    };
+
+                    // Flip Patterns Horizontally
+                    sprite_bits_lo = flipbyte(sprite_bits_lo);
+                    sprite_bits_hi = flipbyte(sprite_bits_hi);
+                }
+
+                sprite_shifter_pattern_lo[i] = sprite_bits_lo;
+                sprite_shifter_pattern_hi[i] = sprite_bits_hi;
+            }
         }
     }
 
