@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 {
     std::unique_ptr<NesSystem> nes(new NesSystem());
 
-    nes->insertCartridge("DonkeyKong.nes");
+    nes->insertCartridge("smb.nes");
 
     bool quit = false;
     SDL_Event e;

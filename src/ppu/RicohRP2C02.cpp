@@ -1,5 +1,3 @@
-#include <cassert>
-
 #include <RicohRP2C02.hpp>
 
 uint32_t genColor(uint8_t r, uint8_t g, uint8_t b)
@@ -101,11 +99,11 @@ uint32_t RicohRP2C02::GetColourFromPaletteRam(uint8_t palette, uint8_t pixel)
     return palScreen[localRead(0x3F00 + (palette << 2) + pixel) & 0x3F];
 }
 
-uint8_t RicohRP2C02::getByte(uint16_t addr, bool readOnly)
+uint8_t RicohRP2C02::getByte(uint16_t addr, bool rdonly)
 {
     uint8_t data = 0x00;
 
-    if (readOnly)
+    if (rdonly)
     {
         switch (addr)
         {
@@ -121,7 +119,6 @@ uint8_t RicohRP2C02::getByte(uint16_t addr, bool readOnly)
         case 0x0003:
             break;
         case 0x0004:
-            data = pOAM[oam_addr];
             break;
         case 0x0005:
             break;
@@ -137,10 +134,8 @@ uint8_t RicohRP2C02::getByte(uint16_t addr, bool readOnly)
         {
         case 0x0000:
             break;
-
         case 0x0001:
             break;
-
         case 0x0002:
             data = (status.reg & 0xE0) | (ppu_data_buffer & 0x1F);
             status.vertical_blank = 0;
@@ -148,9 +143,11 @@ uint8_t RicohRP2C02::getByte(uint16_t addr, bool readOnly)
             break;
         case 0x0003:
             break;
+
         case 0x0004:
             data = pOAM[oam_addr];
             break;
+
         case 0x0005:
             break;
         case 0x0006:
@@ -237,6 +234,7 @@ uint8_t RicohRP2C02::localRead(uint16_t addr, bool rdonly)
 
         if (cart->getMirrorMode() == GamePak::MirrorMode::VERTICAL)
         {
+            // Vertical
             if (addr >= 0x0000 && addr <= 0x03FF)
                 data = tblName[0][addr & 0x03FF];
             if (addr >= 0x0400 && addr <= 0x07FF)
@@ -248,6 +246,7 @@ uint8_t RicohRP2C02::localRead(uint16_t addr, bool rdonly)
         }
         else if (cart->getMirrorMode() == GamePak::MirrorMode::HORIZONTAL)
         {
+            // Horizontal
             if (addr >= 0x0000 && addr <= 0x03FF)
                 data = tblName[0][addr & 0x03FF];
             if (addr >= 0x0400 && addr <= 0x07FF)
@@ -288,6 +287,7 @@ void RicohRP2C02::localWrite(uint16_t addr, uint8_t data)
         addr &= 0x0FFF;
         if (cart->getMirrorMode() == GamePak::MirrorMode::VERTICAL)
         {
+            // Vertical
             if (addr >= 0x0000 && addr <= 0x03FF)
                 tblName[0][addr & 0x03FF] = data;
             if (addr >= 0x0400 && addr <= 0x07FF)
@@ -299,8 +299,7 @@ void RicohRP2C02::localWrite(uint16_t addr, uint8_t data)
         }
         else if (cart->getMirrorMode() == GamePak::MirrorMode::HORIZONTAL)
         {
-            // std::cout << "write " << std::hex << static_cast<int>(data) << " to " << static_cast<int>(addr) << std::endl;
-
+            // Horizontal
             if (addr >= 0x0000 && addr <= 0x03FF)
                 tblName[0][addr & 0x03FF] = data;
             if (addr >= 0x0400 && addr <= 0x07FF)
@@ -326,12 +325,6 @@ void RicohRP2C02::localWrite(uint16_t addr, uint8_t data)
     }
 }
 
-void RicohRP2C02::addCartridge(const std::shared_ptr<AddressableDevice> cartridge)
-{
-    assert(this->cart = dynamic_cast<GamePak *>(cartridge.get()));
-    chrData = cart->chr;
-}
-
 void RicohRP2C02::reset()
 {
     fine_x = 0x00;
@@ -352,6 +345,11 @@ void RicohRP2C02::reset()
     control.reg = 0x00;
     vram_addr.reg = 0x0000;
     tram_addr.reg = 0x0000;
+}
+
+void RicohRP2C02::addCartridge(const std::shared_ptr<AddressableDevice> cartridge)
+{
+    assert(this->cart = dynamic_cast<GamePak *>(cartridge.get()));
 }
 
 void RicohRP2C02::run()
@@ -436,11 +434,11 @@ void RicohRP2C02::run()
 
         if (mask.render_sprites && cycle >= 1 && cycle < 258)
         {
-            for (uint8_t i = 0; i < sprite_count; ++i)
+            for (int i = 0; i < sprite_count; i++)
             {
                 if (spriteScanline[i].x > 0)
                 {
-                    --spriteScanline[i].x;
+                    spriteScanline[i].x--;
                 }
                 else
                 {
@@ -461,9 +459,12 @@ void RicohRP2C02::run()
         if (scanline == -1 && cycle == 1)
         {
             status.vertical_blank = 0;
+
             status.sprite_overflow = 0;
 
-            for (uint8_t i = 0; i < 8; ++i)
+            status.sprite_zero_hit = 0;
+
+            for (int i = 0; i < 8; i++)
             {
                 sprite_shifter_pattern_lo[i] = 0;
                 sprite_shifter_pattern_hi[i] = 0;
@@ -473,18 +474,17 @@ void RicohRP2C02::run()
         if ((cycle >= 2 && cycle < 258) || (cycle >= 321 && cycle < 338))
         {
             UpdateShifters();
+
             switch ((cycle - 1) % 8)
             {
             case 0:
                 LoadBackgroundShifters();
 
                 bg_next_tile_id = localRead(0x2000 | (vram_addr.reg & 0x0FFF));
-
-                // std::cout << "1 bg_next_tile_id " << std::hex << static_cast<int>(bg_next_tile_id) << std::endl;
-                // std::cout << "vram addr " << std::hex << static_cast<int>(vram_addr.reg & 0x0FFF) << std::endl;
                 break;
             case 2:
                 bg_next_tile_attrib = localRead(0x23C0 | (vram_addr.nametable_y << 11) | (vram_addr.nametable_x << 10) | ((vram_addr.coarse_y >> 2) << 3) | (vram_addr.coarse_x >> 2));
+
                 if (vram_addr.coarse_y & 0x02)
                     bg_next_tile_attrib >>= 4;
                 if (vram_addr.coarse_x & 0x02)
@@ -494,6 +494,7 @@ void RicohRP2C02::run()
 
             case 4:
                 bg_next_tile_lsb = localRead((control.pattern_background << 12) + ((uint16_t)bg_next_tile_id << 4) + (vram_addr.fine_y) + 0);
+
                 break;
             case 6:
                 bg_next_tile_msb = localRead((control.pattern_background << 12) + ((uint16_t)bg_next_tile_id << 4) + (vram_addr.fine_y) + 8);
@@ -515,38 +516,51 @@ void RicohRP2C02::run()
             TransferAddressX();
         }
 
-        if (scanline == -1 && cycle >= 280 && cycle < 305)
-        {
-            TransferAddressY();
-        }
-
         if (cycle == 338 || cycle == 340)
         {
             bg_next_tile_id = localRead(0x2000 | (vram_addr.reg & 0x0FFF));
         }
 
-        // Foreground
+        if (scanline == -1 && cycle >= 280 && cycle < 305)
+        {
+            TransferAddressY();
+        }
 
         if (cycle == 257 && scanline >= 0)
         {
-            std::memset(spriteScanline, 0xFF, 8 * sizeof(oamEntry));
+            std::memset(spriteScanline, 0xFF, 8 * sizeof(sObjectAttributeEntry));
+
             sprite_count = 0;
 
-            uint8_t oamEntryI = 0;
-
-            while (oamEntryI < 64 && sprite_count < 9)
+            for (uint8_t i = 0; i < 8; i++)
             {
-                uint16_t diff = ((int16_t)scanline - (int16_t)OAM[0].y);
+                sprite_shifter_pattern_lo[i] = 0;
+                sprite_shifter_pattern_hi[i] = 0;
+            }
+
+            uint8_t nOAMEntry = 0;
+
+            bSpriteZeroHitPossible = false;
+
+            while (nOAMEntry < 64 && sprite_count < 9)
+            {
+                int16_t diff = ((int16_t)scanline - (int16_t)OAM[nOAMEntry].y);
 
                 if (diff >= 0 && diff < (control.sprite_size ? 16 : 8))
                 {
                     if (sprite_count < 8)
                     {
-                        std::memcpy(&spriteScanline[sprite_count], &OAM[oamEntryI], sizeof(oamEntry));
-                        ++sprite_count;
+                        if (nOAMEntry == 0)
+                        {
+                            bSpriteZeroHitPossible = true;
+                        }
+
+                        memcpy(&spriteScanline[sprite_count], &OAM[nOAMEntry], sizeof(sObjectAttributeEntry));
+                        sprite_count++;
                     }
                 }
-                ++oamEntryI;
+
+                nOAMEntry++;
             }
 
             status.sprite_overflow = (sprite_count > 8);
@@ -554,70 +568,59 @@ void RicohRP2C02::run()
 
         if (cycle == 340)
         {
-            for (uint8_t i = 0; i < sprite_count; ++i)
+            for (uint8_t i = 0; i < sprite_count; i++)
             {
-                uint8_t sprite_bits_lo, sprite_bits_hi;
+
+                uint8_t sprite_pattern_bits_lo, sprite_pattern_bits_hi;
                 uint16_t sprite_pattern_addr_lo, sprite_pattern_addr_hi;
 
                 if (!control.sprite_size)
                 {
-                    // 8x8
                     if (!(spriteScanline[i].attribute & 0x80))
                     {
-                        sprite_pattern_addr_lo = (control.pattern_sprite << 12) |
-                                                 (spriteScanline[i].id << 4) |
-                                                 (scanline - spriteScanline[i].y);
+                        sprite_pattern_addr_lo =
+                            (control.pattern_sprite << 12) | (spriteScanline[i].id << 4) | (scanline - spriteScanline[i].y);
                     }
                     else
                     {
-                        sprite_pattern_addr_lo = (control.pattern_sprite << 12) |
-                                                 (spriteScanline[i].id << 4) |
-                                                 (7 - (scanline - spriteScanline[i].y));
+                        sprite_pattern_addr_lo =
+                            (control.pattern_sprite << 12) | (spriteScanline[i].id << 4) | (7 - (scanline - spriteScanline[i].y));
                     }
                 }
                 else
                 {
-                    // 8x16
                     if (!(spriteScanline[i].attribute & 0x80))
                     {
                         if (scanline - spriteScanline[i].y < 8)
                         {
-                            sprite_pattern_addr_lo = ((spriteScanline[i].id & 1) << 12) |
-                                                     ((spriteScanline[i].id & 0xFE) << 4) |
-                                                     ((scanline - spriteScanline[i].y) & 0x7);
+                            sprite_pattern_addr_lo =
+                                ((spriteScanline[i].id & 0x01) << 12) | ((spriteScanline[i].id & 0xFE) << 4) | ((scanline - spriteScanline[i].y) & 0x07);
                         }
                         else
                         {
-                            sprite_pattern_addr_lo = ((spriteScanline[i].id & 1) << 12) |
-                                                     (((spriteScanline[i].id & 0xFE) + 1) << 4) |
-                                                     ((scanline - spriteScanline[i].y) & 0x7);
+                            sprite_pattern_addr_lo =
+                                ((spriteScanline[i].id & 0x01) << 12) | (((spriteScanline[i].id & 0xFE) + 1) << 4) | ((scanline - spriteScanline[i].y) & 0x07);
                         }
                     }
                     else
                     {
-                        // Sprite is flipped vertically, i.e. upside down
                         if (scanline - spriteScanline[i].y < 8)
                         {
-                            // Reading Top half Tile
                             sprite_pattern_addr_lo =
-                                ((spriteScanline[i].id & 0x01) << 12)            // Which Pattern Table? 0KB or 4KB offset
-                                | (((spriteScanline[i].id & 0xFE) + 1) << 4)     // Which Cell? Tile ID * 16 (16 bytes per tile)
-                                | (7 - (scanline - spriteScanline[i].y) & 0x07); // Which Row in cell? (0->7)
+                                ((spriteScanline[i].id & 0x01) << 12) | (((spriteScanline[i].id & 0xFE) + 1) << 4) | (7 - (scanline - spriteScanline[i].y) & 0x07);
                         }
                         else
                         {
-                            // Reading Bottom Half Tile
                             sprite_pattern_addr_lo =
-                                ((spriteScanline[i].id & 0x01) << 12)            // Which Pattern Table? 0KB or 4KB offset
-                                | ((spriteScanline[i].id & 0xFE) << 4)           // Which Cell? Tile ID * 16 (16 bytes per tile)
-                                | (7 - (scanline - spriteScanline[i].y) & 0x07); // Which Row in cell? (0->7)
+                                ((spriteScanline[i].id & 0x01) << 12) | ((spriteScanline[i].id & 0xFE) << 4) | (7 - (scanline - spriteScanline[i].y) & 0x07);
                         }
                     }
                 }
 
                 sprite_pattern_addr_hi = sprite_pattern_addr_lo + 8;
-                sprite_bits_lo = localRead(sprite_pattern_addr_lo);
-                sprite_bits_hi = localRead(sprite_pattern_addr_hi);
+
+                sprite_pattern_bits_lo = localRead(sprite_pattern_addr_lo);
+                sprite_pattern_bits_hi = localRead(sprite_pattern_addr_hi);
 
                 if (spriteScanline[i].attribute & 0x40)
                 {
@@ -628,13 +631,12 @@ void RicohRP2C02::run()
                         return b;
                     };
 
-                    // Flip Patterns Horizontally
-                    sprite_bits_lo = flipbyte(sprite_bits_lo);
-                    sprite_bits_hi = flipbyte(sprite_bits_hi);
+                    sprite_pattern_bits_lo = flipbyte(sprite_pattern_bits_lo);
+                    sprite_pattern_bits_hi = flipbyte(sprite_pattern_bits_hi);
                 }
 
-                sprite_shifter_pattern_lo[i] = sprite_bits_lo;
-                sprite_shifter_pattern_hi[i] = sprite_bits_hi;
+                sprite_shifter_pattern_lo[i] = sprite_pattern_bits_lo;
+                sprite_shifter_pattern_hi[i] = sprite_pattern_bits_hi;
             }
         }
     }
@@ -646,10 +648,7 @@ void RicohRP2C02::run()
             status.vertical_blank = 1;
 
             if (control.enable_nmi)
-            {
-                // std::cout << "NMI GETS SET" << std::endl;
                 requestCpuNmi = true;
-            }
         }
     }
 
@@ -676,7 +675,10 @@ void RicohRP2C02::run()
 
     if (mask.render_sprites)
     {
-        for (uint8_t i = 0; i < sprite_count; ++i)
+
+        bSpriteZeroBeingRendered = false;
+
+        for (uint8_t i = 0; i < sprite_count; i++)
         {
             if (spriteScanline[i].x == 0)
             {
@@ -687,8 +689,13 @@ void RicohRP2C02::run()
                 fg_palette = (spriteScanline[i].attribute & 0x03) + 0x04;
                 fg_priority = (spriteScanline[i].attribute & 0x20) == 0;
 
-                if (fg_pixel == 0)
+                if (fg_pixel != 0)
                 {
+                    if (i == 0)
+                    {
+                        bSpriteZeroBeingRendered = true;
+                    }
+
                     break;
                 }
             }
@@ -726,27 +733,26 @@ void RicohRP2C02::run()
             palette = bg_palette;
         }
 
-        // Sprite Zero Hit detection
-        // if (bSpriteZeroHitPossible && bSpriteZeroBeingRendered)
-        // {
-        //     if (mask.render_background & mask.render_sprites)
-        //     {
-        //         if (~(mask.render_background_left | mask.render_sprites_left))
-        //         {
-        //             if (cycle >= 9 && cycle < 258)
-        //             {
-        //                 status.sprite_zero_hit = 1;
-        //             }
-        //         }
-        //         else
-        //         {
-        //             if (cycle >= 1 && cycle < 258)
-        //             {
-        //                 status.sprite_zero_hit = 1;
-        //             }
-        //         }
-        //     }
-        // }
+        if (bSpriteZeroHitPossible && bSpriteZeroBeingRendered)
+        {
+            if (mask.render_background & mask.render_sprites)
+            {
+                if (~(mask.render_background_left | mask.render_sprites_left))
+                {
+                    if (cycle >= 9 && cycle < 258)
+                    {
+                        status.sprite_zero_hit = 1;
+                    }
+                }
+                else
+                {
+                    if (cycle >= 1 && cycle < 258)
+                    {
+                        status.sprite_zero_hit = 1;
+                    }
+                }
+            }
+        }
     }
 
     if (scanline < 240 and cycle > 0 and cycle <= 256)

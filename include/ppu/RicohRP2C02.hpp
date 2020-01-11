@@ -87,21 +87,17 @@ private:
         uint16_t reg = 0x0000;
     };
 
-    loopy_register vram_addr; // Active "pointer" address into nametable to extract background tile info
-    loopy_register tram_addr; // Temporary store of information to be "transferred" into "pointer" at various times
+    loopy_register vram_addr;
+    loopy_register tram_addr;
 
-    // Pixel offset horizontally
     uint8_t fine_x = 0x00;
 
-    // Internal communications
     uint8_t address_latch = 0x00;
     uint8_t ppu_data_buffer = 0x00;
 
-    // Pixel "dot" position information
     int16_t scanline = 0;
     int16_t cycle = 0;
 
-    // Background rendering
     uint8_t bg_next_tile_id = 0x00;
     uint8_t bg_next_tile_attrib = 0x00;
     uint8_t bg_next_tile_lsb = 0x00;
@@ -110,37 +106,37 @@ private:
     uint16_t bg_shifter_pattern_hi = 0x0000;
     uint16_t bg_shifter_attrib_lo = 0x0000;
     uint16_t bg_shifter_attrib_hi = 0x0000;
-
-public:
-    // Communications with Main Bus
-    uint8_t getByte(uint16_t addr, bool readOnly = false) override;
-    void setByte(uint16_t addr, uint8_t data) override;
-
-    // Communications with PPU Bus
-    uint8_t localRead(uint16_t addr, bool rdonly = false);
-    void localWrite(uint16_t addr, uint8_t data);
-
-private:
-    // The Cartridge or "GamePak"
     GamePak *cart;
-    std::vector<uint8_t> chrData;
 
-    struct oamEntry
+    struct sObjectAttributeEntry
     {
         uint8_t y;
         uint8_t id;
         uint8_t attribute;
         uint8_t x;
     } OAM[64];
+
     uint8_t oam_addr = 0x00;
 
-    oamEntry spriteScanline[8];
-    uint8_t sprite_count = 0;
+    sObjectAttributeEntry spriteScanline[8];
+    uint8_t sprite_count;
     uint8_t sprite_shifter_pattern_lo[8];
     uint8_t sprite_shifter_pattern_hi[8];
 
+    bool bSpriteZeroHitPossible = false;
+    bool bSpriteZeroBeingRendered = false;
+
 public:
     uint8_t *pOAM = (uint8_t *)OAM;
+
+public:
+    uint8_t getByte(uint16_t addr, bool readOnly = false) override;
+    void setByte(uint16_t addr, uint8_t data) override;
+
+    uint8_t localRead(uint16_t addr, bool rdonly = false);
+    void localWrite(uint16_t addr, uint8_t data);
+
+public:
     void addCartridge(const std::shared_ptr<AddressableDevice> cartridge);
     void run();
     void reset();
