@@ -11,8 +11,8 @@ uint8_t Bus::read(uint16_t addr, bool readOnly)
     if (addr >= 0x4016 && addr <= 0x4017)
     {
         //addr & 0x0001
-        data = (controllerState[0] & 0x80) > 0;
-        controllerState[0] <<= 1;
+        data = (controllerState[addr & 0x0001] & 0x80) > 0;
+        controllerState[addr & 0x0001] <<= 1;
     }
     else
     {
@@ -26,7 +26,8 @@ void Bus::write(uint16_t addr, uint8_t data)
 {
     if (addr >= 0x4016 && addr <= 0x4017)
     {
-        controllerState[0] = controller[0];
+        controllerState[addr & 0x0001] = controller[addr & 0x0001];
+        // std::cout << static_cast<int>(controller[addr & 0x0001]) << std::endl;
     }
     else
     {

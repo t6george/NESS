@@ -19,9 +19,10 @@ int main(int argc, char *argv[])
     using namespace std::chrono;
 
     // auto start = high_resolution_clock::now();
+    nes->cpu->bus->controller[0] = 0x00;
     while (!quit)
     {
-        nes->cpu->bus->controller[0] = 0x00;
+
         while (SDL_PollEvent(&e))
         {
             switch (e.type)
@@ -51,10 +52,41 @@ int main(int argc, char *argv[])
                     nes->cpu->bus->controller[0] |= 0x40;
                     break;
                 case SDLK_z: // Start
-                    nes->cpu->bus->controller[0] |= 0x20;
+                    nes->cpu->bus->controller[0] |= 0x10;
                     break;
                 case SDLK_x: // Select
-                    nes->cpu->bus->controller[0] |= 0x10;
+                    nes->cpu->bus->controller[0] |= 0x20;
+                    break;
+                default:
+                    break;
+                }
+                break;
+            case SDL_KEYUP:
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_LEFT: // D-pad
+                    nes->cpu->bus->controller[0] &= ~0x02;
+                    break;
+                case SDLK_RIGHT:
+                    nes->cpu->bus->controller[0] &= ~0x01;
+                    break;
+                case SDLK_UP:
+                    nes->cpu->bus->controller[0] &= ~0x08;
+                    break;
+                case SDLK_DOWN:
+                    nes->cpu->bus->controller[0] &= ~0x04;
+                    break;
+                case SDLK_a: // A
+                    nes->cpu->bus->controller[0] &= ~0x80;
+                    break;
+                case SDLK_s: // B
+                    nes->cpu->bus->controller[0] &= ~0x40;
+                    break;
+                case SDLK_z: // Start
+                    nes->cpu->bus->controller[0] &= ~0x10;
+                    break;
+                case SDLK_x: // Select
+                    nes->cpu->bus->controller[0] &= ~0x20;
                     break;
                 default:
                     break;
@@ -63,6 +95,7 @@ int main(int argc, char *argv[])
             default:
                 break;
             }
+            break;
         }
 
         while (!nes->ppu->frame_complete)
