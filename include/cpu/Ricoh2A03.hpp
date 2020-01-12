@@ -5,6 +5,8 @@
 
 #include <Bus.hpp>
 #include <MOS6502Instruction.hpp>
+#include <Nes_Apu.h>
+#include <Apu2A03.hpp>
 
 #define STACK_BASE 0x0100
 #define NUM_OPCODES 0x100
@@ -62,12 +64,14 @@ public:
     uint8_t SP;
     uint16_t PC;
     uint8_t S;
+    uint16_t remaining;
 
     Ricoh2A03(std::shared_ptr<AddressableDevice> ppu);
     ~Ricoh2A03() = default;
 
     uint8_t read(uint16_t addr, bool zpageMode = false);
     uint16_t readDoubleWord(uint16_t addr, bool zpageMode = false);
+    int dmcRead(void *, uint16_t addr);
 
     void write(uint16_t addr, uint8_t data);
 
@@ -91,6 +95,8 @@ public:
     uint8_t dma_page = 0x00;
     uint8_t dma_addr = 0x00;
     bool dma_transfer = false;
+
+    uint16_t elapsed() const;
 
     friend class NesSystem;
 };

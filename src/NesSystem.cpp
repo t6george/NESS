@@ -6,10 +6,22 @@
 #include <GamePak.hpp>
 #include <Display.hpp>
 #include <HwConstants.hpp>
+#include <Apu2A03.hpp>
 
 NesSystem::NesSystem()
     : frameCount{0}, systemClock{0}, ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu}},
-      screen{new Display{DISPLAY::Width, DISPLAY::Height, ppu->getFrameBuffData()}} {}
+      screen{new Display{DISPLAY::Width, DISPLAY::Height, ppu->getFrameBuffData()}}
+{
+    APU::func = &cpu->dmcRead;
+    APU::nes = this;
+    soundQueue = new Sound_Queue;
+    soundQueue->init(96000);
+}
+
+void NesSystem::newSamples(const blip_sample_t *samples, size_t count)
+{
+    soundQueue->write(samples, count);
+}
 
 void NesSystem::tick()
 {
@@ -68,6 +80,7 @@ void NesSystem::reset()
 {
     cpu->reset();
     ppu->reset();
+    APU::reset();
     systemClock = 0;
 }
 

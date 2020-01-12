@@ -4,6 +4,8 @@
 #include <string>
 #include <Display.hpp>
 #include <Ricoh2A03.hpp>
+#include <Nes_Apu.h>
+#include <Sound_Queue.h>
 
 class RicohRP2C02;
 
@@ -15,6 +17,7 @@ public:
     std::shared_ptr<RicohRP2C02> ppu;
     std::shared_ptr<Ricoh2A03> cpu;
     std::unique_ptr<Display> screen;
+    Sound_Queue *soundQueue;
 
     uint8_t dma_data = 0x00;
 
@@ -28,4 +31,5 @@ public:
     void reset();
     void insertCartridge(const std::string &romName);
     uint64_t getFrameCount() const;
+    void newSamples(const blip_sample_t *samples, size_t count);
 };

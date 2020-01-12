@@ -10,12 +10,24 @@
 // Nested template syntax can be damaging to the eye - I only want to write it out once :)
 #define GEN_INSTR(name, type, cycles) std::unique_ptr<MOS6502Instruction>(new name<Ricoh2A03::AddressingType::type>(this, cycles))
 
+uint16_t Ricoh2A03::elapsed() const
+{
+    return 29781 - remaining;
+}
+
 uint8_t Ricoh2A03::read(uint16_t addr, bool zpageMode)
 {
     uint16_t mask = 0xFFFF;
 
     if (zpageMode)
         mask = 0x00FF;
+
+    addr &= mask;
+
+    if ((0x4000 <= addr && addr <= 0x4013) || addr == 0x4015)
+    {
+        return APU::access<0>(elapsed(), addr, mask);
+    }
 
     return bus->read(addr & mask);
 }
@@ -26,6 +38,11 @@ uint16_t Ricoh2A03::readDoubleWord(uint16_t addr, bool zpageMode)
            (static_cast<uint16_t>(read(addr, zpageMode)));
 }
 
+int Ricoh2A03::dmcRead(void *, uint16_t addr)
+{
+    return read(addr);
+}
+
 void Ricoh2A03::write(uint16_t addr, uint8_t data)
 {
     if (addr == 0x4014)
@@ -33,7 +50,15 @@ void Ricoh2A03::write(uint16_t addr, uint8_t data)
         dma_transfer = true;
         dma_page = data;
         dma_addr = 0x00;
-        }
+    }
+    else if (addr == 0x4017)
+    {
+        APU::access<1>(elapsed(), addr, data);
+    }
+    else if ((0x4000 <= addr && addr <= 0x4013) || addr == 0x4015)
+    {
+        APU::access<1>(elapsed(), addr, data);
+    }
     else
     {
         bus->write(addr, data);
@@ -74,11 +99,16 @@ void Ricoh2A03::fetch()
         setFlag(U, true);
     }
     --cycles;
+
+    if (remaining == 0)
+        remaining = 29781;
+    else
+        --remaining;
 }
 
 void Ricoh2A03::reset()
 {
-    A = X = Y = 0x00;
+    A = X = Y = remaining = 0x00;
     SP = 0xFD;
     S = U;
 
