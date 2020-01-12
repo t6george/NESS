@@ -8,12 +8,18 @@
 #include <HwConstants.hpp>
 #include <Apu2A03.hpp>
 
+int dmcRead(void *, unsigned int addr)
+{
+    return nes->cpu->read(addr);
+}
+
 NesSystem::NesSystem()
     : frameCount{0}, systemClock{0}, ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu}},
       screen{new Display{DISPLAY::Width, DISPLAY::Height, ppu->getFrameBuffData()}}
 {
-    APU::func = &cpu->dmcRead;
+    APU::func = dmcRead;
     APU::nes = this;
+    APU::init();
     soundQueue = new Sound_Queue;
     soundQueue->init(96000);
 }
@@ -29,6 +35,14 @@ void NesSystem::tick()
 
     if (systemClock % 3 == 0)
     {
+        if (systemClock > 0)
+        {
+            if (cpu->remaining <= 0)
+                cpu->remaining += 29781;
+            else
+                --cpu->remaining;
+        }
+
         if (cpu->dma_transfer)
         {
             if (dma_dummy)

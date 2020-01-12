@@ -10,8 +10,7 @@
 
 int main(int argc, char *argv[])
 {
-    std::unique_ptr<NesSystem> nes(new NesSystem());
-
+    nes.reset(new NesSystem());
     nes->insertCartridge("smb.nes");
 
     bool quit = false;
@@ -102,6 +101,7 @@ int main(int argc, char *argv[])
             nes->tick();
         nes->ppu->frame_complete = false;
         nes->screen->blit();
+        APU::run_frame(nes->cpu->elapsed());
     }
     // auto stop = high_resolution_clock::now();
     // auto duration = duration_cast<seconds>(stop - start);

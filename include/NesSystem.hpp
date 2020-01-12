@@ -8,6 +8,9 @@
 #include <Sound_Queue.h>
 
 class RicohRP2C02;
+class NesSystem;
+
+static std::unique_ptr<NesSystem> nes;
 
 class NesSystem
 {

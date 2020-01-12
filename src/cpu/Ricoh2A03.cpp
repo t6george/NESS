@@ -26,7 +26,7 @@ uint8_t Ricoh2A03::read(uint16_t addr, bool zpageMode)
 
     if ((0x4000 <= addr && addr <= 0x4013) || addr == 0x4015)
     {
-        return APU::access<0>(elapsed(), addr, mask);
+        return APU::access<0>(elapsed(), addr, 0);
     }
 
     return bus->read(addr & mask);
@@ -36,11 +36,6 @@ uint16_t Ricoh2A03::readDoubleWord(uint16_t addr, bool zpageMode)
 {
     return (static_cast<uint16_t>(read(addr + 0x1, zpageMode)) << 8) |
            (static_cast<uint16_t>(read(addr, zpageMode)));
-}
-
-int Ricoh2A03::dmcRead(void *, uint16_t addr)
-{
-    return read(addr);
 }
 
 void Ricoh2A03::write(uint16_t addr, uint8_t data)
@@ -99,11 +94,6 @@ void Ricoh2A03::fetch()
         setFlag(U, true);
     }
     --cycles;
-
-    if (remaining == 0)
-        remaining = 29781;
-    else
-        --remaining;
 }
 
 void Ricoh2A03::reset()

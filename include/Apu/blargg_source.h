@@ -21,8 +21,8 @@
 // Like printf() except output goes to debug log file. Might be defined to do
 // nothing (not even evaluate its arguments).
 // void dprintf( const char* format, ... );
-#undef dprintf
-#define dprintf (1) ? ((void)0) : (void)
+// #undef dprintf
+// #define dprintf (1) ? ((void)0) : (void)
 
 // If enabled, evaluate expr and if false, make debug log entry with source file
 // and line. Meant for finding situations that should be examined further, but that

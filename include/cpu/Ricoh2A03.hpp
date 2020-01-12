@@ -64,14 +64,13 @@ public:
     uint8_t SP;
     uint16_t PC;
     uint8_t S;
-    uint16_t remaining;
+    int remaining;
 
     Ricoh2A03(std::shared_ptr<AddressableDevice> ppu);
     ~Ricoh2A03() = default;
 
     uint8_t read(uint16_t addr, bool zpageMode = false);
     uint16_t readDoubleWord(uint16_t addr, bool zpageMode = false);
-    int dmcRead(void *, uint16_t addr);
 
     void write(uint16_t addr, uint8_t data);
 
