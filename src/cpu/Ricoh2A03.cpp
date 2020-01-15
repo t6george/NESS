@@ -26,7 +26,7 @@ uint8_t Ricoh2A03::read(uint16_t addr, bool zpageMode)
 
     if ((0x4000 <= addr && addr <= 0x4013) || addr == 0x4015)
     {
-        return APU::access<0>(elapsed(), addr, 0);
+        return apu->access<0>(elapsed(), addr, 0);
     }
 
     return bus->read(addr & mask);
@@ -48,11 +48,11 @@ void Ricoh2A03::write(uint16_t addr, uint8_t data)
     }
     else if (addr == 0x4017)
     {
-        APU::access<1>(elapsed(), addr, data);
+        apu->access<1>(elapsed(), addr, data);
     }
     else if ((0x4000 <= addr && addr <= 0x4013) || addr == 0x4015)
     {
-        APU::access<1>(elapsed(), addr, data);
+        apu->access<1>(elapsed(), addr, data);
     }
     else
     {

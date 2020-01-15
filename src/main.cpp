@@ -3,14 +3,30 @@
 #include <string>
 #include <chrono>
 #include <iostream>
+#include <stdio.h>
 #include <RicohRP2C02.hpp>
+#include <Apu2A03.hpp>
 
 #include <SDL2/SDL.h>
 #include <NesSystem.hpp>
 
+int dmcRead(void *, unsigned int addr)
+{
+    return nes->cpu->read(addr);
+}
+
 int main(int argc, char *argv[])
 {
     nes.reset(new NesSystem());
+    Apu2A03 *apu = new Apu2A03;
+
+    apu->func = dmcRead;
+    // apu->init();
+    // printf("But the NES ptr is: %p\n", nes.get());
+    apu->nes.reset(nes.get());
+    nes->cpu->apu.reset(apu);
+    // printf("AND NOW: %p\n", APU::nes);
+
     nes->insertCartridge("smb.nes");
 
     bool quit = false;
@@ -97,11 +113,13 @@ int main(int argc, char *argv[])
             break;
         }
 
-        while (!nes->ppu->frame_complete)
+        nes->cpu->remaining += 29781;
+        // while (!nes->ppu->frame_complete)
+        while (nes->cpu->remaining > 0)
             nes->tick();
+        apu->run_frame(nes->cpu->elapsed());
         nes->ppu->frame_complete = false;
         nes->screen->blit();
-        APU::run_frame(nes->cpu->elapsed());
     }
     // auto stop = high_resolution_clock::now();
     // auto duration = duration_cast<seconds>(stop - start);

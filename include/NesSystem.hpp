@@ -4,7 +4,7 @@
 #include <string>
 #include <Display.hpp>
 #include <Ricoh2A03.hpp>
-#include <Nes_Apu.h>
+#include <Apu2A03.hpp>
 #include <Sound_Queue.h>
 
 class RicohRP2C02;
@@ -17,8 +17,11 @@ class NesSystem
 public:
     uint64_t frameCount;
     uint32_t systemClock;
+
     std::shared_ptr<RicohRP2C02> ppu;
     std::shared_ptr<Ricoh2A03> cpu;
+    std::shared_ptr<Apu2A03> apu;
+
     std::unique_ptr<Display> screen;
     Sound_Queue *soundQueue;
 

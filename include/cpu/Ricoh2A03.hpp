@@ -5,7 +5,7 @@
 
 #include <Bus.hpp>
 #include <MOS6502Instruction.hpp>
-#include <Nes_Apu.h>
+// #include <Nes_Apu.h>
 #include <Apu2A03.hpp>
 
 #define STACK_BASE 0x0100
@@ -68,6 +68,7 @@ public:
 
     Ricoh2A03(std::shared_ptr<AddressableDevice> ppu);
     ~Ricoh2A03() = default;
+    std::shared_ptr<Apu2A03> apu;
 
     uint8_t read(uint16_t addr, bool zpageMode = false);
     uint16_t readDoubleWord(uint16_t addr, bool zpageMode = false);
