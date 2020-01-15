@@ -21,23 +21,23 @@ int main(int argc, char *argv[])
     Apu2A03 *apu = new Apu2A03;
 
     apu->func = dmcRead;
-    // apu->init();
-    // printf("But the NES ptr is: %p\n", nes.get());
     apu->nes.reset(nes.get());
     nes->cpu->apu.reset(apu);
-    // printf("AND NOW: %p\n", APU::nes);
 
     nes->insertCartridge("smb.nes");
 
     bool quit = false;
     SDL_Event e;
-    using namespace std::chrono;
+
+    unsigned int frameStart, frameTime;
+    const int FPS = 60;
+    const int DELAY = 1000.0f / FPS;
 
     // auto start = high_resolution_clock::now();
     nes->cpu->bus->controller[0] = 0x00;
     while (!quit)
     {
-
+        frameStart = SDL_GetTicks();
         while (SDL_PollEvent(&e))
         {
             switch (e.type)
@@ -114,16 +114,15 @@ int main(int argc, char *argv[])
         }
 
         nes->cpu->remaining += 29781;
-        // while (!nes->ppu->frame_complete)
         while (nes->cpu->remaining > 0)
             nes->tick();
         apu->run_frame(nes->cpu->elapsed());
-        nes->ppu->frame_complete = false;
         nes->screen->blit();
+
+        frameTime = SDL_GetTicks() - frameStart;
+        if (frameTime < DELAY)
+            SDL_Delay((int)(DELAY - frameTime));
     }
-    // auto stop = high_resolution_clock::now();
-    // auto duration = duration_cast<seconds>(stop - start);
-    // std::cout << "FPS: " << (nes->getFrameCount() / duration.count()) << std::endl;
 
     return 0;
 }

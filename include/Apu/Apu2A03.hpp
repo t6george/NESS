@@ -12,7 +12,7 @@ class Apu2A03
 {
 public:
     Apu2A03();
-    Nes_Apu *apu;
+    Nes_Apu apu;
     Blip_Buffer buf;
 
     blip_sample_t outBuf[OUT_SIZE];
@@ -22,6 +22,4 @@ public:
     template <bool write>
     uint8_t access(int elapsed, uint16_t addr, uint8_t v = 0);
     void run_frame(int elapsed);
-    void reset();
-    // void init();
 };

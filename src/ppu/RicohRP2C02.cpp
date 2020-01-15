@@ -769,7 +769,6 @@ void RicohRP2C02::run()
         if (scanline >= 261)
         {
             scanline = -1;
-            frame_complete = true;
         }
     }
 }

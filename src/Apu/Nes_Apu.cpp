@@ -133,12 +133,9 @@ void Nes_Apu::irq_changed()
 }
 
 // frames
-#include <stdio.h>
-int cnt = 0;
+
 void Nes_Apu::run_until(cpu_time_t end_time)
 {
-    printf("%d: %ld %ld\n", cnt, last_time, end_time);
-    ++cnt;
     require(end_time >= last_time);
 
     if (end_time == last_time)

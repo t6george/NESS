@@ -15,7 +15,6 @@ static std::unique_ptr<NesSystem> nes;
 class NesSystem
 {
 public:
-    uint64_t frameCount;
     uint32_t systemClock;
 
     std::shared_ptr<RicohRP2C02> ppu;

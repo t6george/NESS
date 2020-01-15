@@ -9,12 +9,9 @@
 #include <Apu2A03.hpp>
 
 NesSystem::NesSystem()
-    : frameCount{0}, systemClock{0}, ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu}},
+    : systemClock{0}, ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu}},
       screen{new Display{DISPLAY::Width, DISPLAY::Height, ppu->getFrameBuffData()}}
 {
-    // APU::func = dmcRead;
-
-    // APU::init();
     soundQueue = new Sound_Queue;
     soundQueue->init(96000);
 }
@@ -71,13 +68,6 @@ void NesSystem::tick()
         cpu->nmi();
         ppu->requestCpuNmi = false;
     }
-
-    if (ppu->frame_complete)
-    {
-        // screen->blit();
-        // ppu->frame_complete = false;
-        ++frameCount;
-    }
     ++systemClock;
 }
 
@@ -85,14 +75,7 @@ void NesSystem::reset()
 {
     cpu->reset();
     ppu->reset();
-    apu->reset();
-    // APU::reset();
     systemClock = 0;
-}
-
-uint64_t NesSystem::getFrameCount() const
-{
-    return frameCount;
 }
 
 // #define DISASSEMBLE
