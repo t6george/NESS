@@ -35,18 +35,6 @@ void GamePak::parseFile(const std::string &fname)
 
             in.read((char *)prg.data(), prg.size());
             in.read((char *)chr.data(), chr.size());
-
-            // SDL_Log("PRG Dump\n");
-            // for (int i = 0; i < prg.size(); ++i)
-            // {
-            //     SDL_Log("prg %X: %X ", i, prg[i]);
-            // }
-
-            // SDL_Log("\n\nCHR Dump\n");
-            // for (int i = 0; i < chr.size(); ++i)
-            // {
-            //     SDL_Log("chr %X: %X ", i, chr[i]);
-            // }
         }
 
         switch (mapperNum)
@@ -71,10 +59,6 @@ void GamePak::parseFile(const std::string &fname)
 inline uint8_t GamePak::getByte(uint16_t addr, bool readOnly)
 {
     uint8_t data = 0x00;
-    // if (mem == PRG)
-    //     std::cout << "PRG Mode" << std::endl;
-    // else if (mem == CHR)
-    //     std::cout << "CHR Mode" << std::endl;
 
     if (mem == PRG && mapper->translatePrgAddress(addr))
     {
