@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <array>
 #include <vector>
+#include <memory>
 
 #include <HwConstants.hpp>
 #include <SDL2/SDL.h>
@@ -12,6 +13,8 @@
 #define LEFT_MARGIN DISPLAY::PixelDim * 10
 #define RIGHT_MARGIN DISPLAY::PixelDim * 10
 #define RADIUS 10
+
+class FileExplorer;
 
 class Display
 {
@@ -26,6 +29,7 @@ public:
     const SDL_Rect controller;
     const SDL_Rect slot;
 
+    FileExplorer* fileExplorer;
 
     const uint32_t *frameBuffer;
 
@@ -39,7 +43,6 @@ public:
 
     inline void drawButtonPress(const uint8_t buttonI);
     inline void drawCartridgeSlot();
-
 
     inline void drawCircle(const std::pair<uint16_t, uint16_t> center, 
         const uint16_t radius, const SDL_Color& col);

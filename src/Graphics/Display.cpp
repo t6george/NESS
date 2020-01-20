@@ -1,4 +1,5 @@
 #include <Display.hpp>
+#include <FileExplorer.hpp>
 
 Display::Display(const uint16_t width, const uint16_t height, const uint32_t *fb)
     :
@@ -21,7 +22,7 @@ Display::Display(const uint16_t width, const uint16_t height, const uint32_t *fb
       canvas{.x = LEFT_MARGIN, .y = TOP_MARGIN, .w = width * DISPLAY::PixelDim, .h = height * DISPLAY::PixelDim},
       controller{.x = LEFT_MARGIN * 4, .y = canvas.h + TOP_MARGIN * 2, .w = canvas.w - LEFT_MARGIN * 6, .h = static_cast<int>((canvas.w - LEFT_MARGIN * 6) / 2.25)},
       slot{.x = LEFT_MARGIN * 6, .y = TOP_MARGIN / 4, .w = canvas.w - LEFT_MARGIN * 10, .h = TOP_MARGIN / 2},
-      frameBuffer{fb},
+      fileExplorer{new FileExplorer()}, frameBuffer{fb},
       buttonCoords
       {
           std::make_pair(176,699), std::make_pair(130,699),
@@ -32,6 +33,7 @@ Display::Display(const uint16_t width, const uint16_t height, const uint32_t *fb
 
 Display::~Display() noexcept
 {
+    delete fileExplorer;
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

@@ -9,8 +9,7 @@
 
 #include <SDL2/SDL.h>
 #include <NesSystem.hpp>
-#include <dirent.h>
-#include <unistd.h>
+
 
 int dmcRead(void *, unsigned int addr)
 {
@@ -26,21 +25,21 @@ int main(int argc, char *argv[])
     apu->nes.reset(nes.get());
     nes->cpu->apu.reset(apu);
     // chdir("..");
-    DIR *dir;
-    struct dirent *ent;
-    if ((dir = opendir(".")) != NULL)
-    {
-        while ((ent = readdir(dir)) != NULL)
-        {
-            printf("%s\n", ent->d_name);
-        }
-        closedir(dir);
-    }
-    else
-    {
-        perror("moss");
-        return 0;
-    }
+    // DIR *dir;
+    // struct dirent *ent;
+    // if ((dir = opendir(".")) != NULL)
+    // {
+    //     while ((ent = readdir(dir)) != NULL)
+    //     {
+    //         printf("%s\n", ent->d_name);
+    //     }
+    //     closedir(dir);
+    // }
+    // else
+    // {
+    //     perror("moss");
+    //     return 0;
+    // }
 
     nes->insertCartridge("smb.nes");
 
