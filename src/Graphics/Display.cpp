@@ -18,9 +18,9 @@ Display::Display(const uint16_t width, const uint16_t height, const uint32_t *fb
           width,
           height)},
       controllerTexture{SDL_CreateTextureFromSurface(renderer, IMG_Load("controller.png"))},
-
       canvas{.x = LEFT_MARGIN, .y = TOP_MARGIN, .w = width * DISPLAY::PixelDim, .h = height * DISPLAY::PixelDim},
       controller{.x = LEFT_MARGIN * 4, .y = canvas.h + TOP_MARGIN * 2, .w = canvas.w - LEFT_MARGIN * 6, .h = static_cast<int>((canvas.w - LEFT_MARGIN * 6) / 2.25)},
+      slot{.x = LEFT_MARGIN * 6, .y = TOP_MARGIN / 4, .w = canvas.w - LEFT_MARGIN * 10, .h = TOP_MARGIN / 2},
       frameBuffer{fb},
       buttonCoords
       {
@@ -70,18 +70,39 @@ void Display::setActiveButtons(const uint8_t activePress)
 
 void Display::drawButtonPress(const uint8_t buttonI)
 {
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0x00, 0xFF);
+    SDL_Color col = {.r = 0xFF, .g = 0xFF, .b = 0x00, .a = 0xFF};
+    drawCircle(buttonCoords[buttonI], RADIUS, col);
+}
 
-    for (int w = 0; w < RADIUS * 2; ++w)
+void Display::drawCartridgeSlot()
+{
+    SDL_SetRenderDrawColor(renderer, 0x20, 0x20, 0x20, 0xFF);
+    SDL_RenderFillRect(renderer, &slot);
+    SDL_Color col = {.r = 0xFF, .g = 0xFF, .b = 0xFF, .a = 0xFF};
+    std::pair<uint16_t, uint16_t> coords;
+    for (uint8_t i = 0; i < 30; ++i)
     {
-        for (int h = 0; h < RADIUS * 2; ++h)
+        coords = {LEFT_MARGIN * 6 + 10 + i * 10, TOP_MARGIN / 4 + 10};
+        drawCircle(coords, 2, col);
+        coords.second += 10;
+        drawCircle(coords, 2, col);
+    }
+}
+
+void Display::drawCircle(const std::pair<uint16_t, uint16_t> center, 
+    const uint16_t radius, const SDL_Color& col)
+{
+    int16_t dx, dy;
+    SDL_SetRenderDrawColor(renderer, col.r, col.g, col.b, col.a);
+    for (uint16_t w = 0; w < radius * 2; ++w)
+    {
+        for (uint16_t h = 0; h < radius * 2; ++h)
         {
-            int dx = RADIUS - w;
-            int dy = RADIUS - h;
-            if ((dx * dx + dy * dy) <= (RADIUS * RADIUS))
+            dx = radius - w;
+            dy = radius - h;
+            if ((dx * dx + dy * dy) <= (radius * radius))
             {
-                SDL_RenderDrawPoint(renderer, buttonCoords[buttonI].first + dx, 
-                    buttonCoords[buttonI].second + dy);
+                SDL_RenderDrawPoint(renderer, center.first + dx, center.second + dy);
             }
         }
     }
@@ -89,12 +110,14 @@ void Display::drawButtonPress(const uint8_t buttonI)
 
 void Display::blit(const uint8_t activePress)
 {
-    SDL_SetRenderDrawColor(renderer, 0x40, 0x40, 0x40, 0xFF);
+    SDL_SetRenderDrawColor(renderer, 0x40, 0x00, 0x00, 0xFF);
     SDL_UpdateTexture(texture, nullptr, frameBuffer, DISPLAY::Width * sizeof(uint32_t));
     SDL_RenderClear(renderer);
 
     SDL_RenderCopy(renderer, texture, nullptr, &canvas);
     SDL_RenderCopy(renderer, controllerTexture, nullptr, &controller);
+    drawCartridgeSlot();
+
     setActiveButtons(activePress);
 
     SDL_RenderPresent(renderer);

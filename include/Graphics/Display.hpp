@@ -24,6 +24,7 @@ public:
 
     const SDL_Rect canvas;
     const SDL_Rect controller;
+    const SDL_Rect slot;
 
 
     const uint32_t *frameBuffer;
@@ -35,5 +36,11 @@ public:
 
     void blit(const uint8_t activePress);
     inline void setActiveButtons(const uint8_t activePress);
+
     inline void drawButtonPress(const uint8_t buttonI);
+    inline void drawCartridgeSlot();
+
+
+    inline void drawCircle(const std::pair<uint16_t, uint16_t> center, 
+        const uint16_t radius, const SDL_Color& col);
 };
