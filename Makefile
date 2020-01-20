@@ -9,7 +9,7 @@ CPPC := g++
 CPPFLAGS := -std=c++17 -g -Wall -Werror $(INCLUDES)
 
 nes: $(OBJECTS)
-	$(CPPC) -o $@ $^ -l SDL2-2.0.0 -lstdc++ $(CPPFLAGS)
+	$(CPPC) -o $@ $^ -l SDL2-2.0.0 -lstdc++ -lSDL2_image $(CPPFLAGS)
 
 %.o: %.cpp
 	$(CPPC)  $< -o $@ $(CPPFLAGS) -c
