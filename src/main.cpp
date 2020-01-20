@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
         while (nes->cpu->remaining > 0)
             nes->tick();
         apu->run_frame(nes->cpu->elapsed());
-        nes->screen->blit();
+        nes->screen->blit(nes->cpu->bus->controller[0]);
 
         frameTime = SDL_GetTicks() - frameStart;
         if (frameTime < DELAY)

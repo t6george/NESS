@@ -2,7 +2,6 @@
 #include <cstdint>
 #include <array>
 #include <vector>
-#include <utility>
 
 #include <HwConstants.hpp>
 #include <SDL2/SDL.h>
@@ -34,7 +33,7 @@ public:
     Display(const uint16_t width, const uint16_t height, const uint32_t *fb);
     ~Display() noexcept;
 
-    void blit();
-    void updateButtonPress(uint8_t activePress);
-    void drawButtonPress();
+    void blit(const uint8_t activePress);
+    inline void setActiveButtons(const uint8_t activePress);
+    inline void drawButtonPress(const uint8_t buttonI);
 };
