@@ -11,7 +11,6 @@ Display::Display(const uint16_t width, const uint16_t height, const uint32_t *fb
       renderer{SDL_CreateRenderer(
           window, -1,
           SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)},
-      menuItem1{nullptr}, menuItem2{nullptr}, menuItem3{nullptr},
       texture{SDL_CreateTexture(
           renderer,
           SDL_PIXELFORMAT_ARGB8888,
@@ -87,7 +86,7 @@ void Display::drawButtonPress(const uint8_t buttonI)
 void Display::drawCartridgeSlot()
 {
     SDL_SetRenderDrawColor(renderer, 0x20, 0x20, 0x20, 0xFF);
-    SDL_RenderFillRect(renderer, &slot);
+    // SDL_RenderFillRect(renderer, &slot);
     SDL_Color col = {.r = 0xFF, .g = 0xFF, .b = 0xFF, .a = 0xFF};
     std::pair<uint16_t, uint16_t> coords;
     for (uint8_t i = 0; i < 30; ++i)
@@ -118,20 +117,15 @@ void Display::drawCircle(const std::pair<uint16_t, uint16_t> center,
     }
 }
 
-void Display::drawFileMenu()
-{
-}
-
 void Display::blit(const uint8_t activePress)
 {
     SDL_SetRenderDrawColor(renderer, 0x40, 0x00, 0x00, 0xFF);
     SDL_UpdateTexture(texture, nullptr, frameBuffer, DISPLAY::Width * sizeof(uint32_t));
-    drawFileMenu();
     SDL_RenderClear(renderer);
 
     SDL_RenderCopy(renderer, texture, nullptr, &canvas);
     SDL_RenderCopy(renderer, controllerTexture, nullptr, &controller);
-    drawCartridgeSlot();
+    // drawCartridgeSlot();
 
     setActiveButtons(activePress);
 

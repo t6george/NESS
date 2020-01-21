@@ -1,10 +1,6 @@
 #include <FileExplorer.hpp>
 
-FileExplorer::FileExplorer() : fileFrame{0}, filePointer{0}, path{".."}, visible{false}
-{
-    // chdir("..");
-    // getFiles();
-}
+FileExplorer::FileExplorer() : fileFrame{0}, filePointer{0}, path{".."}, visible{false} {}
 
 void FileExplorer::getFiles(const int8_t moveSelect)
 {
@@ -19,7 +15,6 @@ void FileExplorer::getFiles(const int8_t moveSelect)
     {
         fileFrame -= 3;
     }
-
 }
 
 void FileExplorer::select()
@@ -29,17 +24,14 @@ void FileExplorer::select()
 
     if (dir)
     {
-        // chdir(path);
         files.clear();
         while ((ent = readdir(dir)))
         {
             files.emplace_back(ent->d_name);
-            // printf("%s\n", ent->d_name);
         }
         closedir(dir);
     }
     else
     {
-        
     }
 }

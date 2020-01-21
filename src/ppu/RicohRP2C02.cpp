@@ -1,5 +1,7 @@
 #include <RicohRP2C02.hpp>
 
+#define COLOR(r, g, b) static_cast<uint32_t>(0xFF000000 | ((r) << 0x10) | ((g) << 0x8) | (b))
+
 uint32_t genColor(uint8_t r, uint8_t g, uint8_t b)
 {
     uint32_t color = 0xFF000000;
@@ -10,78 +12,79 @@ uint32_t genColor(uint8_t r, uint8_t g, uint8_t b)
 }
 
 RicohRP2C02::RicohRP2C02()
+    : palettes {
+        COLOR(84, 84, 84),
+        COLOR(0, 30, 116),
+        COLOR(8, 16, 144),
+        COLOR(48, 0, 136),
+        COLOR(68, 0, 100),
+        COLOR(92, 0, 48),
+        COLOR(84, 4, 0),
+        COLOR(60, 24, 0),
+        COLOR(32, 42, 0),
+        COLOR(8, 58, 0),
+        COLOR(0, 64, 0),
+        COLOR(0, 60, 0),
+        COLOR(0, 50, 60),
+        COLOR(0, 0, 0),
+        COLOR(0, 0, 0),
+        COLOR(0, 0, 0),
+
+        COLOR(152, 150, 152),
+        COLOR(8, 76, 196),
+        COLOR(48, 50, 236),
+        COLOR(92, 30, 228),
+        COLOR(136, 20, 176),
+        COLOR(160, 20, 100),
+        COLOR(152, 34, 32),
+        COLOR(120, 60, 0),
+        COLOR(84, 90, 0),
+        COLOR(40, 114, 0),
+        COLOR(8, 124, 0),
+        COLOR(0, 118, 40),
+        COLOR(0, 102, 120),
+        COLOR(0, 0, 0),
+        COLOR(0, 0, 0),
+        COLOR(0, 0, 0),
+
+        COLOR(236, 238, 236),
+        COLOR(76, 154, 236),
+        COLOR(120, 124, 236),
+        COLOR(176, 98, 236),
+        COLOR(228, 84, 236),
+        COLOR(236, 88, 180),
+        COLOR(236, 106, 10),
+        COLOR(212, 136, 32),
+        COLOR(160, 170, 0),
+        COLOR(116, 196, 0),
+        COLOR(76, 208, 32),
+        COLOR(56, 204, 108),
+        COLOR(56, 180, 204),
+        COLOR(60, 60, 60),
+        COLOR(0, 0, 0),
+        COLOR(0, 0, 0),
+
+        COLOR(236, 238, 236),
+        COLOR(168, 204, 236),
+        COLOR(188, 188, 236),
+        COLOR(212, 178, 236),
+        COLOR(236, 174, 236),
+        COLOR(236, 174, 212),
+        COLOR(236, 180, 176),
+        COLOR(228, 196, 144),
+        COLOR(204, 210, 120),
+        COLOR(180, 222, 120),
+        COLOR(168, 226, 144),
+        COLOR(152, 226, 180),
+        COLOR(160, 214, 228),
+        COLOR(160, 162, 160),
+        COLOR(0, 0, 0),
+        COLOR(0, 0, 0)
+    }
 {
     sprScreen.resize(240 * 256);
     for (int i = 0; i < 256 * 240; ++i)
         sprScreen[i] = 0;
-
-    palScreen[0x00] = genColor(84, 84, 84);
-    palScreen[0x01] = genColor(0, 30, 116);
-    palScreen[0x02] = genColor(8, 16, 144);
-    palScreen[0x03] = genColor(48, 0, 136);
-    palScreen[0x04] = genColor(68, 0, 100);
-    palScreen[0x05] = genColor(92, 0, 48);
-    palScreen[0x06] = genColor(84, 4, 0);
-    palScreen[0x07] = genColor(60, 24, 0);
-    palScreen[0x08] = genColor(32, 42, 0);
-    palScreen[0x09] = genColor(8, 58, 0);
-    palScreen[0x0A] = genColor(0, 64, 0);
-    palScreen[0x0B] = genColor(0, 60, 0);
-    palScreen[0x0C] = genColor(0, 50, 60);
-    palScreen[0x0D] = genColor(0, 0, 0);
-    palScreen[0x0E] = genColor(0, 0, 0);
-    palScreen[0x0F] = genColor(0, 0, 0);
-
-    palScreen[0x10] = genColor(152, 150, 152);
-    palScreen[0x11] = genColor(8, 76, 196);
-    palScreen[0x12] = genColor(48, 50, 236);
-    palScreen[0x13] = genColor(92, 30, 228);
-    palScreen[0x14] = genColor(136, 20, 176);
-    palScreen[0x15] = genColor(160, 20, 100);
-    palScreen[0x16] = genColor(152, 34, 32);
-    palScreen[0x17] = genColor(120, 60, 0);
-    palScreen[0x18] = genColor(84, 90, 0);
-    palScreen[0x19] = genColor(40, 114, 0);
-    palScreen[0x1A] = genColor(8, 124, 0);
-    palScreen[0x1B] = genColor(0, 118, 40);
-    palScreen[0x1C] = genColor(0, 102, 120);
-    palScreen[0x1D] = genColor(0, 0, 0);
-    palScreen[0x1E] = genColor(0, 0, 0);
-    palScreen[0x1F] = genColor(0, 0, 0);
-
-    palScreen[0x20] = genColor(236, 238, 236);
-    palScreen[0x21] = genColor(76, 154, 236);
-    palScreen[0x22] = genColor(120, 124, 236);
-    palScreen[0x23] = genColor(176, 98, 236);
-    palScreen[0x24] = genColor(228, 84, 236);
-    palScreen[0x25] = genColor(236, 88, 180);
-    palScreen[0x26] = genColor(236, 106, 100);
-    palScreen[0x27] = genColor(212, 136, 32);
-    palScreen[0x28] = genColor(160, 170, 0);
-    palScreen[0x29] = genColor(116, 196, 0);
-    palScreen[0x2A] = genColor(76, 208, 32);
-    palScreen[0x2B] = genColor(56, 204, 108);
-    palScreen[0x2C] = genColor(56, 180, 204);
-    palScreen[0x2D] = genColor(60, 60, 60);
-    palScreen[0x2E] = genColor(0, 0, 0);
-    palScreen[0x2F] = genColor(0, 0, 0);
-
-    palScreen[0x30] = genColor(236, 238, 236);
-    palScreen[0x31] = genColor(168, 204, 236);
-    palScreen[0x32] = genColor(188, 188, 236);
-    palScreen[0x33] = genColor(212, 178, 236);
-    palScreen[0x34] = genColor(236, 174, 236);
-    palScreen[0x35] = genColor(236, 174, 212);
-    palScreen[0x36] = genColor(236, 180, 176);
-    palScreen[0x37] = genColor(228, 196, 144);
-    palScreen[0x38] = genColor(204, 210, 120);
-    palScreen[0x39] = genColor(180, 222, 120);
-    palScreen[0x3A] = genColor(168, 226, 144);
-    palScreen[0x3B] = genColor(152, 226, 180);
-    palScreen[0x3C] = genColor(160, 214, 228);
-    palScreen[0x3D] = genColor(160, 162, 160);
-    palScreen[0x3E] = genColor(0, 0, 0);
-    palScreen[0x3F] = genColor(0, 0, 0);
 }
 
 RicohRP2C02::~RicohRP2C02()
@@ -90,13 +93,12 @@ RicohRP2C02::~RicohRP2C02()
 
 uint32_t *RicohRP2C02::getFrameBuffData()
 {
-    // Simply returns the current sprite holding the rendered screen
     return sprScreen.data();
 }
 
 uint32_t RicohRP2C02::GetColourFromPaletteRam(uint8_t palette, uint8_t pixel)
 {
-    return palScreen[localRead(0x3F00 + (palette << 2) + pixel) & 0x3F];
+    return palettes[localRead(0x3F00 + (palette << 2) + pixel) & 0x3F];
 }
 
 uint8_t RicohRP2C02::getByte(uint16_t addr, bool rdonly)
@@ -116,41 +118,19 @@ uint8_t RicohRP2C02::getByte(uint16_t addr, bool rdonly)
         case 0x0002:
             data = status.reg;
             break;
-        case 0x0003:
-            break;
-        case 0x0004:
-            break;
-        case 0x0005:
-            break;
-        case 0x0006:
-            break;
-        case 0x0007:
-            break;
         }
     }
     else
     {
         switch (addr)
         {
-        case 0x0000:
-            break;
-        case 0x0001:
-            break;
         case 0x0002:
             data = (status.reg & 0xE0) | (ppu_data_buffer & 0x1F);
             status.vertical_blank = 0;
             address_latch = 0;
             break;
-        case 0x0003:
-            break;
-
         case 0x0004:
             data = pOAM[oam_addr];
-            break;
-
-        case 0x0005:
-            break;
-        case 0x0006:
             break;
         case 0x0007:
             data = ppu_data_buffer;
@@ -176,8 +156,6 @@ void RicohRP2C02::setByte(uint16_t addr, uint8_t data)
         break;
     case 0x0001:
         mask.reg = data;
-        break;
-    case 0x0002:
         break;
     case 0x0003:
         oam_addr = data;
@@ -234,7 +212,6 @@ uint8_t RicohRP2C02::localRead(uint16_t addr, bool rdonly)
 
         if (cart->getMirrorMode() == GamePak::MirrorMode::VERTICAL)
         {
-            // Vertical
             if (addr >= 0x0000 && addr <= 0x03FF)
                 data = tblName[0][addr & 0x03FF];
             if (addr >= 0x0400 && addr <= 0x07FF)
@@ -246,7 +223,6 @@ uint8_t RicohRP2C02::localRead(uint16_t addr, bool rdonly)
         }
         else if (cart->getMirrorMode() == GamePak::MirrorMode::HORIZONTAL)
         {
-            // Horizontal
             if (addr >= 0x0000 && addr <= 0x03FF)
                 data = tblName[0][addr & 0x03FF];
             if (addr >= 0x0400 && addr <= 0x07FF)
@@ -287,7 +263,6 @@ void RicohRP2C02::localWrite(uint16_t addr, uint8_t data)
         addr &= 0x0FFF;
         if (cart->getMirrorMode() == GamePak::MirrorMode::VERTICAL)
         {
-            // Vertical
             if (addr >= 0x0000 && addr <= 0x03FF)
                 tblName[0][addr & 0x03FF] = data;
             if (addr >= 0x0400 && addr <= 0x07FF)
@@ -299,7 +274,6 @@ void RicohRP2C02::localWrite(uint16_t addr, uint8_t data)
         }
         else if (cart->getMirrorMode() == GamePak::MirrorMode::HORIZONTAL)
         {
-            // Horizontal
             if (addr >= 0x0000 && addr <= 0x03FF)
                 tblName[0][addr & 0x03FF] = data;
             if (addr >= 0x0400 && addr <= 0x07FF)

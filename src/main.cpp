@@ -26,6 +26,7 @@ enum emuState
 
 int main(int argc, char *argv[])
 {
+    assert(argc > 1);
     nes.reset(new NesSystem());
     Apu2A03 *apu = new Apu2A03;
 

@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include <array>
 
 #include <AddressableDevice.hpp>
 #include <GamePak.hpp>
@@ -18,7 +19,7 @@ private:
     uint8_t tblPalette[32];
 
 private:
-    uint32_t palScreen[0x40];
+    std::array<uint32_t, 0x40> palettes;
     std::vector<uint32_t> sprScreen;
 
 public:
@@ -62,7 +63,7 @@ private:
             uint8_t pattern_sprite : 1;
             uint8_t pattern_background : 1;
             uint8_t sprite_size : 1;
-            uint8_t slave_mode : 1; // unused
+            uint8_t slave_mode : 1;
             uint8_t enable_nmi : 1;
         };
 
@@ -70,7 +71,6 @@ private:
     } control;
 
     union loopy_register {
-        // Credit to Loopy for working this out :D
         struct
         {
 
