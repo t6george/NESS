@@ -1,11 +1,11 @@
 <p align="center">
-  <img width="150" height="100" src="https://user-images.githubusercontent.com/31244240/72781082-763a2a00-3bee-11ea-902f-9963f2a764fb.png">
+  <img width="120" height="80" src="https://user-images.githubusercontent.com/31244240/72781082-763a2a00-3bee-11ea-902f-9963f2a764fb.png">
 </p>
 
 # NESS - NES Simulator
 
-For the past couple of months, I have been working on a really exciting project. Although the Ninendo Entertainment System was 
-released in North America 14 years before I was born, I still enjoyed the many games I played on various NES emulators. It was about time I wrote my own!
+For the past couple of months, I have been working on a really exciting project. Although the [Ninendo Entertainment System](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) was 
+released in North America 14 years before I was born, I still enjoyed the multitude of games that I played on various NES emulators. It was about time I wrote my own!
 
 ## Usage and Gameplay
 
@@ -37,7 +37,7 @@ Arrow Keys - (D-Pad)
 ```
 ## The Name
 I didn't want this to just be another NES emulator ;) so I just titled it a "simulator" instead. More conveniently this spells out NESS, which
-is the main character in my favorite RPG: Earthbound. Earthbound is actually for the Super Nintendo Entertainment System, which is my favorite console
+is the main character in my favorite RPG: [Earthbound](https://en.wikipedia.org/wiki/EarthBound). Earthbound is actually for the [Super Nintendo Entertainment System](https://en.wikipedia.org/wiki/Super_Nintendo_Entertainment_System), which is my favorite console
 of all time, due to its vast library of genuinely awesome games.
 
 That being said, I should probably get started on a Super Nintendo Emulator. However, the 8-bit NES proved to be quite a challenging project - 
@@ -45,6 +45,7 @@ I can only imagine the hardware quirks, volume of instructions, and graphical re
 this new adventure, there are a couple of aspects of NESS that I would like to improve:
 * Code refactor - in a rush to complete NESS before the school term, there are some aspects of the code which could be encapsulated more effectively.
 * Improved GUI - while I like what I have done so far, I want to add a file browser system and display some diagnostics such as the framerate.
+
 Currently, I have put this project on hold to focus on the school term, but I look forward to resuming development after finals!
 
 ## Tool-Assisted Speedrunning
@@ -55,7 +56,7 @@ you to consistently exploit in-game glitches. While humans can become very good 
 where the input into the game must be so precise, that only a Tool-Assisted Speedrunner could achieve it at a reasonable success
 rate.
 
-At the bottom of the screen, the NES Joypad's button presses are being indicated in real-time. This is to help with the tool-assisted speedrunning experience. By screen-recording a speedrun recorded on this emulator, you can observe the frame-by-frame inputs that the author is making. Hopefully, this can make speedrunning more accessible to newcomers who have not developed 60Hz reflexes.
+At the bottom of the screen, the NES Joypad's button presses are being indicated in real-time. This is to help with the tool-assisted speedrunning experience. By screen-recording a speedrun recorded on this emulator, you can observe the frame-by-frame inputs that the author is making. Hopefully, this can make speedrunning more accessible to newcomers who have not developed 60Hz reflexes yet.
 
 ## Credits
 * [NesDev Wiki](https://nesdev.com/) - the NES development community is unparalleled. Thanks to all of the clever researchers and reverse-engineers
