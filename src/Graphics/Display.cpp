@@ -2,34 +2,41 @@
 #include <FileExplorer.hpp>
 
 Display::Display(const uint16_t width, const uint16_t height, const uint32_t *fb)
-    :
-    window{SDL_CreateWindow(
+    : window{SDL_CreateWindow(
           "NESS", SDL_WINDOWPOS_UNDEFINED,
           SDL_WINDOWPOS_UNDEFINED,
           width * DISPLAY::PixelDim + LEFT_MARGIN + RIGHT_MARGIN,
           height * DISPLAY::PixelDim + TOP_MARGIN + BOT_MARGIN,
           SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN)},
-    renderer{SDL_CreateRenderer(
+      renderer{SDL_CreateRenderer(
           window, -1,
           SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)},
-    texture{SDL_CreateTexture(
+      menuItem1{nullptr}, menuItem2{nullptr}, menuItem3{nullptr},
+      texture{SDL_CreateTexture(
           renderer,
           SDL_PIXELFORMAT_ARGB8888,
           SDL_TEXTUREACCESS_STREAMING,
           width,
           height)},
       controllerTexture{SDL_CreateTextureFromSurface(renderer, IMG_Load("controller.png"))},
+      menuTexture{nullptr},
       canvas{.x = LEFT_MARGIN, .y = TOP_MARGIN, .w = width * DISPLAY::PixelDim, .h = height * DISPLAY::PixelDim},
       controller{.x = LEFT_MARGIN * 4, .y = canvas.h + TOP_MARGIN * 2, .w = canvas.w - LEFT_MARGIN * 6, .h = static_cast<int>((canvas.w - LEFT_MARGIN * 6) / 2.25)},
-      slot{.x = LEFT_MARGIN * 6, .y = TOP_MARGIN / 4, .w = canvas.w - LEFT_MARGIN * 10, .h = TOP_MARGIN / 2},
+      //   slot{.x = LEFT_MARGIN * 6, .y = TOP_MARGIN / 4, .w = canvas.w - LEFT_MARGIN * 10, .h = TOP_MARGIN / 2},
+      //   fileMenu{.x = LEFT_MARGIN * 6, .y = TOP_MARGIN / 2, .w = canvas.w - LEFT_MARGIN * 10, .h = TOP_MARGIN / 2},
       fileExplorer{new FileExplorer()}, frameBuffer{fb},
-      buttonCoords
-      {
-          std::make_pair(176,699), std::make_pair(130,699),
-          std::make_pair(153,720), std::make_pair(153,678), 
-          std::make_pair(302,718), std::make_pair(249,718),
-          std::make_pair(419,719), std::make_pair(368,719),
-      } {}
+      buttonCoords{
+          std::make_pair(176, 699),
+          std::make_pair(130, 699),
+          std::make_pair(153, 720),
+          std::make_pair(153, 678),
+          std::make_pair(302, 718),
+          std::make_pair(249, 718),
+          std::make_pair(419, 719),
+          std::make_pair(368, 719),
+      }
+{
+}
 
 Display::~Display() noexcept
 {
@@ -37,6 +44,7 @@ Display::~Display() noexcept
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    TTF_Quit();
     SDL_Quit();
 }
 
@@ -91,8 +99,8 @@ void Display::drawCartridgeSlot()
     }
 }
 
-void Display::drawCircle(const std::pair<uint16_t, uint16_t> center, 
-    const uint16_t radius, const SDL_Color& col)
+void Display::drawCircle(const std::pair<uint16_t, uint16_t> center,
+                         const uint16_t radius, const SDL_Color &col)
 {
     int16_t dx, dy;
     SDL_SetRenderDrawColor(renderer, col.r, col.g, col.b, col.a);
@@ -110,10 +118,15 @@ void Display::drawCircle(const std::pair<uint16_t, uint16_t> center,
     }
 }
 
+void Display::drawFileMenu()
+{
+}
+
 void Display::blit(const uint8_t activePress)
 {
     SDL_SetRenderDrawColor(renderer, 0x40, 0x00, 0x00, 0xFF);
     SDL_UpdateTexture(texture, nullptr, frameBuffer, DISPLAY::Width * sizeof(uint32_t));
+    drawFileMenu();
     SDL_RenderClear(renderer);
 
     SDL_RenderCopy(renderer, texture, nullptr, &canvas);

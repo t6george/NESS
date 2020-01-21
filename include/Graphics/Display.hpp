@@ -7,6 +7,7 @@
 #include <HwConstants.hpp>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 
 #define TOP_MARGIN DISPLAY::PixelDim * 30
 #define BOT_MARGIN DISPLAY::PixelDim * 125
@@ -24,12 +25,13 @@ public:
 
     SDL_Texture *texture;
     SDL_Texture *controllerTexture;
+    SDL_Texture *menuTexture;
 
     const SDL_Rect canvas;
     const SDL_Rect controller;
     const SDL_Rect slot;
 
-    FileExplorer* fileExplorer;
+    FileExplorer *fileExplorer;
 
     const uint32_t *frameBuffer;
 
@@ -43,7 +45,8 @@ public:
 
     inline void drawButtonPress(const uint8_t buttonI);
     inline void drawCartridgeSlot();
+    inline void drawFileMenu();
 
-    inline void drawCircle(const std::pair<uint16_t, uint16_t> center, 
-        const uint16_t radius, const SDL_Color& col);
+    inline void drawCircle(const std::pair<uint16_t, uint16_t> center,
+                           const uint16_t radius, const SDL_Color &col);
 };

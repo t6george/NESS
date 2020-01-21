@@ -35,18 +35,6 @@ void GamePak::parseFile(const std::string &fname)
 
             in.read((char *)prg.data(), prg.size());
             in.read((char *)chr.data(), chr.size());
-
-            // SDL_Log("PRG Dump\n");
-            // for (int i = 0; i < prg.size(); ++i)
-            // {
-            //     SDL_Log("prg %X: %X ", i, prg[i]);
-            // }
-
-            // SDL_Log("\n\nCHR Dump\n");
-            // for (int i = 0; i < chr.size(); ++i)
-            // {
-            //     SDL_Log("chr %X: %X ", i, chr[i]);
-            // }
         }
 
         switch (mapperNum)
@@ -71,20 +59,14 @@ void GamePak::parseFile(const std::string &fname)
 inline uint8_t GamePak::getByte(uint16_t addr, bool readOnly)
 {
     uint8_t data = 0x00;
-    // if (mem == PRG)
-    //     std::cout << "PRG Mode" << std::endl;
-    // else if (mem == CHR)
-    //     std::cout << "CHR Mode" << std::endl;
 
     if (mem == PRG && mapper->translatePrgAddress(addr))
     {
         data = prg[addr];
-        // std::cout << "rd prg " << std::hex << static_cast<int>(addr) << " " << static_cast<int>(data) << std::endl;
     }
     else if (mem == CHR && mapper->translateChrAddress(addr))
     {
         data = chr[addr];
-        // std::cout << "rd chr " << std::hex << static_cast<int>(addr) << " " << static_cast<int>(data) << std::endl;
     }
 
     return data;
@@ -92,18 +74,12 @@ inline uint8_t GamePak::getByte(uint16_t addr, bool readOnly)
 
 inline void GamePak::setByte(uint16_t addr, uint8_t data)
 {
-    // if (mem == PRG)
-    //     std::cout << "PRG Mode" << std::endl;
-    // else if (mem == CHR)
-    //     std::cout << "CHR Mode" << std::endl;
     if (mem == PRG && mapper->translatePrgAddress(addr))
     {
-        // std::cout << "wr prg " << std::hex << static_cast<int>(addr) << " " << static_cast<int>(data) << std::endl;
         prg[addr] = data;
     }
     else if (mem == CHR && mapper->translateChrAddress(addr))
     {
-        // std::cout << "wr chr " << std::hex << static_cast<int>(addr) << " " << static_cast<int>(data) << std::endl;
         chr[addr] = data;
     }
 }
