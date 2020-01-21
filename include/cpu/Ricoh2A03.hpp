@@ -10,6 +10,7 @@
 
 #define STACK_BASE 0x0100
 #define NUM_OPCODES 0x100
+#define FRAME_TICKS 29781
 // #define DUMP
 
 class GamePak;

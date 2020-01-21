@@ -12,7 +12,7 @@
 
 uint16_t Ricoh2A03::elapsed() const
 {
-    return 29781 - remaining;
+    return FRAME_TICKS - remaining;
 }
 
 uint8_t Ricoh2A03::read(uint16_t addr, bool zpageMode)

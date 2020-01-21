@@ -9,23 +9,18 @@
 
 class RicohRP2C02 : public AddressableDevice
 {
-public:
-    RicohRP2C02();
-    ~RicohRP2C02();
-    uint32_t *getFrameBuffData();
-
-private:
     uint8_t tblName[2][1024];
     uint8_t tblPalette[32];
+    inline void scrollX();
+    inline void scrollY();
+    inline void tax();
+    inline void tay();
+    inline void loadShifters();
+    inline void updateShifters();
 
-private:
     std::array<uint32_t, 0x40> palettes;
     std::vector<uint32_t> sprScreen;
 
-public:
-    uint32_t GetColourFromPaletteRam(uint8_t palette, uint8_t pixel);
-
-private:
     union {
         struct
         {
@@ -123,18 +118,20 @@ private:
 
     bool bSpriteZeroHitPossible = false;
     bool bSpriteZeroBeingRendered = false;
-
+    
 public:
+    RicohRP2C02();
+    ~RicohRP2C02();
+    uint32_t *getFrameBuffData();
+    uint32_t GetColourFromPaletteRam(uint8_t palette, uint8_t pixel);
     uint8_t *pOAM = (uint8_t *)OAM;
 
-public:
     uint8_t getByte(uint16_t addr, bool readOnly = false) override;
     void setByte(uint16_t addr, uint8_t data) override;
 
     uint8_t localRead(uint16_t addr, bool rdonly = false);
     void localWrite(uint16_t addr, uint8_t data);
 
-public:
     void addCartridge(const std::shared_ptr<AddressableDevice> cartridge);
     void run();
     void reset();

@@ -2,15 +2,6 @@
 
 #define COLOR(r, g, b) static_cast<uint32_t>(0xFF000000 | ((r) << 0x10) | ((g) << 0x8) | (b))
 
-uint32_t genColor(uint8_t r, uint8_t g, uint8_t b)
-{
-    uint32_t color = 0xFF000000;
-    color |= (static_cast<uint32_t>(r) << 16);
-    color |= (static_cast<uint32_t>(g) << 8);
-    color |= (static_cast<uint32_t>(b) << 0);
-    return color;
-}
-
 RicohRP2C02::RicohRP2C02()
     : palettes {
         COLOR(84, 84, 84),
@@ -80,12 +71,8 @@ RicohRP2C02::RicohRP2C02()
         COLOR(160, 162, 160),
         COLOR(0, 0, 0),
         COLOR(0, 0, 0)
-    }
-{
-    sprScreen.resize(240 * 256);
-    for (int i = 0; i < 256 * 240; ++i)
-        sprScreen[i] = 0;
-}
+    },
+    sprScreen{std::vector<uint32_t>(240 * 256, 0x00)} {}
 
 RicohRP2C02::~RicohRP2C02()
 {
@@ -326,134 +313,135 @@ void RicohRP2C02::addCartridge(const std::shared_ptr<AddressableDevice> cartridg
     assert(this->cart = dynamic_cast<GamePak *>(cartridge.get()));
 }
 
+void RicohRP2C02::scrollX()
+{
+    if (mask.render_background || mask.render_sprites)
+    {
+        if (vram_addr.coarse_x == 31)
+        {
+            vram_addr.coarse_x = 0;
+            vram_addr.nametable_x = ~vram_addr.nametable_x;
+        }
+        else
+        {
+            ++vram_addr.coarse_x;
+        }
+    }
+}
+
+void RicohRP2C02::scrollY()
+{
+    if (mask.render_background || mask.render_sprites)
+    {
+        if (vram_addr.fine_y < 7)
+        {
+            ++vram_addr.fine_y;
+        }
+        else
+        {
+            vram_addr.fine_y = 0;
+
+            if (vram_addr.coarse_y == 29)
+            {
+                vram_addr.coarse_y = 0;
+                vram_addr.nametable_y = ~vram_addr.nametable_y;
+            }
+            else if (vram_addr.coarse_y == 31)
+            {
+                vram_addr.coarse_y = 0;
+            }
+            else
+            {
+                ++vram_addr.coarse_y;
+            }
+        }
+    }
+}
+
+void RicohRP2C02::tax()
+{
+    if (mask.render_background || mask.render_sprites)
+    {
+        vram_addr.nametable_x = tram_addr.nametable_x;
+        vram_addr.coarse_x = tram_addr.coarse_x;
+    }
+}
+
+void RicohRP2C02::tay()
+{
+    if (mask.render_background || mask.render_sprites)
+    {
+        vram_addr.fine_y = tram_addr.fine_y;
+        vram_addr.nametable_y = tram_addr.nametable_y;
+        vram_addr.coarse_y = tram_addr.coarse_y;
+    }
+}
+
+void RicohRP2C02::loadShifters()
+{
+    bg_shifter_pattern_lo = (bg_shifter_pattern_lo & 0xFF00) | bg_next_tile_lsb;
+    bg_shifter_pattern_hi = (bg_shifter_pattern_hi & 0xFF00) | bg_next_tile_msb;
+
+    bg_shifter_attrib_lo = (bg_shifter_attrib_lo & 0xFF00) | ((bg_next_tile_attrib & 0b01) ? 0xFF : 0x00);
+    bg_shifter_attrib_hi = (bg_shifter_attrib_hi & 0xFF00) | ((bg_next_tile_attrib & 0b10) ? 0xFF : 0x00);
+}
+
+void RicohRP2C02::updateShifters()
+{
+    if (mask.render_background)
+    {
+        bg_shifter_pattern_lo <<= 1;
+        bg_shifter_pattern_hi <<= 1;
+
+        bg_shifter_attrib_lo <<= 1;
+        bg_shifter_attrib_hi <<= 1;
+    }
+
+    if (mask.render_sprites && cycle >= 1 && cycle < 258)
+    {
+        for (int i = 0; i < sprite_count; ++i)
+        {
+            if (spriteScanline[i].x > 0)
+            {
+                spriteScanline[i].x--;
+            }
+            else
+            {
+                sprite_shifter_pattern_lo[i] <<= 1;
+                sprite_shifter_pattern_hi[i] <<= 1;
+            }
+        }
+    }
+}
 void RicohRP2C02::run()
 {
-    auto IncrementScrollX = [&]() {
-        if (mask.render_background || mask.render_sprites)
-        {
-            if (vram_addr.coarse_x == 31)
-            {
-                vram_addr.coarse_x = 0;
-                vram_addr.nametable_x = ~vram_addr.nametable_x;
-            }
-            else
-            {
-                vram_addr.coarse_x++;
-            }
-        }
-    };
-
-    auto IncrementScrollY = [&]() {
-        if (mask.render_background || mask.render_sprites)
-        {
-            if (vram_addr.fine_y < 7)
-            {
-                vram_addr.fine_y++;
-            }
-            else
-            {
-                vram_addr.fine_y = 0;
-
-                if (vram_addr.coarse_y == 29)
-                {
-                    vram_addr.coarse_y = 0;
-                    vram_addr.nametable_y = ~vram_addr.nametable_y;
-                }
-                else if (vram_addr.coarse_y == 31)
-                {
-                    vram_addr.coarse_y = 0;
-                }
-                else
-                {
-                    vram_addr.coarse_y++;
-                }
-            }
-        }
-    };
-
-    auto TransferAddressX = [&]() {
-        if (mask.render_background || mask.render_sprites)
-        {
-            vram_addr.nametable_x = tram_addr.nametable_x;
-            vram_addr.coarse_x = tram_addr.coarse_x;
-        }
-    };
-
-    auto TransferAddressY = [&]() {
-        if (mask.render_background || mask.render_sprites)
-        {
-            vram_addr.fine_y = tram_addr.fine_y;
-            vram_addr.nametable_y = tram_addr.nametable_y;
-            vram_addr.coarse_y = tram_addr.coarse_y;
-        }
-    };
-
-    auto LoadBackgroundShifters = [&]() {
-        bg_shifter_pattern_lo = (bg_shifter_pattern_lo & 0xFF00) | bg_next_tile_lsb;
-        bg_shifter_pattern_hi = (bg_shifter_pattern_hi & 0xFF00) | bg_next_tile_msb;
-
-        bg_shifter_attrib_lo = (bg_shifter_attrib_lo & 0xFF00) | ((bg_next_tile_attrib & 0b01) ? 0xFF : 0x00);
-        bg_shifter_attrib_hi = (bg_shifter_attrib_hi & 0xFF00) | ((bg_next_tile_attrib & 0b10) ? 0xFF : 0x00);
-    };
-
-    auto UpdateShifters = [&]() {
-        if (mask.render_background)
-        {
-            bg_shifter_pattern_lo <<= 1;
-            bg_shifter_pattern_hi <<= 1;
-
-            bg_shifter_attrib_lo <<= 1;
-            bg_shifter_attrib_hi <<= 1;
-        }
-
-        if (mask.render_sprites && cycle >= 1 && cycle < 258)
-        {
-            for (int i = 0; i < sprite_count; i++)
-            {
-                if (spriteScanline[i].x > 0)
-                {
-                    spriteScanline[i].x--;
-                }
-                else
-                {
-                    sprite_shifter_pattern_lo[i] <<= 1;
-                    sprite_shifter_pattern_hi[i] <<= 1;
-                }
-            }
-        }
-    };
-
     if (scanline >= -1 && scanline < 240)
     {
         if (scanline == 0 && cycle == 0)
         {
             cycle = 1;
         }
-
-        if (scanline == -1 && cycle == 1)
+        else if (scanline == -1 && cycle == 1)
         {
-            status.vertical_blank = 0;
+            status.vertical_blank = 0x0;
+            status.sprite_overflow = 0x0;
+            status.sprite_zero_hit = 0x0;
 
-            status.sprite_overflow = 0;
-
-            status.sprite_zero_hit = 0;
-
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < 8; ++i)
             {
-                sprite_shifter_pattern_lo[i] = 0;
-                sprite_shifter_pattern_hi[i] = 0;
+                sprite_shifter_pattern_lo[i] = 0x0;
+                sprite_shifter_pattern_hi[i] = 0x0;
             }
         }
 
         if ((cycle >= 2 && cycle < 258) || (cycle >= 321 && cycle < 338))
         {
-            UpdateShifters();
+            updateShifters();
 
-            switch ((cycle - 1) % 8)
+            switch ((cycle - 1) & 0x7)
             {
             case 0:
-                LoadBackgroundShifters();
-
+                loadShifters();
                 bg_next_tile_id = localRead(0x2000 | (vram_addr.reg & 0x0FFF));
                 break;
             case 2:
@@ -464,40 +452,36 @@ void RicohRP2C02::run()
                 if (vram_addr.coarse_x & 0x02)
                     bg_next_tile_attrib >>= 2;
                 bg_next_tile_attrib &= 0x03;
-                break;
 
+                break;
             case 4:
                 bg_next_tile_lsb = localRead((control.pattern_background << 12) + ((uint16_t)bg_next_tile_id << 4) + (vram_addr.fine_y) + 0);
-
                 break;
             case 6:
                 bg_next_tile_msb = localRead((control.pattern_background << 12) + ((uint16_t)bg_next_tile_id << 4) + (vram_addr.fine_y) + 8);
                 break;
             case 7:
-                IncrementScrollX();
+                scrollX();
                 break;
             }
         }
 
         if (cycle == 256)
         {
-            IncrementScrollY();
+            scrollY();
         }
-
-        if (cycle == 257)
+        else if (cycle == 257)
         {
-            LoadBackgroundShifters();
-            TransferAddressX();
+            loadShifters();
+            tax();
         }
-
-        if (cycle == 338 || cycle == 340)
+        else if (cycle == 338 || cycle == 340)
         {
             bg_next_tile_id = localRead(0x2000 | (vram_addr.reg & 0x0FFF));
         }
-
-        if (scanline == -1 && cycle >= 280 && cycle < 305)
+        else if (scanline == -1 && cycle >= 280 && cycle < 305)
         {
-            TransferAddressY();
+            tay();
         }
 
         if (cycle == 257 && scanline >= 0)
@@ -506,7 +490,7 @@ void RicohRP2C02::run()
 
             sprite_count = 0;
 
-            for (uint8_t i = 0; i < 8; i++)
+            for (uint8_t i = 0; i < 8; ++i)
             {
                 sprite_shifter_pattern_lo[i] = 0;
                 sprite_shifter_pattern_hi[i] = 0;
@@ -614,8 +598,7 @@ void RicohRP2C02::run()
             }
         }
     }
-
-    if (scanline >= 241 && scanline < 261)
+    else if (scanline >= 241 && scanline < 261)
     {
         if (scanline == 241 && cycle == 1)
         {

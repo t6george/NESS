@@ -1,14 +1,12 @@
 #include <memory>
 #include <cstdint>
 #include <string>
-#include <chrono>
 #include <iostream>
 #include <stdio.h>
 #include <RicohRP2C02.hpp>
 #include <Apu2A03.hpp>
 
-#include <fstream>
-
+ 
 #include <SDL2/SDL.h>
 #include <NesSystem.hpp>
 
@@ -35,8 +33,8 @@ int main(int argc, char *argv[])
     nes->cpu->apu.reset(apu);
     nes->insertCartridge("smb.nes");
 
-    std::ofstream outputFile("mux.tas");
-    std::ifstream inputFile("moss.tas");
+    std::ofstream outputFile("test1.tas");
+    std::ifstream inputFile("test2.tas");
     bool quit = false;
     SDL_Event e;
 
@@ -242,7 +240,8 @@ int main(int argc, char *argv[])
                 break;
             }
         }
-        nes->cpu->remaining += 29781;
+
+        nes->cpu->remaining += FRAME_TICKS;
         while (nes->cpu->remaining > 0)
             nes->tick();
         apu->run_frame(nes->cpu->elapsed());
