@@ -99,6 +99,6 @@ public:
     uint16_t elapsed() const;
 
     void processFrameAudio() const;
-
-    friend class NesSystem;
+    bool isFrameDone() const;
+    void restartFrameTimer();
 };

@@ -11,10 +11,9 @@
 
 NesSystem::NesSystem()
     : systemClock{0}, p1Controller{new GamePad{}}, ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu, p1Controller}},
-      screen{new Display{DISPLAY::Width, DISPLAY::Height, ppu->getFrameBuffData(), p1Controller}}, dma_data{0x00},
-      dma_dummy{true}
+      screen{new Display{DISPLAY::Width, DISPLAY::Height, ppu->getFrameBuffData(), p1Controller}},
+      soundQueue{new Sound_Queue()}, dma_data{0x00}, dma_dummy{true}, fps{60}, delay{1000 / fps}, delayMultiplier{1.0}
 {
-    soundQueue = new Sound_Queue;
     soundQueue->init(96000);
 }
 
@@ -123,4 +122,150 @@ void NesSystem::outputFrame() const
 {
     cpu->processFrameAudio();
     screen->blit();
+}
+
+bool NesSystem::run()
+{
+    frameStart = SDL_GetTicks();
+    // if (state == RECORD_TAS)
+    // {
+    //     nes->cpu->bus->controller[0] = 0x00;
+    //     bool out = false;
+    //     while (!quit && !out)
+    //     {
+    //         while (SDL_PollEvent(&e))
+    //         {
+    //             switch (e.type)
+    //             {
+    //             case SDL_QUIT:
+    //                 quit = true;
+    //                 break;
+    //             case SDL_KEYDOWN:
+    //                 switch (e.key.keysym.sym)
+    //                 {
+    //                 case SDLK_LEFT: // D-pad
+    //                     if ((nes->cpu->bus->controller[0] & 0x02) == 0x00)
+    //                         outputFile << "L";
+    //                     nes->cpu->bus->controller[0] |= 0x02;
+    //                     break;
+    //                 case SDLK_RIGHT:
+    //                     if ((nes->cpu->bus->controller[0] & 0x01) == 0x00)
+    //                         outputFile << "R";
+    //                     nes->cpu->bus->controller[0] |= 0x01;
+    //                     break;
+    //                 case SDLK_UP:
+    //                     if ((nes->cpu->bus->controller[0] & 0x08) == 0x00)
+    //                         outputFile << "L";
+    //                     nes->cpu->bus->controller[0] |= 0x08;
+    //                     break;
+    //                 case SDLK_DOWN:
+    //                     if ((nes->cpu->bus->controller[0] & 0x04) == 0x00)
+    //                         outputFile << "D";
+    //                     nes->cpu->bus->controller[0] |= 0x04;
+    //                     break;
+    //                 case SDLK_a: // A
+    //                     if ((nes->cpu->bus->controller[0] & 0x80) == 0x00)
+    //                         outputFile << "A";
+    //                     nes->cpu->bus->controller[0] |= 0x80;
+    //                     break;
+    //                 case SDLK_s: // B
+    //                     if ((nes->cpu->bus->controller[0] & 0x40) == 0x00)
+    //                         outputFile << "B";
+    //                     nes->cpu->bus->controller[0] |= 0x40;
+    //                     break;
+    //                 case SDLK_z: // Start
+    //                     if ((nes->cpu->bus->controller[0] & 0x10) == 0x00)
+    //                         outputFile << "Z";
+    //                     nes->cpu->bus->controller[0] |= 0x10;
+    //                     break;
+    //                 case SDLK_x: // Select
+    //                     if ((nes->cpu->bus->controller[0] & 0x20) == 0x00)
+    //                         outputFile << "X";
+    //                     nes->cpu->bus->controller[0] |= 0x20;
+    //                     break;
+    //                 case SDLK_RETURN:
+    //                     out = true;
+    //                     break;
+    //                 default:
+    //                     break;
+    //                 }
+    //             default:
+    //                 break;
+    //             }
+    //         }
+    //     }
+
+    //     if (nes->cpu->bus->controller[0] != 0x00)
+    //         outputFile << std::endl;
+    // }
+    // else if (state == PLAY_TAS)
+    // {
+    //     nes->cpu->bus->controller[0] = 0x00;
+    //     std::string inp;
+    //     if (!done)
+    //     {
+    //         std::getline(inputFile, inp);
+
+    //         for (int i = 0; i < inp.size(); ++i)
+    //         {
+    //             switch (inp[i])
+    //             {
+    //             case 'L': // D-pad
+    //                 nes->cpu->bus->controller[0] |= 0x02;
+    //                 break;
+    //             case 'R':
+    //                 nes->cpu->bus->controller[0] |= 0x01;
+    //                 break;
+    //             case 'U':
+    //                 nes->cpu->bus->controller[0] |= 0x08;
+    //                 break;
+    //             case 'D':
+    //                 nes->cpu->bus->controller[0] |= 0x04;
+    //                 break;
+    //             case 'A': // A
+    //                 nes->cpu->bus->controller[0] |= 0x80;
+    //                 break;
+    //             case 'B': // B
+    //                 nes->cpu->bus->controller[0] |= 0x40;
+    //                 break;
+    //             case 'Z': // Start
+    //                 nes->cpu->bus->controller[0] |= 0x10;
+    //                 break;
+    //             case 'X': // Select
+    //                 nes->cpu->bus->controller[0] |= 0x20;
+    //                 break;
+    //             default:
+    //                 done = true;
+    //                 break;
+    //             }
+    //         }
+    //     }
+    // }
+    // else
+    // {
+
+    while (SDL_PollEvent(&e))
+    {
+        if (e.type == SDL_QUIT)
+        {
+            return false;
+        }
+        else
+        {
+            processGameplayInput(e);
+        }
+    }
+
+    // }
+
+    cpu->restartFrameTimer();
+    while (!cpu->isFrameDone())
+        tick();
+    outputFrame();
+
+    frameTime = SDL_GetTicks() - frameStart;
+    if (frameTime < static_cast<uint32_t>(delay * delayMultiplier))
+        SDL_Delay((int)(delay - frameTime));
+
+    return true;
 }

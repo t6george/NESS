@@ -23,10 +23,15 @@ public:
     std::shared_ptr<Apu2A03> apu;
 
     std::unique_ptr<Display> screen;
-    Sound_Queue *soundQueue;
+    std::unique_ptr<Sound_Queue> soundQueue;
 
     uint8_t dma_data;
     bool dma_dummy;
+
+    const uint32_t fps, delay;
+    double delayMultiplier;
+    uint32_t frameStart, frameTime;
+    SDL_Event e;
 
 public:
     NesSystem();
@@ -39,4 +44,5 @@ public:
     void newSamples(const blip_sample_t *samples, size_t count);
     void processGameplayInput(const SDL_Event &event);
     void outputFrame() const;
+    bool run();
 };

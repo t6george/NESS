@@ -339,3 +339,13 @@ void Ricoh2A03::processFrameAudio() const
 {
     apu->run_frame(elapsed());
 }
+
+bool Ricoh2A03::isFrameDone() const
+{
+    return remaining <= 0;
+}
+
+void Ricoh2A03::restartFrameTimer()
+{
+    remaining += FRAME_TICKS;
+}
