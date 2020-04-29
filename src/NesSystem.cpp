@@ -9,13 +9,28 @@
 #include <Apu2A03.hpp>
 #include <GamePad.hpp>
 
-NesSystem::NesSystem(EmuState state)
+NesSystem::NesSystem(EmuState state, std::string outputPath)
     : systemClock{0}, p1Controller{new GamePad{}}, ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu, p1Controller}},
       screen{new Display{DISPLAY::Width, DISPLAY::Height, ppu->getFrameBuffData(), p1Controller}},
       soundQueue{new Sound_Queue()}, dma_data{0x00}, dma_dummy{true}, fps{60}, delay{1000 / fps},
-      delayMultiplier{1.0}, state{state}
+      delayMultiplier{1.0}, state{state}, commandI{0}, scriptOutputPath{outputPath + ".tas"}
 {
     soundQueue->init(96000);
+}
+
+NesSystem::~NesSystem() noexcept
+{
+    if (state == RECORD_TAS)
+    {
+        std::ofstream out;
+
+        out.open(scriptOutputPath, std::ofstream::binary);
+        for (size_t i = 0; i < commands.size(); ++i)
+        {
+            out << commands[i];
+        }
+        out.close();
+    }
 }
 
 void NesSystem::newSamples(const blip_sample_t *samples, size_t count)
@@ -80,6 +95,20 @@ void NesSystem::reset()
     systemClock = 0;
 }
 
+void NesSystem::parseTasScript(const std::string &scriptPath)
+{
+    std::ifstream in;
+    uint8_t frameInput;
+
+    in.open(scriptPath, std::ifstream::binary);
+    while (!in.eof())
+    {
+        in >> frameInput;
+        commands.emplace_back(frameInput);
+    }
+    in.close();
+}
+
 // #define DISASSEMBLE
 void NesSystem::insertCartridge(const std::string &romName)
 {
@@ -119,131 +148,28 @@ void NesSystem::processGameplayInput(const SDL_Event &event)
     p1Controller->registerInputStateChange(event);
 }
 
+void NesSystem::setGameplayInput(const uint8_t btns)
+{
+    p1Controller->setPressRegister(btns);
+}
+
+void NesSystem::saveGameplayInput()
+{
+    commands.emplace_back(p1Controller->readPressReg());
+}
+
 void NesSystem::outputFrame() const
 {
-    cpu->processFrameAudio();
+    if (state != RECORD_TAS)
+    {
+        cpu->processFrameAudio();
+    }
     screen->blit();
 }
 
 bool NesSystem::run()
 {
     frameStart = SDL_GetTicks();
-    // if (state == RECORD_TAS)
-    // {
-    //     nes->cpu->bus->controller[0] = 0x00;
-    //     bool out = false;
-    //     while (!quit && !out)
-    //     {
-    //         while (SDL_PollEvent(&e))
-    //         {
-    //             switch (e.type)
-    //             {
-    //             case SDL_QUIT:
-    //                 quit = true;
-    //                 break;
-    //             case SDL_KEYDOWN:
-    //                 switch (e.key.keysym.sym)
-    //                 {
-    //                 case SDLK_LEFT: // D-pad
-    //                     if ((nes->cpu->bus->controller[0] & 0x02) == 0x00)
-    //                         outputFile << "L";
-    //                     nes->cpu->bus->controller[0] |= 0x02;
-    //                     break;
-    //                 case SDLK_RIGHT:
-    //                     if ((nes->cpu->bus->controller[0] & 0x01) == 0x00)
-    //                         outputFile << "R";
-    //                     nes->cpu->bus->controller[0] |= 0x01;
-    //                     break;
-    //                 case SDLK_UP:
-    //                     if ((nes->cpu->bus->controller[0] & 0x08) == 0x00)
-    //                         outputFile << "L";
-    //                     nes->cpu->bus->controller[0] |= 0x08;
-    //                     break;
-    //                 case SDLK_DOWN:
-    //                     if ((nes->cpu->bus->controller[0] & 0x04) == 0x00)
-    //                         outputFile << "D";
-    //                     nes->cpu->bus->controller[0] |= 0x04;
-    //                     break;
-    //                 case SDLK_a: // A
-    //                     if ((nes->cpu->bus->controller[0] & 0x80) == 0x00)
-    //                         outputFile << "A";
-    //                     nes->cpu->bus->controller[0] |= 0x80;
-    //                     break;
-    //                 case SDLK_s: // B
-    //                     if ((nes->cpu->bus->controller[0] & 0x40) == 0x00)
-    //                         outputFile << "B";
-    //                     nes->cpu->bus->controller[0] |= 0x40;
-    //                     break;
-    //                 case SDLK_z: // Start
-    //                     if ((nes->cpu->bus->controller[0] & 0x10) == 0x00)
-    //                         outputFile << "Z";
-    //                     nes->cpu->bus->controller[0] |= 0x10;
-    //                     break;
-    //                 case SDLK_x: // Select
-    //                     if ((nes->cpu->bus->controller[0] & 0x20) == 0x00)
-    //                         outputFile << "X";
-    //                     nes->cpu->bus->controller[0] |= 0x20;
-    //                     break;
-    //                 case SDLK_RETURN:
-    //                     out = true;
-    //                     break;
-    //                 default:
-    //                     break;
-    //                 }
-    //             default:
-    //                 break;
-    //             }
-    //         }
-    //     }
-
-    //     if (nes->cpu->bus->controller[0] != 0x00)
-    //         outputFile << std::endl;
-    // }
-    // else if (state == PLAY_TAS)
-    // {
-    //     nes->cpu->bus->controller[0] = 0x00;
-    //     std::string inp;
-    //     if (!done)
-    //     {
-    //         std::getline(inputFile, inp);
-
-    //         for (int i = 0; i < inp.size(); ++i)
-    //         {
-    //             switch (inp[i])
-    //             {
-    //             case 'L': // D-pad
-    //                 nes->cpu->bus->controller[0] |= 0x02;
-    //                 break;
-    //             case 'R':
-    //                 nes->cpu->bus->controller[0] |= 0x01;
-    //                 break;
-    //             case 'U':
-    //                 nes->cpu->bus->controller[0] |= 0x08;
-    //                 break;
-    //             case 'D':
-    //                 nes->cpu->bus->controller[0] |= 0x04;
-    //                 break;
-    //             case 'A': // A
-    //                 nes->cpu->bus->controller[0] |= 0x80;
-    //                 break;
-    //             case 'B': // B
-    //                 nes->cpu->bus->controller[0] |= 0x40;
-    //                 break;
-    //             case 'Z': // Start
-    //                 nes->cpu->bus->controller[0] |= 0x10;
-    //                 break;
-    //             case 'X': // Select
-    //                 nes->cpu->bus->controller[0] |= 0x20;
-    //                 break;
-    //             default:
-    //                 done = true;
-    //                 break;
-    //             }
-    //         }
-    //     }
-    // }
-    // else
-    // {
 
     while (SDL_PollEvent(&e))
     {
@@ -255,8 +181,21 @@ bool NesSystem::run()
                 processGameplayInput(e);
                 break;
             case RECORD_TAS:
+                while (SDL_PollEvent(&e) && (e.type != SDL_KEYDOWN || e.key.keysym.sym != SDLK_KP_ENTER))
+                {
+                    if (e.type == SDL_QUIT)
+                    {
+                        return false;
+                    }
+                    processGameplayInput(e);
+                }
+                saveGameplayInput();
                 break;
             case PLAY_TAS:
+                if (commandI < commands.size())
+                {
+                    setGameplayInput(commands[commandI++]);
+                }
                 break;
             default:
                 break;
@@ -267,8 +206,6 @@ bool NesSystem::run()
             return false;
         }
     }
-
-    // }
 
     cpu->restartFrameTimer();
     while (!cpu->isFrameDone())

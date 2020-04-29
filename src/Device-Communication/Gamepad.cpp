@@ -79,6 +79,11 @@ void GamePad::writeButtonState()
     buttonState = buttonReg;
 }
 
+void GamePad::setPressRegister(const uint8_t btns)
+{
+    buttonReg = btns;
+}
+
 uint8_t GamePad::readStateMSB()
 {
     uint8_t msb = (buttonState & 0x80) != 0x00;

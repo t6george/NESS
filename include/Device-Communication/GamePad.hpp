@@ -14,4 +14,5 @@ public:
     void writeButtonState();
     uint8_t readStateMSB();
     uint8_t readPressReg() const;
+    void setPressRegister(const uint8_t btns);
 };
