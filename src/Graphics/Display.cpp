@@ -9,17 +9,18 @@ Display::Display(const uint16_t width, const uint16_t height, const uint32_t *fb
           SDL_WINDOWPOS_UNDEFINED,
           width * DISPLAY::PixelDim + LEFT_MARGIN + RIGHT_MARGIN,
           height * DISPLAY::PixelDim + TOP_MARGIN + BOT_MARGIN,
-          SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN)},
+          SDL_WINDOW_SHOWN)},
       renderer{SDL_CreateRenderer(
           window, -1,
           SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)},
+      wallpaperTexture{SDL_CreateTextureFromSurface(renderer, IMG_Load("assets/bg.jpg"))},
       texture{SDL_CreateTexture(
           renderer,
           SDL_PIXELFORMAT_ARGB8888,
           SDL_TEXTUREACCESS_STREAMING,
           width,
           height)},
-      controllerTexture{SDL_CreateTextureFromSurface(renderer, IMG_Load("controller.png"))},
+      controllerTexture{SDL_CreateTextureFromSurface(renderer, IMG_Load("assets/controller.png"))},
       menuTexture{nullptr},
       canvas{.x = LEFT_MARGIN, .y = TOP_MARGIN, .w = width * DISPLAY::PixelDim, .h = height * DISPLAY::PixelDim},
       controller{.x = LEFT_MARGIN * 4, .y = canvas.h + TOP_MARGIN * 2, .w = canvas.w - LEFT_MARGIN * 6, .h = static_cast<int>((canvas.w - LEFT_MARGIN * 6) / 2.25)},
@@ -81,8 +82,7 @@ void Display::setActiveButtons(const uint8_t activePress)
 
 void Display::drawButtonPress(const uint8_t buttonI)
 {
-    SDL_Color col = {.r = 0xFF, .g = 0xFF, .b = 0x00, .a = 0xFF};
-    drawCircle(buttonCoords[buttonI], RADIUS, col);
+    drawCircle(buttonCoords[buttonI], RADIUS, {.r = 0xFF, .g = 0xFF, .b = 0x00, .a = 0xFF});
 }
 
 void Display::drawCartridgeSlot()
@@ -122,10 +122,11 @@ void Display::drawCircle(const std::pair<uint16_t, uint16_t> center,
 void Display::blit()
 {
     const uint8_t activePress = p1Controller->readPressReg();
-    SDL_SetRenderDrawColor(renderer, 0x40, 0x00, 0x00, 0xFF);
+    //SDL_SetRenderDrawColor(renderer, 0x40, 0x00, 0x00, 0xFF);
     SDL_UpdateTexture(texture, nullptr, frameBuffer, DISPLAY::Width * sizeof(uint32_t));
     SDL_RenderClear(renderer);
 
+    SDL_RenderCopy(renderer, wallpaperTexture, nullptr, nullptr);
     SDL_RenderCopy(renderer, texture, nullptr, &canvas);
     SDL_RenderCopy(renderer, controllerTexture, nullptr, &controller);
     // drawCartridgeSlot();
