@@ -85,3 +85,8 @@ uint8_t GamePad::readStateMSB()
     buttonState <<= 1;
     return msb;
 }
+
+uint8_t GamePad::readPressReg() const
+{
+    return buttonReg;
+}

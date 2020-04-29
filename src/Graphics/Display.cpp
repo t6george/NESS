@@ -1,8 +1,10 @@
 #include <Display.hpp>
 #include <FileExplorer.hpp>
+#include <GamePad.hpp>
 
-Display::Display(const uint16_t width, const uint16_t height, const uint32_t *fb)
-    : window{SDL_CreateWindow(
+Display::Display(const uint16_t width, const uint16_t height, const uint32_t *fb, std::shared_ptr<GamePad> p1)
+    : p1Controller{p1},
+      window{SDL_CreateWindow(
           "NESS", SDL_WINDOWPOS_UNDEFINED,
           SDL_WINDOWPOS_UNDEFINED,
           width * DISPLAY::PixelDim + LEFT_MARGIN + RIGHT_MARGIN,
@@ -117,8 +119,9 @@ void Display::drawCircle(const std::pair<uint16_t, uint16_t> center,
     }
 }
 
-void Display::blit(const uint8_t activePress)
+void Display::blit()
 {
+    const uint8_t activePress = p1Controller->readPressReg();
     SDL_SetRenderDrawColor(renderer, 0x40, 0x00, 0x00, 0xFF);
     SDL_UpdateTexture(texture, nullptr, frameBuffer, DISPLAY::Width * sizeof(uint32_t));
     SDL_RenderClear(renderer);

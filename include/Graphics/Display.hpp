@@ -16,9 +16,12 @@
 #define RADIUS 10
 
 class FileExplorer;
+class GamePad;
 
 class Display
 {
+    std::shared_ptr<GamePad> p1Controller;
+
 public:
     SDL_Window *window;
     SDL_Renderer *renderer;
@@ -37,10 +40,10 @@ public:
 
     std::array<std::pair<uint16_t, uint16_t>, 0x8> buttonCoords;
 
-    Display(const uint16_t width, const uint16_t height, const uint32_t *fb);
+    Display(const uint16_t width, const uint16_t height, const uint32_t *fb, std::shared_ptr<GamePad> p1);
     ~Display() noexcept;
 
-    void blit(const uint8_t activePress);
+    void blit();
     inline void setActiveButtons(const uint8_t activePress);
 
     inline void drawButtonPress(const uint8_t buttonI);

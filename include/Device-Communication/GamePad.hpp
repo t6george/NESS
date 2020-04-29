@@ -13,4 +13,5 @@ public:
     void registerInputStateChange(const SDL_Event &e);
     void writeButtonState();
     uint8_t readStateMSB();
+    uint8_t readPressReg() const;
 };

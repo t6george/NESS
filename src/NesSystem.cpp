@@ -11,7 +11,8 @@
 
 NesSystem::NesSystem()
     : systemClock{0}, p1Controller{new GamePad{}}, ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu, p1Controller}},
-      screen{new Display{DISPLAY::Width, DISPLAY::Height, ppu->getFrameBuffData()}}, dma_data{0x00}, dma_dummy{true}
+      screen{new Display{DISPLAY::Width, DISPLAY::Height, ppu->getFrameBuffData(), p1Controller}}, dma_data{0x00},
+      dma_dummy{true}
 {
     soundQueue = new Sound_Queue;
     soundQueue->init(96000);
