@@ -8,7 +8,7 @@ INCLUDES := $(shell find include -type d | sed s/^/-I/)
 CPPC := g++
 CPPFLAGS := -std=c++17 -g -Wall -Werror $(INCLUDES)
 
-nes: $(OBJECTS)
+ness: $(OBJECTS)
 	$(CPPC) -o $@ $^ -l SDL2-2.0.0 -lstdc++ -lSDL2_image -lSDL2_ttf $(CPPFLAGS)
 
 %.o: %.cpp

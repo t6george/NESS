@@ -6,6 +6,7 @@
 #include <Instructions.hpp>
 #include <HwConstants.hpp>
 #include <GamePak.hpp>
+#include <GamePad.hpp>
 
 // Nested template syntax can be damaging to the eye - I only want to write it out once :)
 #define GEN_INSTR(name, type, cycles) std::unique_ptr<MOS6502Instruction>(new name<Ricoh2A03::AddressingType::type>(this, cycles))
@@ -171,8 +172,8 @@ void Ricoh2A03::addCartridge(std::shared_ptr<AddressableDevice> cart)
                       cart);
 }
 
-Ricoh2A03::Ricoh2A03(std::shared_ptr<AddressableDevice> ppu)
-    : bus{new Bus{}},
+Ricoh2A03::Ricoh2A03(std::shared_ptr<AddressableDevice> ppu, std::shared_ptr<GamePad> p1)
+    : bus{new Bus{p1}},
       instructions{
           GEN_INSTR(BRK, IMM, 7), GEN_INSTR(ORA, IX, 6),
           GEN_INSTR(NOP, IMP, 2), GEN_INSTR(NOP, IMP, 8),

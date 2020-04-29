@@ -7,10 +7,11 @@
 #include <Display.hpp>
 #include <HwConstants.hpp>
 #include <Apu2A03.hpp>
+#include <GamePad.hpp>
 
 NesSystem::NesSystem()
-    : systemClock{0}, ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu}},
-      screen{new Display{DISPLAY::Width, DISPLAY::Height, ppu->getFrameBuffData()}}
+    : systemClock{0}, p1Controller{new GamePad{}}, ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu, p1Controller}},
+      screen{new Display{DISPLAY::Width, DISPLAY::Height, ppu->getFrameBuffData()}}, dma_data{0x00}, dma_dummy{true}
 {
     soundQueue = new Sound_Queue;
     soundQueue->init(96000);
@@ -110,4 +111,9 @@ void NesSystem::insertCartridge(const std::string &romName)
         asmFile.close();
     }
 #endif
+}
+
+void NesSystem::processGameplayInput(const SDL_Event &event)
+{
+    p1Controller->registerInputStateChange(event);
 }

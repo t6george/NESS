@@ -16,6 +16,7 @@
 class GamePak;
 class AddressableDevice;
 class NesSystem;
+class GamePad;
 
 class Ricoh2A03
 {
@@ -28,7 +29,6 @@ public:
     std::array<std::unique_ptr<MOS6502Instruction>, NUM_OPCODES> instructions;
 
     uint8_t cycles;
-    // uint8_t cpuRam[2048];
 
 public:
     enum Flags6502
@@ -67,7 +67,7 @@ public:
     uint8_t S;
     int remaining;
 
-    Ricoh2A03(std::shared_ptr<AddressableDevice> ppu);
+    Ricoh2A03(std::shared_ptr<AddressableDevice> ppu, std::shared_ptr<GamePad> p1);
     ~Ricoh2A03() = default;
     std::shared_ptr<Apu2A03> apu;
 
