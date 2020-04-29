@@ -12,8 +12,6 @@ class RicohRP2C02;
 class NesSystem;
 class GamePad;
 
-static std::shared_ptr<NesSystem> nes;
-
 class NesSystem
 {
 public:
@@ -40,4 +38,5 @@ public:
     uint64_t getFrameCount() const;
     void newSamples(const blip_sample_t *samples, size_t count);
     void processGameplayInput(const SDL_Event &event);
+    void outputFrame() const;
 };

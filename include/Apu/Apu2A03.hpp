@@ -8,6 +8,8 @@ class NesSystem;
 
 static const int OUT_SIZE = 4096;
 
+extern void newSamples(const blip_sample_t *samples, size_t count);
+
 class Apu2A03
 {
 public:
@@ -16,7 +18,6 @@ public:
     Blip_Buffer buf;
 
     blip_sample_t outBuf[OUT_SIZE];
-    std::shared_ptr<NesSystem> nes;
 
     int (*func)(void *, unsigned int);
     template <bool write>

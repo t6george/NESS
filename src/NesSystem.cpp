@@ -118,3 +118,9 @@ void NesSystem::processGameplayInput(const SDL_Event &event)
 {
     p1Controller->registerInputStateChange(event);
 }
+
+void NesSystem::outputFrame() const
+{
+    cpu->processFrameAudio();
+    screen->blit();
+}

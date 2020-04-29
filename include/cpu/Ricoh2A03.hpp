@@ -5,18 +5,16 @@
 
 #include <Bus.hpp>
 #include <MOS6502Instruction.hpp>
-// #include <Nes_Apu.h>
-#include <Apu2A03.hpp>
 
 #define STACK_BASE 0x0100
 #define NUM_OPCODES 0x100
 #define FRAME_TICKS 29781
-// #define DUMP
 
 class GamePak;
 class AddressableDevice;
 class NesSystem;
 class GamePad;
+class Apu2A03;
 
 class Ricoh2A03
 {
@@ -67,9 +65,14 @@ public:
     uint8_t S;
     int remaining;
 
+    uint8_t dma_page;
+    uint8_t dma_addr;
+    bool dma_transfer;
+
+    std::shared_ptr<Apu2A03> apu;
+
     Ricoh2A03(std::shared_ptr<AddressableDevice> ppu, std::shared_ptr<GamePad> p1);
     ~Ricoh2A03() = default;
-    std::shared_ptr<Apu2A03> apu;
 
     uint8_t read(uint16_t addr, bool zpageMode = false);
     uint16_t readDoubleWord(uint16_t addr, bool zpageMode = false);
@@ -93,11 +96,9 @@ public:
     uint8_t branch(uint16_t absoluteAddress, bool cond);
     void addCartridge(std::shared_ptr<AddressableDevice> cart);
 
-    uint8_t dma_page = 0x00;
-    uint8_t dma_addr = 0x00;
-    bool dma_transfer = false;
-
     uint16_t elapsed() const;
+
+    void processFrameAudio() const;
 
     friend class NesSystem;
 };

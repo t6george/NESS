@@ -2,17 +2,11 @@
 #include <cstdint>
 #include <string>
 #include <iostream>
-#include <stdio.h>
-#include <RicohRP2C02.hpp>
-#include <Apu2A03.hpp>
 
 #include <SDL2/SDL.h>
 #include <NesSystem.hpp>
 
-int dmcRead(void *, unsigned int addr)
-{
-    return nes->cpu->read(addr);
-}
+static std::shared_ptr<NesSystem> nes;
 
 enum emuState
 {
@@ -21,16 +15,16 @@ enum emuState
     PLAY_TAS,
 };
 
+void newSamples(const blip_sample_t *samples, size_t count)
+{
+    nes->newSamples(samples, count);
+}
+
 int main(int argc, char *argv[])
 {
     if (argc == 2)
     {
         nes.reset(new NesSystem());
-        Apu2A03 *apu = new Apu2A03;
-
-        apu->func = dmcRead;
-        apu->nes.reset(nes.get());
-        nes->cpu->apu.reset(apu);
         nes->insertCartridge(argv[1]);
 
         // std::ofstream outputFile("test1.tas");
@@ -183,8 +177,7 @@ int main(int argc, char *argv[])
             nes->cpu->remaining += FRAME_TICKS;
             while (nes->cpu->remaining > 0)
                 nes->tick();
-            apu->run_frame(nes->cpu->elapsed());
-            nes->screen->blit();
+            nes->outputFrame();
 
             frameTime = SDL_GetTicks() - frameStart;
             if (frameTime < DELAY)

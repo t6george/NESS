@@ -1,7 +1,4 @@
 #include <Apu2A03.hpp>
-#include <Ricoh2A03.hpp>
-#include <NesSystem.hpp>
-#include <stdio.h>
 
 Apu2A03::Apu2A03()
 {
@@ -31,5 +28,5 @@ void Apu2A03::run_frame(int elapsed)
     buf.end_frame(elapsed);
 
     if (buf.samples_avail() >= OUT_SIZE)
-        nes->newSamples(outBuf, buf.read_samples(outBuf, OUT_SIZE));
+        newSamples(outBuf, buf.read_samples(outBuf, OUT_SIZE));
 }

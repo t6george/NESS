@@ -18,4 +18,4 @@ ness: $(OBJECTS)
 
 clean:
 	find . -type f -name '*.o' -delete
-	rm nes
+	rm ness

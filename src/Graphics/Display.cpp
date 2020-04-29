@@ -122,12 +122,14 @@ void Display::drawCircle(const std::pair<uint16_t, uint16_t> center,
 void Display::blit()
 {
     const uint8_t activePress = p1Controller->readPressReg();
-    //SDL_SetRenderDrawColor(renderer, 0x40, 0x00, 0x00, 0xFF);
+
     SDL_UpdateTexture(texture, nullptr, frameBuffer, DISPLAY::Width * sizeof(uint32_t));
     SDL_RenderClear(renderer);
 
     SDL_RenderCopy(renderer, wallpaperTexture, nullptr, nullptr);
+
     SDL_RenderCopy(renderer, texture, nullptr, &canvas);
+
     SDL_RenderCopy(renderer, controllerTexture, nullptr, &controller);
     // drawCartridgeSlot();
 

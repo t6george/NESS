@@ -7,11 +7,12 @@
 #include <HwConstants.hpp>
 #include <GamePak.hpp>
 #include <GamePad.hpp>
+#include <Apu2A03.hpp>
 
 // Nested template syntax can be damaging to the eye - I only want to write it out once :)
 #define GEN_INSTR(name, type, cycles) std::unique_ptr<MOS6502Instruction>(new name<Ricoh2A03::AddressingType::type>(this, cycles))
 
-uint16_t Ricoh2A03::elapsed() const
+inline uint16_t Ricoh2A03::elapsed() const
 {
     return FRAME_TICKS - remaining;
 }
@@ -317,7 +318,9 @@ Ricoh2A03::Ricoh2A03(std::shared_ptr<AddressableDevice> ppu, std::shared_ptr<Gam
           GEN_INSTR(SED, IMP, 2), GEN_INSTR(SBC, ABY, 4),
           GEN_INSTR(NOP, IMP, 2), GEN_INSTR(NOP, IMP, 7),
           GEN_INSTR(NOP, IMP, 4), GEN_INSTR(SBC, ABX, 4),
-          GEN_INSTR(INC, ABX, 7), GEN_INSTR(INC, IMP, 7)}
+          GEN_INSTR(INC, ABX, 7), GEN_INSTR(INC, IMP, 7)},
+      dma_page{0x00}, dma_addr{0x00}, dma_transfer{false},
+      apu{new Apu2A03()}
 {
     ram.reset(new Ram(CPU::RAM::Size));
     Ppu = ppu;
@@ -330,4 +333,9 @@ Ricoh2A03::Ricoh2A03(std::shared_ptr<AddressableDevice> ppu, std::shared_ptr<Gam
                       CPU::PPU::Limit,
                       CPU::PPU::Mirror,
                       ppu);
+}
+
+void Ricoh2A03::processFrameAudio() const
+{
+    apu->run_frame(elapsed());
 }
