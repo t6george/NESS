@@ -15,6 +15,14 @@ class GamePad;
 class NesSystem
 {
 public:
+    enum EmuState
+    {
+        PLAY,
+        RECORD_TAS,
+        PLAY_TAS,
+    };
+
+private:
     uint32_t systemClock;
     std::shared_ptr<GamePad> p1Controller;
 
@@ -30,11 +38,13 @@ public:
 
     const uint32_t fps, delay;
     double delayMultiplier;
+    EmuState state;
+
     uint32_t frameStart, frameTime;
     SDL_Event e;
 
 public:
-    NesSystem();
+    NesSystem(EmuState state);
     ~NesSystem() = default;
 
     void tick();

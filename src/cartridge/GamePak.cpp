@@ -1,5 +1,7 @@
 #include <fstream>
 #include <cassert>
+#include <iostream>
+#include <stdexcept>
 
 #include <GamePak.hpp>
 #include <Mapper000.hpp>
@@ -13,11 +15,17 @@ GamePak::GamePak(const std::string &fname) : mem{PRG}
 void GamePak::parseFile(const std::string &fname)
 {
     std::ifstream in;
-    in.open(fname, std::ifstream::binary);
 
-    if (in.is_open())
+    try
     {
+        in.open(fname, std::ifstream::binary);
         in.read((char *)&header, sizeof(GameHeader));
+
+        // Validate NES ROM Checksum
+        if (header.name[0] != 'N' || header.name[1] != 'E' || header.name[2] != 'S' || header.name[3] != 0x1A)
+        {
+            throw std::ifstream::failure("Invalid ROM:\nCheck https://github.com/t6george/NESS for supported mappers/games.");
+        }
 
         if (header.mapper1 & 0x04)
             in.seekg(0x200, std::ios_base::cur);
@@ -44,15 +52,17 @@ void GamePak::parseFile(const std::string &fname)
             break;
         default:
             // Unsupported Mapper Type
-            assert(false);
+            throw std::ifstream::failure("Unsupported ROM:\nCheck https://github.com/t6george/NESS for supported mappers/games.");
             break;
         }
 
         in.close();
     }
-    else
+    catch (const std::ifstream::failure &e)
     {
-        assert(false);
+        std::cerr << e.what() << std::endl;
+        in.close();
+        exit(0);
     }
 }
 

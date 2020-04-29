@@ -1,16 +1,10 @@
 #include <memory>
 #include <string>
 #include <iostream>
+#include <stdexcept>
 #include <NesSystem.hpp>
 
 static std::shared_ptr<NesSystem> nes;
-
-enum emuState
-{
-    PLAY,
-    RECORD_TAS,
-    PLAY_TAS,
-};
 
 void newSamples(const blip_sample_t *samples, size_t count)
 {
@@ -19,23 +13,40 @@ void newSamples(const blip_sample_t *samples, size_t count)
 
 int main(int argc, char *argv[])
 {
-    if (argc == 2)
+    const std::string usageMsg = "The usage is:\nness <play | recordtas | playtas> <PATH_TO_ROM>";
+    std::string romPath;
+    try
     {
-        nes.reset(new NesSystem());
-        nes->insertCartridge(argv[1]);
+        if (argc != 3)
+        {
+            throw std::invalid_argument(usageMsg);
+        }
+        else if (strcmp(argv[1], "play"))
+        {
+            nes.reset(new NesSystem(NesSystem::PLAY));
+            romPath = argv[2];
+        }
+        else if (strcmp(argv[1], "recordtas"))
+        {
+            nes.reset(new NesSystem(NesSystem::RECORD_TAS));
+        }
+        else if (strcmp(argv[1], "playtas"))
+        {
+            nes.reset(new NesSystem(NesSystem::PLAY_TAS));
+        }
+        else
+        {
+            throw std::invalid_argument(usageMsg);
+        }
 
-        // std::ofstream outputFile("test1.tas");
-        // std::ifstream inputFile("test2.tas");
-
-        // enum emuState state = PLAY;
-        // bool done = false;
+        nes->insertCartridge(romPath);
 
         while (nes->run())
             ;
     }
-    else
+    catch (const std::invalid_argument &e)
     {
-        std::cerr << "Invalid Execution: Must specify a relative path to a NES ROM binary." << std::endl;
+        std::cerr << "Invalid Execution Commands - " << e.what() << std::endl;
     }
 
     return 0;

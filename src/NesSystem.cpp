@@ -9,10 +9,11 @@
 #include <Apu2A03.hpp>
 #include <GamePad.hpp>
 
-NesSystem::NesSystem()
+NesSystem::NesSystem(EmuState state)
     : systemClock{0}, p1Controller{new GamePad{}}, ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu, p1Controller}},
       screen{new Display{DISPLAY::Width, DISPLAY::Height, ppu->getFrameBuffData(), p1Controller}},
-      soundQueue{new Sound_Queue()}, dma_data{0x00}, dma_dummy{true}, fps{60}, delay{1000 / fps}, delayMultiplier{1.0}
+      soundQueue{new Sound_Queue()}, dma_data{0x00}, dma_dummy{true}, fps{60}, delay{1000 / fps},
+      delayMultiplier{1.0}, state{state}
 {
     soundQueue->init(96000);
 }
@@ -32,14 +33,14 @@ void NesSystem::tick()
         {
             if (dma_dummy)
             {
-                if (systemClock % 2 == 1)
+                if ((systemClock & 0x1) == 1)
                 {
                     dma_dummy = false;
                 }
             }
             else
             {
-                if (systemClock % 2 == 0)
+                if ((systemClock & 0x1) == 0)
                 {
                     dma_data = cpu->read(cpu->dma_page << 8 | cpu->dma_addr);
                 }
@@ -246,13 +247,24 @@ bool NesSystem::run()
 
     while (SDL_PollEvent(&e))
     {
-        if (e.type == SDL_QUIT)
+        if (e.type != SDL_QUIT)
         {
-            return false;
+            switch (state)
+            {
+            case PLAY:
+                processGameplayInput(e);
+                break;
+            case RECORD_TAS:
+                break;
+            case PLAY_TAS:
+                break;
+            default:
+                break;
+            }
         }
         else
         {
-            processGameplayInput(e);
+            return false;
         }
     }
 
