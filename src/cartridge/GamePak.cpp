@@ -28,7 +28,9 @@ void GamePak::parseFile(const std::string &fname)
         }
 
         if (header.mapper1 & 0x04)
+        {
             in.seekg(0x200, std::ios_base::cur);
+        }
 
         uint8_t mapperNum = (header.mapper2 & 0xFFF0) | (header.mapper1 >> 0x4);
         mMode = (header.mapper1 & 0x01) ? VERTICAL : HORIZONTAL;

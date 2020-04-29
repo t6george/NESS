@@ -14,23 +14,23 @@ void newSamples(const blip_sample_t *samples, size_t count)
 int main(int argc, char *argv[])
 {
     const std::string usageMsg = "The usage is:\nness <play | recordtas | playtas> <PATH_TO_ROM>";
-    std::string romPath;
+
     try
     {
         if (argc != 3)
         {
             throw std::invalid_argument(usageMsg);
         }
-        else if (strcmp(argv[1], "play"))
+        else if (!strcmp(argv[1], "play"))
         {
             nes.reset(new NesSystem(NesSystem::PLAY));
-            romPath = argv[2];
+            nes->insertCartridge(argv[2]);
         }
-        else if (strcmp(argv[1], "recordtas"))
+        else if (!strcmp(argv[1], "recordtas"))
         {
             nes.reset(new NesSystem(NesSystem::RECORD_TAS));
         }
-        else if (strcmp(argv[1], "playtas"))
+        else if (!strcmp(argv[1], "playtas"))
         {
             nes.reset(new NesSystem(NesSystem::PLAY_TAS));
         }
@@ -38,8 +38,6 @@ int main(int argc, char *argv[])
         {
             throw std::invalid_argument(usageMsg);
         }
-
-        nes->insertCartridge(romPath);
 
         while (nes->run())
             ;
