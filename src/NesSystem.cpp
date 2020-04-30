@@ -13,9 +13,13 @@ NesSystem::NesSystem(EmuState state, std::string outputPath)
     : systemClock{0}, p1Controller{new GamePad{}}, ppu{new RicohRP2C02{}}, cpu{new Ricoh2A03{ppu, p1Controller}},
       screen{new Display{DISPLAY::Width, DISPLAY::Height, ppu->getFrameBuffData(), p1Controller}},
       soundQueue{new Sound_Queue()}, dma_data{0x00}, dma_dummy{true}, fps{60}, delay{1000 / fps},
-      delayMultiplier{1.0}, state{state}, commandI{0}, scriptOutputPath{outputPath + ".tas"}
+      delayMultiplier{1.0}, state{state}, commandI{0}, scriptPath{outputPath}
 {
     soundQueue->init(96000);
+    if (state == PLAY_TAS)
+    {
+        parseTasScript();
+    }
 }
 
 NesSystem::~NesSystem() noexcept
@@ -24,7 +28,7 @@ NesSystem::~NesSystem() noexcept
     {
         std::ofstream out;
 
-        out.open(scriptOutputPath, std::ofstream::binary);
+        out.open(scriptPath, std::ofstream::binary);
         for (size_t i = 0; i < commands.size(); ++i)
         {
             out << commands[i];
@@ -95,7 +99,7 @@ void NesSystem::reset()
     systemClock = 0;
 }
 
-void NesSystem::parseTasScript(const std::string &scriptPath)
+void NesSystem::parseTasScript()
 {
     std::ifstream in;
     uint8_t frameInput;
@@ -160,10 +164,7 @@ void NesSystem::saveGameplayInput()
 
 void NesSystem::outputFrame() const
 {
-    if (state != RECORD_TAS)
-    {
-        cpu->processFrameAudio();
-    }
+    cpu->processFrameAudio();
     screen->blit();
 }
 

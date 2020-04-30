@@ -43,9 +43,10 @@ private:
 
     uint32_t frameStart, frameTime, commandI;
     SDL_Event e;
-    const std::string scriptOutputPath;
+    const std::string scriptPath;
 
     std::vector<uint8_t> commands;
+    void parseTasScript();
 
 public:
     NesSystem(EmuState state, std::string outputPath = "");
@@ -60,6 +61,5 @@ public:
     void setGameplayInput(const uint8_t btns);
     void outputFrame() const;
     bool run();
-    void parseTasScript(const std::string &scriptPath);
     void saveGameplayInput();
 };
