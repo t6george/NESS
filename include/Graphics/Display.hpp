@@ -22,6 +22,12 @@ class Display
 {
     std::shared_ptr<GamePad> p1Controller;
 
+    inline void drawButtonPress(const uint8_t buttonI);
+    inline void drawCartridgeSlot();
+
+    inline void drawCircle(const std::pair<uint16_t, uint16_t> center,
+                           const uint16_t radius, const SDL_Color &col);
+
 public:
     SDL_Window *window;
     SDL_Renderer *renderer;
@@ -45,11 +51,5 @@ public:
     ~Display() noexcept;
 
     void blit();
-    inline void setActiveButtons(const uint8_t activePress);
-
-    inline void drawButtonPress(const uint8_t buttonI);
-    inline void drawCartridgeSlot();
-
-    inline void drawCircle(const std::pair<uint16_t, uint16_t> center,
-                           const uint16_t radius, const SDL_Color &col);
+    void setActiveButtons(const uint8_t activePress);
 };

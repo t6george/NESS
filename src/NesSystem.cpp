@@ -1,4 +1,5 @@
 #include <fstream>
+#include <iostream>
 
 #include <NesSystem.hpp>
 #include <Ricoh2A03.hpp>
@@ -31,7 +32,7 @@ NesSystem::~NesSystem() noexcept
         out.open(scriptPath, std::ofstream::binary);
         for (size_t i = 0; i < commands.size(); ++i)
         {
-            out << commands[i];
+            out << commands[i] << std::endl;
         }
         out.close();
     }
@@ -171,41 +172,47 @@ void NesSystem::outputFrame() const
 bool NesSystem::run()
 {
     frameStart = SDL_GetTicks();
-
-    while (SDL_PollEvent(&e))
+    if (state != PLAY_TAS)
     {
-        if (e.type != SDL_QUIT)
+        while (SDL_PollEvent(&e))
         {
-            switch (state)
+            if (e.type != SDL_QUIT)
             {
-            case PLAY:
-                processGameplayInput(e);
-                break;
-            case RECORD_TAS:
-                while (SDL_PollEvent(&e) && (e.type != SDL_KEYDOWN || e.key.keysym.sym != SDLK_KP_ENTER))
+                switch (state)
                 {
-                    if (e.type == SDL_QUIT)
-                    {
-                        return false;
-                    }
+                case PLAY:
                     processGameplayInput(e);
+                    break;
+                case RECORD_TAS:
+                    do
+                    {
+                        if (e.type == SDL_QUIT)
+                        {
+                            return false;
+                        }
+                        processGameplayInput(e);
+                        SDL_PollEvent(&e);
+                    } while ((e.type != SDL_KEYDOWN || e.key.keysym.sym != SDLK_RETURN));
+                    saveGameplayInput();
+                    break;
+                default:
+                    break;
                 }
-                saveGameplayInput();
-                break;
-            case PLAY_TAS:
-                if (commandI < commands.size())
-                {
-                    setGameplayInput(commands[commandI++]);
-                }
-                break;
-            default:
-                break;
+            }
+            else
+            {
+                return false;
             }
         }
-        else
-        {
-            return false;
-        }
+    }
+    else if (state == PLAY_TAS && commandI < commands.size())
+    {
+        SDL_PollEvent(&e);
+        setGameplayInput(commands[commandI++]);
+    }
+    else
+    {
+        return false;
     }
 
     cpu->restartFrameTimer();

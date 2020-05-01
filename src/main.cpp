@@ -29,9 +29,9 @@ int main(int argc, char *argv[])
         }
         else
         {
-            throw std::invalid_argument("Usage:\n\\
-            To play a ROM: ./ness play <PATH_TO_ROM>\n\\
-            To record a TAS: ./ness maketas <PATH_TO_ROM> <DESTINATION_PATH_FOR_TAS_SCRIPT>\n\\
+            throw std::invalid_argument("Usage:\n \
+            To play a ROM: ./ness play <PATH_TO_ROM>\n \
+            To record a TAS: ./ness maketas <PATH_TO_ROM> <DESTINATION_PATH_FOR_TAS_SCRIPT>\n \
             To replay a TAS: ./ness playtas <PATH_TO_ROM> <PATH_TO_TAS_SCRIPT>\n");
         }
 

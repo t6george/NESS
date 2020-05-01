@@ -1,4 +1,5 @@
 #include <GamePad.hpp>
+#include <iostream>
 
 GamePad::GamePad() : buttonReg{0x00}, buttonState{0x00} {}
 
@@ -82,6 +83,7 @@ void GamePad::writeButtonState()
 void GamePad::setPressRegister(const uint8_t btns)
 {
     buttonReg = btns;
+    std::cerr << std::hex << ((int)buttonReg) << std::endl;
 }
 
 uint8_t GamePad::readStateMSB()
