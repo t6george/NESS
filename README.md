@@ -2,7 +2,7 @@
   <img width="120" height="80" src="https://user-images.githubusercontent.com/31244240/72781082-763a2a00-3bee-11ea-902f-9963f2a764fb.png">
 </p>
 
-# NES++ - NES Emulator + Automated Speedrunner
+# NES++, a NES Emulator + Automated Speedrunner
 
 For the past couple of months, I have been working on a really exciting project. Although the [Ninendo Entertainment System](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) was 
 released in North America 14 years before I was born, I still enjoyed the multitude of games that I played on various NES emulators. It was about time I wrote my own!
