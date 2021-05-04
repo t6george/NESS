@@ -2,7 +2,7 @@
   <img width="120" height="80" src="https://user-images.githubusercontent.com/31244240/72781082-763a2a00-3bee-11ea-902f-9963f2a764fb.png">
 </p>
 
-# NES++, a NES Emulator + Automated Speedrunner
+# NESS, a NES Emulator + Automated Speedrunner
 
 For the past couple of months, I have been working on a really exciting project. Although the [Ninendo Entertainment System](https://en.wikipedia.org/wiki/Nintendo_Entertainment_System) was 
 released in North America 14 years before I was born, I still enjoyed the multitude of games that I played on various NES emulators. It was about time I wrote my own!
@@ -36,7 +36,7 @@ Keyboard X - (Select)
 Arrow Keys - (D-Pad)
 ```
 ## The Name
-I didn't want this to just be another NES emulator ;) so I just titled it after my favorite programming language (and the one I used to build this project), C++. Also, NES++ more than just an emulator - it is a competitive gaming environment for retro enthusiasts!
+I didn't want this to just be another NES emulator ;) so I just titled it after my favorite programming language (and the one I used to build this project), C++. Also, NESS more than just an emulator - it is a competitive gaming environment for retro enthusiasts!
 
 My journey in emulation began in Summer 2018, when I built a [Chip8 Interpreter](https://github.com/t6george/Chip8Emulator), but my interests in retro tech began in my pre-teen years. At this point, I may as well get started on a Super Nintendo Emulator. However, the 8-bit NES proved to be quite a challenging project - 
 I can only imagine the hardware quirks, volume of instructions, and graphical rendering that goes behind the 16-bit SNES. Before I embark on
